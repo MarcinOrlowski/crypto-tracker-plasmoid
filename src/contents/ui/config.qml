@@ -32,7 +32,6 @@ Kirigami.FormLayout {
 
 	function getCryptos(exchange) {
 		var cryptoModel = []
-		console.debug(`exchange: '${exchange}'`)
 		for(const key in Crypto.exchanges[exchange]['pairs']) {
 			cryptoModel.push({'value': key, 'text': Crypto.getCryptoName(key)})
 		}
@@ -40,7 +39,6 @@ Kirigami.FormLayout {
 	}
 	function getFiats(exchange, crypto) {
 		var currencyModel = []
-		console.debug(`exchange: '${exchange}', crypto: '${crypto}'`)
 		for(const key in Crypto.exchanges[exchange]['pairs'][crypto]) {
 			currencyModel.push({'value': key, 'text': Crypto.getCurrencyName(key)})
 		}
@@ -49,10 +47,8 @@ Kirigami.FormLayout {
 
 	// ------------------------------------------------------------------------------------------------------------------------
 
-	onExchangeChanged: {
-		cryptoComboBox.model = getCryptos(crypto)
-		fiatComboBox.model = currencyModel(exchange, crypto)
-	}
+	onExchangeChanged: cryptoComboBox.model = getCryptos(exchange)
+	onCryptoChanged: fiatComboBox.model = getFiats(exchange, crypto)
 
 	// ------------------------------------------------------------------------------------------------------------------------
 
@@ -78,7 +74,6 @@ Kirigami.FormLayout {
 			}
 			model = tmp
 			if (typeof currentIdx !== 'undefined') currentIndex = currentIdx
-			console.debug('exchangeCombo: ' + JSON.stringify(tmp))
 		}
 		onCurrentIndexChanged: exchange = model[currentIndex]['value']
 	}
@@ -109,7 +104,6 @@ Kirigami.FormLayout {
 				}
 				model = tmp
 				if (typeof currentIdx !== 'undefined') currentIndex = currentIdx
-				console.debug('cryptoCombo: ' + JSON.stringify(tmp))
 			}
 		}
 		onCurrentIndexChanged: crypto = model[currentIndex]['value']
@@ -142,7 +136,6 @@ Kirigami.FormLayout {
 				}
 				model = tmp
 				if (typeof currentIdx !== 'undefined') currentIndex = currentIdx
-				console.debug('fiatCombo: ' + JSON.stringify(tmp))
 			}
 		}
 		onCurrentIndexChanged: fiat = model[currentIndex]['value']

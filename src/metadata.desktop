@@ -11,7 +11,7 @@ X-KDE-PluginInfo-Author=Marcin Orlowski
 # Artificial fields
 X-KDE-PluginInfo-Author-Url=http://marcinorlowski.com/
 X-KDE-PluginInfo-UpdateChecker-Url=https://raw.githubusercontent.com/MarcinOrlowski/crypto-tracker-plasmoid/master/src/metadata.desktop
-X-KDE-PluginInfo-FirstReleaseYear=2020
+X-KDE-PluginInfo-FirstReleaseYear=2021
 
 X-KDE-PluginInfo-Email=
 X-KDE-PluginInfo-License=MIT

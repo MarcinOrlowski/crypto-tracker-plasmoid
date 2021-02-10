@@ -18,11 +18,11 @@ import "../js/crypto.js" as Crypto
 Kirigami.FormLayout {
 	Layout.fillWidth: true
 
-	property alias cfg_exchange0: exchangeId.text
-	property alias cfg_crypto0: cryptoId.text
-	property alias cfg_fiat0: fiatId.text
-	property alias cfg_refreshRate0: refreshRate.value
-	property alias cfg_hidePriceDecimals0: hidePriceDecimals.checked
+	property alias cfg_exchange1: exchangeId.text
+	property alias cfg_crypto1: cryptoId.text
+	property alias cfg_fiat1: fiatId.text
+	property alias cfg_refreshRate1: refreshRate.value
+	property alias cfg_hidePriceDecimals1: hidePriceDecimals.checked
 
 	property string exchange: cfg_exchange0
 	property string crypto: cfg_crypto0
@@ -123,7 +123,7 @@ Kirigami.FormLayout {
 		textRole: "text"
 		model: []
 		Component.onCompleted: {
-			if (exchanges in Crypto.exchanges && crypto in Crypto.exchanges[exchange]['pairs']) {
+			if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {
 				var tmp = []
 				var idx = 0
 				var currentIdx = undefined

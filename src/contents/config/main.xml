@@ -23,7 +23,7 @@
 		</entry>
 	</group>
 
-	<group name="Exchange">
+	<group name="Exchange0">
 		<entry name="exchange0" type="String">
 			<default>bitstamp</default>
 		</entry>
@@ -37,6 +37,24 @@
 			<default>5</default>
 		</entry>
 		<entry name="hidePriceDecimals0" type="Bool">
+			<default>false</default>
+		</entry>
+	</group>
+
+	<group name="Exchange1">
+		<entry name="exchange1" type="String">
+			<default>bitstamp</default>
+		</entry>
+		<entry name="crypto1" type="String">
+			<default>BTC</default>
+		</entry>
+		<entry name="fiat1" type="String">
+			<default>USD</default>
+		</entry>
+		<entry name="refreshRate1" type="Int">
+			<default>5</default>
+		</entry>
+		<entry name="hidePriceDecimals1" type="Bool">
 			<default>false</default>
 		</entry>
 	</group>

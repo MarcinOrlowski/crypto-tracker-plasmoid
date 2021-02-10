@@ -12,19 +12,18 @@ import "../js/crypto.js" as Crypto
 
 ColumnLayout {
 	Ticker {
-		exchange: 'bitstamp'
-		crypto: Crypto.BTC
-		fiat: 'USD'
-		refreshRate: plasmoid.configuration.refreshRate
-		noDecimals: true
+		exchange: plasmoid.configuration.exchange0
+		crypto: plasmoid.configuration.crypto0
+		fiat: plasmoid.configuration.fiat0
+		refreshRate: plasmoid.configuration.refreshRate0
+		noDecimals: plasmoid.configuration.hidePriceDecimals0
 	}
 
 	Ticker {
-		exchange: 'bitbay'
-		crypto: Crypto.BTC
-		fiat: 'PLN'
-		localeToUse: 'pl'
-		refreshRate: plasmoid.configuration.refreshRate
-		noDecimals: true
+		exchange: plasmoid.configuration.exchange1
+		crypto: plasmoid.configuration.crypto1
+		fiat: plasmoid.configuration.fiat1
+		refreshRate: plasmoid.configuration.refreshRate1
+		noDecimals: plasmoid.configuration.hidePriceDecimals1
 	}
 }

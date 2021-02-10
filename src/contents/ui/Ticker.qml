@@ -118,7 +118,7 @@ RowLayout {
 
     // --------------------------------------------------------------------------------------------
 
-    function getRateText() {
+    function formatRateText() {
         if (typeof currentRate === 'undefined') return '---'
 
         var localeToUse = tickerRoot.localeToUse
@@ -182,7 +182,7 @@ RowLayout {
         minimumPixelSize: 8
         // font.pixelSize: 12			
         // text: 'N/A'
-        text: getRateText()
+        text: formatRateText()
     }
 
     // --------------------------------------------------------------------------------------------
@@ -222,6 +222,10 @@ RowLayout {
 
         var exchange = tickerRoot.exchange
         var fiat = tickerRoot.fiat
+
+        console.debug(`fetchRate: ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
+
+
         Crypto.downloadExchangeRate(exchange, crypto, fiat, function(rate) {
             var now = new Date()
             lastUpdateMillis = now.getTime()

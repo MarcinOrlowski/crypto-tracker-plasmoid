@@ -45,7 +45,8 @@ RowLayout {
 
     // --------------------------------------------------------------------------------------------
 
-    readonly property var trendingThreshold: 60 * 60 * 1000	// 1 hour
+	readonly property var trendingThreshold: 60 * 60 * 1000	// 1 hour
+/*
 	PlasmaCore.DataSource {
 		id: timeDataSource
 		engine: "time"
@@ -54,27 +55,38 @@ RowLayout {
 		intervalAlignment: PlasmaCore.Types.AlignToHour
 		onNewData: updateTrending()
 	}
+*/
 
-    property var lastTrendingUpdateStamp: 0
-    property var lastTrendingRate: 0
-    property int trendingDirection: 0        // -1, 0, 1
-    property bool trendingAvailable: false
-    function updateTrending() {
-        var now = new Date()
-        if (lastTrendingRate == 0 || ((now.getTime() - lastTrendingUpdateStamp) < (trendingThreshold))) return
+	property var lastTrendingUpdateStamp: 0
+	property var lastTrendingRate: 0
+	property int trendingDirection: undefined		// -1, 0, 1
+	function updateTrending(rate) {
+		var now = new Date()
 
-        if (currentRate > lastTrendingRate) {
-            trendingDirection = 1
-        } else if (currentRate < lastTrendingRate) {
-            trendingDirection = -1
-        } else {
-            trendingDirection = 0
-        }
+		// one hour
+		var updateRate = false
+		if (lastTrendingUpdateStamp != 0) {
+			if ((now.getTime() - lastTrendingUpdateStamp) >= (trendingThreshold)) {
+				if (rate > lastTrendingRate) {
+					trendingDirection = 1
+				} else if (currentRate < lastTrendingRate) {
+					trendingDirection = -1
+				} else {
+					trendingDirection = 0
+				}
 
-console.debug('updateTrending() direction: ' + trendingDirection)
+				updateRate = true
 
-        trendingAvailable = true
-    }
+				console.debug('updateTrending() direction: ' + trendingDirection)
+			}
+		}
+
+		if (lastTrendingUpdateStamp == 0 || updateRate) {
+			lastTrendingUpdateStamp = now.getTime()
+			lastTrendingRate = rate
+		}
+
+	}
 
     // --------------------------------------------------------------------------------------------
 
@@ -121,7 +133,7 @@ console.debug('updateTrending() direction: ' + trendingDirection)
 
         // https://unicode-table.com/en/sets/arrow-symbols/
         // 1 hrs trending direction
-        if (trendingAvailable && trendingDirection !== 0) {
+        if (typeof trendingDirection != 'undefined' && trendingDirection !== 0) {
             // ↑ Upwards Arrow U+2191
             rateText += `<span style="color: ${color};">`
             if (trendingDirection == +1) rateText += '↑'
@@ -225,12 +237,7 @@ console.debug('updateTrending() direction: ' + trendingDirection)
             }
             rateDirectionChanged = (lastRateChangeDirection !== rateChangeDirection)
 
-            // one hour
-            if (lastTrendingUpdateStamp == 0 || ((now.getTime() - lastTrendingUpdateStamp) >= (trendingThreshold))) {
-                console.debug('update trending stuff')
-                lastTrendingUpdateStamp = now.getTime()
-                lastTrendingRate = currentRate
-            }
+			updateTrending(currentRate)
 
             updateInProgress = false
         });

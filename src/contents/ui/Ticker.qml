@@ -15,7 +15,7 @@ import org.kde.plasma.components 3.0 as PlasmaComponents
 // import org.kde.plasma.plasmoid 2.0
 // import "../js/DateTimeFormatter.js" as DTF
 // import "../js/meta.js" as Meta
-import "../js/crypt.js" as Crypt
+import "../js/crypto.js" as Crypto
 
 RowLayout {
     id: tickerRoot
@@ -23,8 +23,9 @@ RowLayout {
     property string crypto: 'BTC'       // cryptocurrency code to use
     property string exchange: 'bitstamp'
     property string currency: 'PLN'
-    property string localeToUse: ''
-    property int refreshRate: 5
+    property string localeToUse: plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
+    
+    property int refreshRate: plasmoid.configuration.refreshRate
     property bool noDecimals: false
     property string colorUp: "#00ff00"
     property string colorDown: "#ff0000"
@@ -50,7 +51,7 @@ RowLayout {
 
         var exchange = tickerRoot.exchange
         var currency = tickerRoot.currency
-        Crypto.getRate(exchange, currency, function(rate) {
+        Crypto.getRate(exchange, function(rate) {
             var now = new Date()
             lastUpdateMillis = now.getTime()
 
@@ -134,7 +135,8 @@ RowLayout {
                 rateText += '</span> '
             }
 
-            var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.currencySymbols[currency])
+            // var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.currencySymbols[currency])
+            var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.currencySymbols[Crypto.exchanges[exchange]['currency']])
             if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
             rateText += `<span>${tmp}</span>`
 

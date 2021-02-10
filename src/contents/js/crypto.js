@@ -17,101 +17,87 @@ var currencySymbols = {
 	'JPY': '¥',					// Japanese Yen
 	'KRW': '₩',					// South Korean Won
 	'PLN': 'zł',				// Polish Zloty
-	'USD': '$',					// US Dollar
-};
+	'USD': '$'					// US Dollar
+}
 
-var sources = [
-	{
-		id: 'bitbay',
+var exchanges = {
+	'bitbay': {
 		name: 'BitBay ',
 		url: 'https://bitbay.net/API/Public/BTCPLN/ticker.json',
 		homepage: 'https://bitbay.net',
 		currency: 'PLN',
-		getRate: function(data) {
-			return data.ask;
+		getRateFromExchangeData: function(data) {
+			return data.ask
 		}
 	},
-	{
-		id: 'bitstamp',
+	'bitstamp': {
 		name: 'BitStamp.com',
 		url: 'https://www.bitstamp.net/api/ticker',
 		homepage: 'https://www.bitstamp.net/',
 		currency: 'USD',
-		getRate: function(data) {
-			return data.ask;
+		getRateFromExchangeData: function(data) {
+			return data.ask
 		}
 	},
-	{
-		id: 'kraken',
+	'kraken': {
 		name: 'Kraken',
 		url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD',
 		homepage: 'https://www.kraken.com',
 		currency: 'USD',
-		getRate: function(data) {
-			return data.result.XXBTZUSD.a[0];
+		getRateFromExchangeData: function(data) {
+			return data.result.XXBTZUSD.a[0]
 		}
-	},
-];
+	}
+}
 
-var currencyApiUrl = 'https://api.exchangeratesapi.io';
+// var currencyApiUrl = 'https://api.exchangeratesapi.io';
 
-function getRate(source, currency, callback) {
-	if (typeof source === 'undefined') return false
-	
-	source = getExchangeById(source)
-	if(source === null) return false
-	
-	request(source.url, function(data) {
-		if(data.length === 0) return false;
+function getRate(exchangeId, callback) {
+// function getRate(exchangeId, currency, callback) {
+	var exchange = exchanges[exchangeId]
+	request(exchange.url, function(data) {
+		if(data.length === 0) return false
 
 		data = JSON.parse(data)
-		var rate = source.getRate(data)
-		if(source.currency != currency) {
-			convertCurrency(rate, source.currency, currency, callback)
-		} else {
-			callback(rate)
-		}
-	});
+		var rate = exchange.getRateFromExchangeData(data)
+		// if(source.currency != currency) {
+		// 	convertCurrency(rate, source.currency, currency, callback)
+		// } else {
+		// 	callback(rate)
+		// }
+
+		callback(rate)
+	})
 	
 	return true
 }
 
-function getExchangeById(id) {
-	for(var i = 0; i < sources.length; i++) {
-		if(sources[i].id == id) {
-			return sources[i]
-		}
-	}
+// function getAllCurrencies() {
+// 	var currencies = []
 	
-	return null
-}
-
-function getAllCurrencies() {
-	var currencies = [];
+// 	Object.keys(currencySymbols).forEach(function eachKey(key) {
+// 		currencies.push(key)
+// 	})
 	
-	Object.keys(currencySymbols).forEach(function eachKey(key) {
-		currencies.push(key);
-	});
-	
-	return currencies;
-}
+// 	return currencies;
+// }
 
 function convertCurrency(value, from, to, callback) {
 	request(currencyApiUrl + '/latest?base=' + from, function(data) {
-		data = JSON.parse(data);
+		data = JSON.parse(data)
 		var rate = data['rates'][to];
 		
 		callback(value * rate);
-	});
+	})
 }
 
 function request(url, callback) {
-	var xhr = new XMLHttpRequest();
+	var xhr = new XMLHttpRequest()
 	xhr.onreadystatechange = function() {
 		if(xhr.readyState === 4) {
-			callback(xhr.responseText);
+			callback(xhr.responseText)
 		}
-	};
-	xhr.open('GET', url, true);
-	xhr.send('');
+	}
+	xhr.open('GET', url, true)
+	xhr.send('')
 }

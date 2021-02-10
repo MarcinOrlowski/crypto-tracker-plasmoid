@@ -13,7 +13,7 @@ ColumnLayout {
 	Ticker {
 		exchange: 'bitstamp'
 		crypto: 'BTC'
-		currency: 'USD'
+		// currency: 'USD'
 		refreshRate: 5
 		noDecimals: true
 	}
@@ -21,7 +21,7 @@ ColumnLayout {
 	Ticker {
 		exchange: 'bitbay'
 		crypto: 'BTC'
-		currency: 'PLN'
+		// currency: 'PLN'
 		localeToUse: 'pl'
 		refreshRate: 5
 		noDecimals: true

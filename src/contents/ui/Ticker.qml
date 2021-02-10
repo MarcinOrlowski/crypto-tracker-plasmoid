@@ -30,9 +30,9 @@ RowLayout {
 
     // --------------------------------------------------------------------------------------------
 
-    function getColor() {
+    function getColor(direction) {
         var color = '#ffffff'
-        switch(rateChangeDirection) {
+        switch(direction) {
             case +1: 
                 color = colorUp
                 break
@@ -124,7 +124,7 @@ RowLayout {
         var localeToUse = tickerRoot.localeToUse
         var noDecimals = tickerRoot.noDecimals
 
-        var color = getColor()
+        var color = getColor(rateChangeDirection)
 
         var rate = currentRate
         if(noDecimals) rate = Math.round(rate)
@@ -133,6 +133,7 @@ RowLayout {
 
         // https://unicode-table.com/en/sets/arrow-symbols/
         // 1 hrs trending direction
+        var color = getColor(trendingDirection)
         if (typeof trendingDirection != 'undefined' && trendingDirection !== 0) {
             // ↑ Upwards Arrow U+2191
             rateText += `<span style="color: ${color};">`
@@ -150,6 +151,7 @@ RowLayout {
         // echange rate change direction
         // • Bullet black small circle U+2022
         // var rateText = '• '
+        color = getColor(rateChangeDirection)
         if (rateChangeDirection !== 0) {
             // ▲ Black Up-Pointing Triangle U+25B2
             rateText += ` <span style="color: ${color};">`
@@ -194,7 +196,7 @@ RowLayout {
     onRateDirectionChangedChanged: {
         // console.debug('changed: ' + rateChangeDirection)
         if (rateChangeDirection !== 0) {
-            bgWall.color = getColor()
+            bgWall.color = getColor(rateChangeDirection)
             bgWall.opacity = 1
             bgWallFadeTimer.running = true
             bgWallFadeTimer.start()

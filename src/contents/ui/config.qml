@@ -1,10 +1,10 @@
 /**
- * Weekday Grid widget for KDE
+ * Crypto Ticker widget for KDE
  *
  * @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
- * @copyright 2020-2021 Marcin Orlowski
+ * @copyright 2021 Marcin Orlowski
  * @license   http://www.opensource.org/licenses/mit-license.php MIT
- * @link      https://github.com/MarcinOrlowski/weekday-plasmoid
+ * @link      https://github.com/MarcinOrlowski/crypto-plasmoid
  */
 
 import QtQuick 2.0
@@ -13,26 +13,22 @@ import QtQuick.Layouts 1.1
 import org.kde.kirigami 2.5 as Kirigami
 import org.kde.kquickcontrols 2.0 as KQControls
 import org.kde.plasma.components 3.0 as PlasmaComponents
-import "../js/themes.js" as Themes
+import "../js/crypto.js" as Crypto
 
 Kirigami.FormLayout {
 	Layout.fillWidth: true
 
-	property alias cfg_themeName: themeName.text
-	property alias cfg_useUserTheme: useUserTheme.checked
-	property alias cfg_useCustomFont: useCustomFont.checked
-	property alias cfg_customFont: fontSelector.selectedFont
+	property alias cfg_exchange: exchangeId.text
+	property alias cfg_refreshRate: refreshRate.value
+	// property alias cfg_currency: currencyId.text
 
-	// key of theme
+	// key of exchange
 	Text {
 		visible: false
-		id: themeName
+		id: exchangeId
 	}
-
-	FakeCalendarModeWarning {}
-
 	PlasmaComponents.ComboBox {
-		Kirigami.FormData.label: i18n('Theme')
+		Kirigami.FormData.label: i18n('Exchange')
 
 		textRole: "text"
 		model: []
@@ -42,10 +38,10 @@ Kirigami.FormLayout {
 			var tmp = []
 			var idx = 0
 			var currentIdx = undefined
-			for(const key in Themes.themes) {
-				var name = Themes.themes[key]['theme']['name']
-				tmp.push({'value':key, 'text': name})
-				if (key === plasmoid.configuration['themeName']) currentIdx = idx
+			for(const key in Crypto.exchanges) {
+				var name = Crypto.exchanges[key]['name']
+				tmp.push({'value': key, 'text': name})
+				if (key === plasmoid.configuration['exchange']) currentIdx = idx
 				idx++
 			}
 			model = tmp
@@ -55,35 +51,55 @@ Kirigami.FormLayout {
 		onCurrentIndexChanged: cfg_themeName = model[currentIndex]['value']
 	}
 
-	PlasmaComponents.CheckBox {
-		id: useUserTheme
-		text: i18n("Use user theme")
+	Kirigami.FormLayout {
+		anchors.left: parent.left
+		anchors.right: parent.right
+
+		PlasmaComponents.SpinBox {
+			id: refreshRate
+			editable: true
+			from: 1
+			to: 600
+			stepSize: 15
+			Kirigami.FormData.label: i18n("Data poll interval (minutes)")
+		}
 	}
+
+	// Text {
+	// 	visible: false
+	// 	id: currencyId
+	// }
+	// PlasmaComponents.ComboBox {
+	// 	Kirigami.FormData.label: i18n('Currency')
+
+	// 	textRole: "text"
+	// 	model: []
+	// 	enabled: !cfg_useUserTheme
+	// 	Component.onCompleted: {
+	// 		// populate model from Theme object
+	// 		var tmp = []
+	// 		var idx = 0
+	// 		var currentIdx = undefined
+	// 		for(const key in Crypto.currencySymbols) {
+	// 			var name = key + ' (' + Crypto.currencySymbols[key] + ')'
+	// 			tmp.push({'value': key, 'text': name})
+	// 			if (key === plasmoid.configuration['currency']) currentIdx = idx
+	// 			idx++
+	// 		}
+	// 		model = tmp
+
+	// 		if (currentIdx !== undefined) currentIndex = currentIdx
+	// 	}
+	// 	onCurrentIndexChanged: cfg_themeName = model[currentIndex]['value']
+	// }
+
+	// PlasmaComponents.CheckBox {
+	// 	id: useUserTheme
+	// 	text: i18n("Use user theme")
+	// }
 
 	Item {
 		height: 10
-	}
-
-	PlasmaComponents.CheckBox {
-		id: useCustomFont
-		text: i18n("Use custom font")
-	}
-
-	RowLayout {
-		enabled: cfg_useCustomFont
-
-		ColumnLayout {
-			PlasmaComponents.Label {
-				text: i18n('Font: %1', cfg_customFont.family)
-			}
-			PlasmaComponents.Label {
-				text: i18n('Size: %1', cfg_customFont.pointSize)
-			}
-		}
-
-		ConfigFontSelector {
-			id: fontSelector
-		}
 	}
 
 }

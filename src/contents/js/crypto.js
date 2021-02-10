@@ -17,9 +17,13 @@ var currencySymbols = {
 	'JPY': '¥',					// Japanese Yen
 	'KRW': '₩',					// South Korean Won
 	'PLN': 'zł',				// Polish Zloty
-	'USD': '$'					// US Dollar
+	'USD': '$',					// US Dollar
+	'USDT': 'T$',					// USDT
 }
 
+function getCurrencyName(code) {
+	return `${code} (${currencySymbols[code]})`
+}
 var exchanges = {
 	'bitbay': {
 		name: 'BitBay ',
@@ -28,6 +32,10 @@ var exchanges = {
 		currency: 'PLN',
 		getRateFromExchangeData: function(data) {
 			return data.ask
+		},
+		ccc: {
+			'PLN': {},
+			'USDT': {}
 		}
 	},
 	'bitstamp': {
@@ -37,6 +45,9 @@ var exchanges = {
 		currency: 'USD',
 		getRateFromExchangeData: function(data) {
 			return data.ask
+		},
+		ccc: {
+			'USD': {}
 		}
 	},
 	'kraken': {
@@ -46,8 +57,15 @@ var exchanges = {
 		currency: 'USD',
 		getRateFromExchangeData: function(data) {
 			return data.result.XXBTZUSD.a[0]
+		},
+		ccc: {
+			'USD': {}
 		}
 	}
+}
+
+function getExchangeName(id) {
+	return exchanges[id]['name']
 }
 
 // var currencyApiUrl = 'https://api.exchangeratesapi.io';

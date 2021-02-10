@@ -22,6 +22,19 @@ Kirigami.FormLayout {
 	property alias cfg_refreshRate: refreshRate.value
 	// property alias cfg_currency: currencyId.text
 
+
+	property string exchange: cfg_exchange
+	onExchangeChanged: {
+		// update currency ComboBox
+		var currencyModel = []
+		for(const key in Crypto.exchanges[exchange]['ccc']) {
+			currencyModel.push({'value': key, 'text': Crypto.getCurrencyName(key)})
+		}
+		console.debug(exchange + ' ' + JSON.stringify(currencyModel))
+
+		currencyComboBox.model = currencyModel
+	}
+
 	// key of exchange
 	Text {
 		visible: false
@@ -32,23 +45,20 @@ Kirigami.FormLayout {
 
 		textRole: "text"
 		model: []
-		enabled: !cfg_useUserTheme
 		Component.onCompleted: {
 			// populate model from Theme object
 			var tmp = []
 			var idx = 0
 			var currentIdx = undefined
 			for(const key in Crypto.exchanges) {
-				var name = Crypto.exchanges[key]['name']
-				tmp.push({'value': key, 'text': name})
+				tmp.push({'value': key, 'text': Crypto.getExchangeName(key)})
 				if (key === plasmoid.configuration['exchange']) currentIdx = idx
 				idx++
 			}
 			model = tmp
-
 			if (currentIdx !== undefined) currentIndex = currentIdx
 		}
-		onCurrentIndexChanged: cfg_themeName = model[currentIndex]['value']
+		onCurrentIndexChanged: exchange = model[currentIndex]['value']
 	}
 
 	Kirigami.FormLayout {
@@ -65,38 +75,38 @@ Kirigami.FormLayout {
 		}
 	}
 
-	// Text {
-	// 	visible: false
-	// 	id: currencyId
-	// }
-	// PlasmaComponents.ComboBox {
-	// 	Kirigami.FormData.label: i18n('Currency')
+	Text {
+		visible: false
+		id: currencyId
+	}
+	PlasmaComponents.ComboBox {
+		id: currencyComboBox
+		Kirigami.FormData.label: i18n('Currency')
 
-	// 	textRole: "text"
-	// 	model: []
-	// 	enabled: !cfg_useUserTheme
-	// 	Component.onCompleted: {
-	// 		// populate model from Theme object
-	// 		var tmp = []
-	// 		var idx = 0
-	// 		var currentIdx = undefined
-	// 		for(const key in Crypto.currencySymbols) {
-	// 			var name = key + ' (' + Crypto.currencySymbols[key] + ')'
-	// 			tmp.push({'value': key, 'text': name})
-	// 			if (key === plasmoid.configuration['currency']) currentIdx = idx
-	// 			idx++
-	// 		}
-	// 		model = tmp
+		textRole: "text"
+		model: []
+		// Component.onCompleted: {
+		// 	// populate model from Theme object
+		// 	var tmp = []
+		// 	var idx = 0
+		// 	var currentIdx = undefined
+		// 	for(const key in Crypto.currencySymbols) {
+		// 		var name = key + ' (' + Crypto.currencySymbols[key] + ')'
+		// 		tmp.push({'value': key, 'text': name})
+		// 		if (key === plasmoid.configuration['currency']) currentIdx = idx
+		// 		idx++
+		// 	}
+		// 	model = tmp
 
-	// 		if (currentIdx !== undefined) currentIndex = currentIdx
-	// 	}
-	// 	onCurrentIndexChanged: cfg_themeName = model[currentIndex]['value']
-	// }
+		// 	if (currentIdx !== undefined) currentIndex = currentIdx
+		// }
+		// onCurrentIndexChanged: cfg_themeName = model[currentIndex]['value']
+	}
 
-	// PlasmaComponents.CheckBox {
-	// 	id: useUserTheme
-	// 	text: i18n("Use user theme")
-	// }
+	PlasmaComponents.CheckBox {
+		id: useUserTheme
+		text: i18n("Use user theme")
+	}
 
 	Item {
 		height: 10

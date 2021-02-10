@@ -8,22 +8,23 @@
  */
 
 import QtQuick.Layouts 1.1
+import "../js/crypto.js" as Crypto
 
 ColumnLayout {
 	Ticker {
 		exchange: 'bitstamp'
-		crypto: 'BTC'
+		crypto: Crypto.BTC
 		fiat: 'USD'
-		refreshRate: 5
+		refreshRate: plasmoid.configuration.refreshRate
 		noDecimals: true
 	}
 
 	Ticker {
 		exchange: 'bitbay'
-		crypto: 'BTC'
+		crypto: Crypto.BTC
 		fiat: 'PLN'
 		localeToUse: 'pl'
-		refreshRate: 5
+		refreshRate: plasmoid.configuration.refreshRate
 		noDecimals: true
 	}
 }

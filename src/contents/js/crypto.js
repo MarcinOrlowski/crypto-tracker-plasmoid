@@ -10,15 +10,17 @@
 // https://doc.qt.io/qt-5/qtqml-javascript-resources.html
 .pragma library
 
+const BTC='BTC'
+const ETH='ETH'
+const LTC='LTC'
+
 var currencySymbols = {
-	'CZK': 'Kč',				// Czech Coruna
 	'EUR': '€',					// Euro
 	'GBP': '£',					// British Pound Sterling
 	'JPY': '¥',					// Japanese Yen
-	'KRW': '₩',					// South Korean Won
 	'PLN': 'zł',				// Polish Zloty
 	'USD': '$',					// US Dollar
-	'USDT': 'T$',					// USDT
+	'USDT': 'T$',				// USDT
 }
 function getCurrencyName(code) {
 	return `${code} (${currencySymbols[code]})`
@@ -54,11 +56,19 @@ var exchanges = {
 			return data.ask
 		},
 		pairs: {
-			'BTC': {
+			BTC: {
 				'PLN': { url: 'https://bitbay.net/API/Public/BTCPLN/ticker.json' },
 				'USD': { url: 'https://bitbay.net/API/Public/BTCUSD/ticker.json' },
-				'EUR': { url: 'https://bitbay.net/API/Public/BTCEUR/ticker.json' }
+				'EUR': { url: 'https://bitbay.net/API/Public/BTCEUR/ticker.json' },
+				'GBP': { url: 'https://bitbay.net/API/Public/BTCGBP/ticker.json' }
+			},
+			ETH: {
+				'PLN': { url: 'https://bitbay.net/API/Public/ETHPLN/ticker.json' },
+				'USD': { url: 'https://bitbay.net/API/Public/ETHUSD/ticker.json' },
+				'EUR': { url: 'https://bitbay.net/API/Public/ETHEUR/ticker.json' },
+				'GBP': { url: 'https://bitbay.net/API/Public/ETHGBP/ticker.json' }
 			}
+
 		}
 	},
 	'bitstamp': {
@@ -68,10 +78,10 @@ var exchanges = {
 			return data.ask
 		},
 		pairs: {
-			'BTC': { 
+			BTC: { 
 				'USD': { url: 'https://www.bitstamp.net/api/v2/ticker/BTCUSD/' }
 			},
-			'ETH': {
+			ETH: {
 				'USD': { url: 'https://www.bitstamp.net/api/v2/ticker/ETHUSD/' }
 			}
 		}
@@ -83,7 +93,7 @@ var exchanges = {
 			return data.result.XXBTZUSD.a[0]
 		},
 		pairs: {
-			'BTC': {
+			BTC: {
 				'USD': { url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD' }
 			}
 		}

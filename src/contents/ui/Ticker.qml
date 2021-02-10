@@ -19,7 +19,7 @@ RowLayout {
     id: tickerRoot
 
     property string exchange: 'bitstamp'
-    property string crypto: 'BTC'       // cryptocurrency code to use
+    property string crypto: Crypto.BTC
     property string fiat: 'PLN'
     property string localeToUse: plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
     

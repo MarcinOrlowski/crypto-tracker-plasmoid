@@ -1,0 +1,8 @@
+[user]
+	name = "Marcin Orlowski"
+	email = "MarcinOrlowski@users.noreply.github.com"
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true

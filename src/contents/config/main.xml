@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+
+	<kcfgfile name=""/>
+
+	<group name="Locale">
+		<entry name="useSpecificLocaleEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="useSpecificLocaleLocaleName" type="String">
+			<default>en_US</default>
+		</entry>
+
+		<entry name="nonDefaultWeekStartDayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="nonDefaultWeekStartDayDayIndex" type="Int">
+			<default>0</default>
+		</entry>
+
+		<!-- custom day labels -->
+		<entry name="customDayLabelsEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<entry name="customDayLabelSundayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customDayLabelSundayLabel" type="String">
+			<default></default>
+		</entry>
+		<entry name="customDayLabelMondayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customDayLabelMondayLabel" type="String">
+			<default></default>
+		</entry>
+		<entry name="customDayLabelTuesdayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customDayLabelTuesdayLabel" type="String">
+			<default></default>
+		</entry>
+		<entry name="customDayLabelWednesdayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customDayLabelWednesdayLabel" type="String">
+			<default></default>
+		</entry>
+		<entry name="customDayLabelThursdayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customDayLabelThursdayLabel" type="String">
+			<default></default>
+		</entry>
+		<entry name="customDayLabelFridayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customDayLabelFridayLabel" type="String">
+			<default></default>
+		</entry>
+		<entry name="customDayLabelSaturdayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customDayLabelSaturdayLabel" type="String">
+			<default></default>
+		</entry>
+
+	</group>
+
+	<group name="Tooltip">
+		<entry name="tooltipFirstLineFormat" type="String">
+			<default>{DDD:u}, {d} {MMM} {yyyy}</default>
+		</entry>
+		<entry name="tooltipSecondLineFormat" type="String">
+			<default>{dy} day of {yyyy} (week {wy})</default>
+		</entry>
+	</group>
+
+	<group name="Appearance">
+		<entry name="themeName" type="String">
+			<default>__default__</default>
+		</entry>
+
+		<entry name="useUserTheme" type="Bool">
+			<default>false</default>
+		</entry>
+		
+		<entry name="useCustomFont" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customFont" type="Font">
+			<default>Noto</default>
+		</entry>
+	</group>
+
+	<group name="CustomColors">
+		<entry name="Enabled" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<!-- widget -->
+
+		<entry name="widgetBg" type="String">
+			<default>#00000000</default>
+		</entry>
+
+		<!-- last days -->
+
+		<entry name="lastDayMonthEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="lastDayMonthBg" type="String">
+			<default>#00000000</default>
+		</entry>
+
+		<!-- past days -->
+
+		<entry name="pastFg" type="String">
+			<default>#FFffffff</default>
+		</entry>
+		<entry name="pastBg" type="String">
+			<default>#00000000</default>
+		</entry>
+		 <entry name="pastBold" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="pastItalic" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<entry name="pastSaturdayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="pastSaturdayFg" type="String">
+			<default>#FFffffff</default>
+		</entry>
+		<entry name="pastSaturdayBg" type="String">
+			<default>#00000000</default>
+		</entry>
+		 <entry name="pastSaturdayBold" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="pastSaturdayItalic" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<entry name="pastSundayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="pastSundayFg" type="String">
+			<default>#FFffffff</default>
+		</entry>
+		<entry name="pastSundayBg" type="String">
+			<default>#00000000</default>
+		</entry>
+		 <entry name="pastSundayBold" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="pastSundayItalic" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<!-- today -->
+
+		<entry name="todayFg" type="String">
+			<default>#FFffffff</default>
+		</entry>
+		<entry name="todayBg" type="String">
+			<default>#FFdeadBEEF</default>
+		</entry>
+		<entry name="todayBold" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="todayItalic" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<entry name="todaySaturdayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="todaySaturdayFg" type="String">
+			<default>#FFffffff</default>
+		</entry>
+		<entry name="todaySaturdayBg" type="String">
+			<default>#00000000</default>
+		</entry>
+		 <entry name="todaySaturdayBold" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="todaySaturdayItalic" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<entry name="todaySundayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="todaySundayFg" type="String">
+			<default>#FFffffff</default>
+		</entry>
+		<entry name="todaySundayBg" type="String">
+			<default>#00000000</default>
+		</entry>
+		 <entry name="todaySundayBold" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="todaySundayItalic" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<!-- future days -->
+
+		<entry name="futureFg" type="String">
+			<default>#FFffffff</default>
+		</entry>
+		<entry name="futureBg" type="String">
+			<default>#00000000</default>
+		</entry>
+		 <entry name="futureBold" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="futureItalic" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<entry name="futureSaturdayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="futureSaturdayFg" type="String">
+			<default>#FFffffff</default>
+		</entry>
+		<entry name="futureSaturdayBg" type="String">
+			<default>#00000000</default>
+		</entry>
+		 <entry name="futureSaturdayBold" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="futureSaturdayItalic" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<entry name="futureSundayEnabled" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="futureSundayFg" type="String">
+			<default>#FFffffff</default>
+		</entry>
+		<entry name="futureSundayBg" type="String">
+			<default>#00000000</default>
+		</entry>
+		 <entry name="futureSundayBold" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="futureSundayItalic" type="Bool">
+			<default>false</default>
+		</entry>
+
+	</group>
+
+	<!-- fake calendar settings -->
+	<group name="FakeCalendar">
+		<entry name="useFakeParameters" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="fakeToday" type="Int">
+			<default>0</default>
+		</entry>
+		<entry name="fakeLastDayMonth" type="Int">
+			<default>0</default>
+		</entry>
+		<entry name="fakeWeekStartDay" type="Int">
+			<default>0</default>
+		</entry>
+	</group>
+
+	<!-- Calendar View related settings -->
+
+	<group name="CalendarView">
+		<entry name="calendarViewEnabled" type="Bool">
+			<default>true</default>
+		</entry>
+	</group>
+
+	<!-- these are settings required by CalendarView.qml, so we keep
+	them unaltered to also avoid altering original CalendarView.qml -->
+	<group name="NeededByCalendarViewQml">
+		<entry name="showWeekNumbers" type="Bool">
+		  <label>Whether the calendar should show week numbers.</label>
+		  <default>false</default>
+		</entry>
+
+		<entry name="pin" type="Bool">
+			<label>Whether the popup should remain open when another window is activated</label>
+			<default>false</default>
+		</entry>
+	</group>
+
+</kcfg>

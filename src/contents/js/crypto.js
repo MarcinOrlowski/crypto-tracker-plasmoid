@@ -20,46 +20,72 @@ var currencySymbols = {
 	'USD': '$',					// US Dollar
 	'USDT': 'T$',					// USDT
 }
-
 function getCurrencyName(code) {
 	return `${code} (${currencySymbols[code]})`
 }
+function getCurrencySymbol(code) {
+	return currencySymbols[code]
+}
+
+// --------------------------------------------------------------------------------------------
+
+var cryptoNames = {
+	BTC: {
+		name: 'Bitcoin'
+	},
+	ETH: {
+		name: 'Ethereum'
+	},
+	LTC: {
+		name: 'Litecoin'
+	}
+}
+function getCryptoName(code) {
+	return `${cryptoNames[code]['name']} (${code})`
+}
+
+// --------------------------------------------------------------------------------------------
+
 var exchanges = {
 	'bitbay': {
-		name: 'BitBay ',
-		url: 'https://bitbay.net/API/Public/BTCPLN/ticker.json',
+		name: 'BitBay',
 		homepage: 'https://bitbay.net',
-		currency: 'PLN',
 		getRateFromExchangeData: function(data) {
 			return data.ask
 		},
-		ccc: {
-			'PLN': {},
-			'USDT': {}
+		pairs: {
+			'BTC': {
+				'PLN': { url: 'https://bitbay.net/API/Public/BTCPLN/ticker.json' },
+				'USD': { url: 'https://bitbay.net/API/Public/BTCUSD/ticker.json' },
+				'EUR': { url: 'https://bitbay.net/API/Public/BTCEUR/ticker.json' }
+			}
 		}
 	},
 	'bitstamp': {
 		name: 'BitStamp.com',
-		url: 'https://www.bitstamp.net/api/ticker',
 		homepage: 'https://www.bitstamp.net/',
-		currency: 'USD',
 		getRateFromExchangeData: function(data) {
 			return data.ask
 		},
-		ccc: {
-			'USD': {}
+		pairs: {
+			'BTC': { 
+				'USD': { url: 'https://www.bitstamp.net/api/v2/ticker/BTCUSD/' }
+			},
+			'ETH': {
+				'USD': { url: 'https://www.bitstamp.net/api/v2/ticker/ETHUSD/' }
+			}
 		}
 	},
 	'kraken': {
 		name: 'Kraken',
-		url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD',
 		homepage: 'https://www.kraken.com',
-		currency: 'USD',
 		getRateFromExchangeData: function(data) {
 			return data.result.XXBTZUSD.a[0]
 		},
-		ccc: {
-			'USD': {}
+		pairs: {
+			'BTC': {
+				'USD': { url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD' }
+			}
 		}
 	}
 }
@@ -68,45 +94,17 @@ function getExchangeName(id) {
 	return exchanges[id]['name']
 }
 
-// var currencyApiUrl = 'https://api.exchangeratesapi.io';
+// --------------------------------------------------------------------------------------------
 
-function getRate(exchangeId, callback) {
-// function getRate(exchangeId, currency, callback) {
+function downloadExchangeRate(exchangeId, crypto, fiat, callback) {
 	var exchange = exchanges[exchangeId]
-	request(exchange.url, function(data) {
-		if(data.length === 0) return false
-
-		data = JSON.parse(data)
-		var rate = exchange.getRateFromExchangeData(data)
-		// if(source.currency != currency) {
-		// 	convertCurrency(rate, source.currency, currency, callback)
-		// } else {
-		// 	callback(rate)
-		// }
-
-		callback(rate)
+	request(exchange['pairs'][crypto][fiat].url, function(data) {
+		if(data.length !== 0) {
+			callback(exchange.getRateFromExchangeData(JSON.parse(data)))
+		}
 	})
 	
 	return true
-}
-
-// function getAllCurrencies() {
-// 	var currencies = []
-	
-// 	Object.keys(currencySymbols).forEach(function eachKey(key) {
-// 		currencies.push(key)
-// 	})
-	
-// 	return currencies;
-// }
-
-function convertCurrency(value, from, to, callback) {
-	request(currencyApiUrl + '/latest?base=' + from, function(data) {
-		data = JSON.parse(data)
-		var rate = data['rates'][to];
-		
-		callback(value * rate);
-	})
 }
 
 function request(url, callback) {

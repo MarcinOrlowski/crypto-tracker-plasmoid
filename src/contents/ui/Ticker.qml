@@ -18,9 +18,9 @@ import "../js/crypto.js" as Crypto
 RowLayout {
     id: tickerRoot
 
-    property string crypto: 'BTC'       // cryptocurrency code to use
     property string exchange: 'bitstamp'
-    property string currency: 'PLN'
+    property string crypto: 'BTC'       // cryptocurrency code to use
+    property string fiat: 'PLN'
     property string localeToUse: plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
     
     property int refreshRate: plasmoid.configuration.refreshRate
@@ -143,8 +143,8 @@ RowLayout {
             rateText += '</span> '
         }
 
-        // var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.currencySymbols[currency])
-        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.currencySymbols[Crypto.exchanges[exchange]['currency']])
+        // var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.currencySymbols[fiat])
+        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
         if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
         rateText += `<span>${tmp}</span>`
 
@@ -221,8 +221,8 @@ RowLayout {
         updateInProgress = true;
 
         var exchange = tickerRoot.exchange
-        var currency = tickerRoot.currency
-        Crypto.getRate(exchange, function(rate) {
+        var fiat = tickerRoot.fiat
+        Crypto.downloadExchangeRate(exchange, crypto, fiat, function(rate) {
             var now = new Date()
             lastUpdateMillis = now.getTime()
 

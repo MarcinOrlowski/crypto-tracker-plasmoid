@@ -25,13 +25,21 @@ Kirigami.FormLayout {
 
 	property string exchange: cfg_exchange
 	onExchangeChanged: {
+		var crypto = 'BTC'
+
+		// update crypto ComboBox
+		var cryptoModel = []
+		for(const key in Crypto.exchanges[exchange]['pairs']) {
+			cryptoModel.push({'value': key, 'text': Crypto.getCryptoName(key)})
+		}
+		cryptoComboBox.model = cryptoModel		
+
 		// update currency ComboBox
 		var currencyModel = []
-		for(const key in Crypto.exchanges[exchange]['ccc']) {
+		for(const key in Crypto.exchanges[exchange]['pairs'][crypto]) {
 			currencyModel.push({'value': key, 'text': Crypto.getCurrencyName(key)})
 		}
-		console.debug(exchange + ' ' + JSON.stringify(currencyModel))
-
+		// console.debug(exchange + ' ' + JSON.stringify(currencyModel))
 		currencyComboBox.model = currencyModel
 	}
 
@@ -74,6 +82,35 @@ Kirigami.FormLayout {
 			Kirigami.FormData.label: i18n("Data poll interval (minutes)")
 		}
 	}
+
+	Text {
+		visible: false
+		id: cryptoId
+	}
+	PlasmaComponents.ComboBox {
+		id: cryptoComboBox
+		Kirigami.FormData.label: i18n('Crypto')
+
+		textRole: "text"
+		model: []
+		// Component.onCompleted: {
+		// 	// populate model from Theme object
+		// 	var tmp = []
+		// 	var idx = 0
+		// 	var currentIdx = undefined
+		// 	for(const key in Crypto.currencySymbols) {
+		// 		var name = key + ' (' + Crypto.currencySymbols[key] + ')'
+		// 		tmp.push({'value': key, 'text': name})
+		// 		if (key === plasmoid.configuration['currency']) currentIdx = idx
+		// 		idx++
+		// 	}
+		// 	model = tmp
+
+		// 	if (currentIdx !== undefined) currentIndex = currentIdx
+		// }
+		// onCurrentIndexChanged: cfg_themeName = model[currentIndex]['value']
+	}
+
 
 	Text {
 		visible: false

@@ -15,6 +15,8 @@ Item {
 	property alias cfg_fiat0: exchange.fiat
 	property alias cfg_refreshRate0: exchange.refreshRate
 	property alias cfg_hidePriceDecimals0: exchange.hidePriceDecimals
+	property alias cfg_useCustomLocale0: exchange.useCustomLocale
+	property alias cfg_customLocaleName0: exchange.customLocaleName
 
 	ExchangeConfig {
 		id: exchange
@@ -24,5 +26,7 @@ Item {
 		fiat: cfg_fiat0
 		refreshRate: cfg_refreshRate0
 		hidePriceDecimals: cfg_hidePriceDecimals0
+		useCustomLocale: cfg_useCustomLocale0
+		customLocaleName: cfg_customLocaleName0
 	}
 }

@@ -24,6 +24,9 @@ Kirigami.FormLayout {
     property int refreshRate: 5
     property bool hidePriceDecimals: false
 
+    property bool useCustomLocale: false
+    property string customLocaleName: ''
+
 	// ------------------------------------------------------------------------------------------------------------------------
 
     onExchangeChanged: {
@@ -153,8 +156,21 @@ Kirigami.FormLayout {
         onCheckedChanged: hidePriceDecimals = checked
 	}
 
-	// Item {
-	// 	height: 10
-	// }
+	// ------------------------------------------------------------------------------------------------------------------------
+
+	RowLayout {
+		CheckBox {
+			text: i18n("Locale to use")
+            onCheckedChanged: useCustomLocale = checked
+		}
+
+		TextField {
+			enabled: useCustomLocale
+			placeholderText: "en_US"
+            onTextChanged: customLocaleName = text
+		}
+	}
+
+	// ------------------------------------------------------------------------------------------------------------------------
 
 }

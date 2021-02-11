@@ -22,7 +22,6 @@ RowLayout {
     property string crypto: Crypto.BTC
     property string fiat: 'PLN'
     property string localeToUse: ''     // plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
-    
     property int refreshRate: 5
     property bool noDecimals: false
     property string colorUp: "#00ff00"

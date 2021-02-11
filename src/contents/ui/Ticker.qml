@@ -17,6 +17,7 @@ ColumnLayout {
 		fiat: plasmoid.configuration.fiat0
 		refreshRate: plasmoid.configuration.refreshRate0
 		noDecimals: plasmoid.configuration.hidePriceDecimals0
+		localeToUse: plasmoid.configuration.useCustomLocale0 ? plasmoid.configuration.customLocaleName0 : ''
 	}
 
 	Exchange {
@@ -25,5 +26,6 @@ ColumnLayout {
 		fiat: plasmoid.configuration.fiat1
 		refreshRate: plasmoid.configuration.refreshRate1
 		noDecimals: plasmoid.configuration.hidePriceDecimals1
+		localeToUse: plasmoid.configuration.useCustomLocale1 ? plasmoid.configuration.customLocaleName1 : ''
 	}
 }

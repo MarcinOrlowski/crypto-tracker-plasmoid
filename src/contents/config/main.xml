@@ -52,7 +52,7 @@
 
 	<group name="Exchange1">
 		<entry name="running1" type="Bool">
-			<default>true</default>
+			<default>false</default>
 		</entry>
 		<entry name="exchange1" type="String">
 			<default>bitbay</default>

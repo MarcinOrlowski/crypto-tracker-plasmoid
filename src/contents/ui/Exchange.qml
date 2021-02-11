@@ -25,19 +25,24 @@ RowLayout {
     property string localeToUse: ''     // plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
     property int refreshRate: 5
     property bool noDecimals: false
-    property string colorUp: "#00ff00"
-    property string colorDown: "#ff0000"
+    // property string colorUp: "#00ff00"
+    // property string colorDown: "#ff0000"
 
     property bool showPriceChangeMarker: true
     property bool showTrendingMarker: true
     property int trendingTimeSpan: 60          // minutes
 
     property bool flashOnPriceRaise: true
+    property string flashOnPriceRaiseColor: '#00ff00'
     property bool flashOnPriceDrop: true
+    property string flashOnPriceDropColor: '#ff0000'
+
+    property string markerColorPriceRaise: '#00ff00'
+    property string markerColorPriceDrop: '#ff0000'
 
     // --------------------------------------------------------------------------------------------
 
-    function getColor(direction) {
+    function getColor(direction, colorUp, colorDown) {
         var color = '#ffffff'
         switch(direction) {
             case +1: 
@@ -126,7 +131,7 @@ RowLayout {
 
         // https://unicode-table.com/en/sets/arrow-symbols/
         if (showTrendingMarker) {
-            color = getColor(trendingDirection)
+            color = getColor(trendingDirection, markerColorPriceRaise, markerColorPriceDrop)
             if (typeof trendingDirection !== 'undefined' && trendingDirection !== 0) {
                 // ↑ Upwards Arrow U+2191
                 rateText += `<span style="color: ${color};">`
@@ -145,7 +150,7 @@ RowLayout {
         // echange rate change direction
         // • Bullet black small circle U+2022
         if (showPriceChangeMarker) {
-            color = getColor(rateChangeDirection)
+            color = getColor(rateChangeDirection, markerColorPriceRaise, markerColorPriceDrop)
             if (rateChangeDirection !== 0) {
                 // ▲ Black Up-Pointing Triangle U+25B2
                 rateText += ` <span style="color: ${color};">`
@@ -195,7 +200,7 @@ RowLayout {
             if (rateChangeDirection === -1 && flashOnPriceDrop) flash = true
 
             if (flash) {
-                bgWall.color = getColor(rateChangeDirection)
+                bgWall.color = getColor(rateChangeDirection, flashOnPriceRaiseColor, flashOnPriceDropColor)
                 bgWall.opacity = 1
                 bgWallFadeTimer.running = true
                 bgWallFadeTimer.start()

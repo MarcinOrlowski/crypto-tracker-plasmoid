@@ -25,7 +25,11 @@ Item {
 
     property alias cfg_flashOnPriceRaise0: exchange.flashOnPriceRaise
     property alias cfg_flashOnPriceDrop0: exchange.flashOnPriceDrop
-
+	property alias cfg_flashOnPriceDropColor0: exchange.flashOnPriceDropColor
+	property alias cfg_flashOnPriceRaiseColor0: exchange.flashOnPriceRaiseColor
+	property alias cfg_markerColorPriceRaise0: exchange.markerColorPriceRaise
+	property alias cfg_markerColorPriceDrop0: exchange.markerColorPriceDrop
+	
 	ExchangeConfig {
 		id: exchange
 	}

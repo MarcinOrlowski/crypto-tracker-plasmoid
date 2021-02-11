@@ -36,7 +36,12 @@ ColumnLayout {
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan0
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise0
+		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor0
 		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop0
+		flashOnPriceDropColor: plasmoid.configuration.flashOnPriceDropColor0
+
+		markerColorPriceRaise: plasmoid.configuration.markerColorPriceRaise0
+		markerColorPriceDrop: plasmoid.configuration.markerColorPriceDrop0
 	}
 
 	Exchange {
@@ -55,7 +60,12 @@ ColumnLayout {
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan1
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise1
+		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor1
 		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop1
+		flashOnPriceDropColor: plasmoid.configuration.flashOnPriceDropColor1
+
+		markerColorPriceRaise: plasmoid.configuration.markerColorPriceRaise1
+		markerColorPriceDrop: plasmoid.configuration.markerColorPriceDrop1
 	}
 
 	Exchange {
@@ -74,7 +84,12 @@ ColumnLayout {
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan2
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise2
+		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor2
 		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop2
+		flashOnPriceDropColor: plasmoid.configuration.flashOnPriceDropColor2
+
+		markerColorPriceRaise: plasmoid.configuration.markerColorPriceRaise2
+		markerColorPriceDrop: plasmoid.configuration.markerColorPriceDrop2
 	}
 
 	Exchange {
@@ -93,7 +108,12 @@ ColumnLayout {
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan3
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise3
+		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor3
 		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop3
+		flashOnPriceDropColor: plasmoid.configuration.flashOnPriceDropColor3
+
+		markerColorPriceRaise: plasmoid.configuration.markerColorPriceRaise3
+		markerColorPriceDrop: plasmoid.configuration.markerColorPriceDrop3
 	}
 
 	Exchange {
@@ -112,7 +132,12 @@ ColumnLayout {
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan4
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise4
+		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor4
 		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop4
+		flashOnPriceDropColor: plasmoid.configuration.flashOnPriceDropColor4
+
+		markerColorPriceRaise: plasmoid.configuration.markerColorPriceRaise4
+		markerColorPriceDrop: plasmoid.configuration.markerColorPriceDrop4
 	}
 
 	Exchange {
@@ -131,7 +156,12 @@ ColumnLayout {
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan5
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise5
+		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor5
 		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop5
+		flashOnPriceDropColor: plasmoid.configuration.flashOnPriceDropColor5
+
+		markerColorPriceRaise: plasmoid.configuration.markerColorPriceRaise5
+		markerColorPriceDrop: plasmoid.configuration.markerColorPriceDrop5
 	}
 
 } // ColumnLayout

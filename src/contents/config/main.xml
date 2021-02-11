@@ -65,6 +65,18 @@
 		<entry name="flashOnPriceDrop0" type="Bool">
 			<default>true</default>
 		</entry>
+		<entry name="flashOnPriceRaiseColor0" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="flashOnPriceDropColor0" type="String">
+			<default>#ff0000</default>
+		</entry>
+		<entry name="markerColorPriceRaise0" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="markerColorPriceDrop0" type="String">
+			<default>#ff0000</default>
+		</entry>
 	</group>
 
 	<group name="Exchange1">
@@ -108,6 +120,18 @@
 		</entry>
 		<entry name="flashOnPriceDrop1" type="Bool">
 			<default>true</default>
+		</entry>
+		<entry name="flashOnPriceRaiseColor1" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="flashOnPriceDropColor1" type="String">
+			<default>#ff0000</default>
+		</entry>
+		<entry name="markerColorPriceRaise1" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="markerColorPriceDrop1" type="String">
+			<default>#ff0000</default>
 		</entry>
 	</group>
 
@@ -153,6 +177,18 @@
 		<entry name="flashOnPriceDrop2" type="Bool">
 			<default>true</default>
 		</entry>
+		<entry name="flashOnPriceRaiseColor2" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="flashOnPriceDropColor2" type="String">
+			<default>#ff0000</default>
+		</entry>
+		<entry name="markerColorPriceRaise2" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="markerColorPriceDrop2" type="String">
+			<default>#ff0000</default>
+		</entry>
 	</group>
 	
 	<group name="Exchange3">
@@ -197,6 +233,18 @@
 		<entry name="flashOnPriceDrop3" type="Bool">
 			<default>true</default>
 		</entry>
+		<entry name="flashOnPriceRaiseColor3" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="flashOnPriceDropColor3" type="String">
+			<default>#ff0000</default>
+		</entry>
+		<entry name="markerColorPriceRaise3" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="markerColorPriceDrop3" type="String">
+			<default>#ff0000</default>
+		</entry>
 	</group>
 
 	<group name="Exchange4">
@@ -240,6 +288,18 @@
 		<entry name="flashOnPriceDrop4" type="Bool">
 			<default>true</default>
 		</entry>
+		<entry name="flashOnPriceRaiseColor4" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="flashOnPriceDropColor4" type="String">
+			<default>#ff0000</default>
+		</entry>
+		<entry name="markerColorPriceRaise4" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="markerColorPriceDrop4" type="String">
+			<default>#ff0000</default>
+		</entry>
 	</group>
 
 	<group name="Exchange5">
@@ -277,13 +337,24 @@
 			<default>60</default>
 		</entry>
 
-		<entry name="flashOnPriceRaise6" type="Bool">
+		<entry name="flashOnPriceRaise5" type="Bool">
 			<default>true</default>
 		</entry>
-		<entry name="flashOnPriceDrop6" type="Bool">
+		<entry name="flashOnPriceDrop5" type="Bool">
 			<default>true</default>
 		</entry>
-
+		<entry name="flashOnPriceRaiseColor5" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="flashOnPriceDropColor5" type="String">
+			<default>#ff0000</default>
+		</entry>
+		<entry name="markerColorPriceRaise5" type="String">
+			<default>#00ff00</default>
+		</entry>
+		<entry name="markerColorPriceDrop5" type="String">
+			<default>#ff0000</default>
+		</entry>
 	</group>
 
 	<group name="CustomColors">

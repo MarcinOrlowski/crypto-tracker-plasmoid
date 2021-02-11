@@ -35,7 +35,12 @@ ColumnLayout {
     property int trendingTimeSpan: 60          // minutes
 
     property bool flashOnPriceRaise: true
+    property string flashOnPriceRaiseColor: '#00ff00'
     property bool flashOnPriceDrop: true
+    property string flashOnPriceDropColor: '#ff0000'
+
+    property string markerColorPriceRaise: '#00ff00'
+    property string markerColorPriceDrop: '#ff0000'
 
     // ------------------------------------------------------------------------------------------------------------------------
 
@@ -226,14 +231,43 @@ ColumnLayout {
             checked: flashOnPriceRaise
             onCheckedChanged: flashOnPriceRaise = checked
         }
+        KQControls.ColorButton {
+            Kirigami.FormData.label: i18n('Price raise background color')
+            dialogTitle: i18n('Price raise background color')
+            color: flashOnPriceRaiseColor
+            onColorChanged: flashOnPriceRaiseColor = color.toString()
+        }
 
         CheckBox {
             text: i18n("Flash background on price drop")
             checked: flashOnPriceDrop
             onCheckedChanged: flashOnPriceDrop = checked
         }
+        KQControls.ColorButton {
+            Kirigami.FormData.label: i18n('Price raise background color')
+            dialogTitle: i18n('Price raise background color')
+            color: flashOnPriceDropColor
+            onColorChanged: flashOnPriceDropColor = color.toString()
+        }
 
-    }
+        // ------------------------------------------------------------------------------------------------------------------------
+
+        KQControls.ColorButton {
+            Kirigami.FormData.label: i18n('Price raise marker color')
+            dialogTitle: i18n('Price raise marker color')
+            color: markerColorPriceRaise
+            onColorChanged: markerColorPriceRaise = color.toString()
+        }
+
+        KQControls.ColorButton {
+            Kirigami.FormData.label: i18n('Price drop marker color')
+            dialogTitle: i18n('Price drop marker color')
+            color: markerColorPriceDrop
+            onColorChanged: markerColorPriceDrop = color.toString()
+        }
 
     // ------------------------------------------------------------------------------------------------------------------------
+
+    } // Kirigami.FormLayout
+
 }

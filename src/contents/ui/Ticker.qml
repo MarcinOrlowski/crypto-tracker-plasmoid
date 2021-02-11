@@ -220,11 +220,18 @@ RowLayout {
 
         updateInProgress = true;
 
-        var exchange = tickerRoot.exchange
-        var fiat = tickerRoot.fiat
-
-        console.debug(`fetchRate: ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
-
+        if (!(exchange in Crypto.exchanges)) {
+            console.debug(`fetchRate(): invalid exchange: '${exchange}'`)
+            return
+        }
+        if (!(crypto in Crypto.exchanges[exchange]['pairs'])) {
+            console.debug(`fetchRate(): invalid crypto: '${crypto}' for exchange: '${exchange}'`)
+            return
+        }
+        if (!(fiat in Crypto.exchanges[exchange]['pairs'][crypto])) {
+            console.debug(`fetchRate(): invalid fiat: '${fiat}' for crypto: '${crypto}' and exchange: '${exchange}'`)
+            return
+        }
 
         Crypto.downloadExchangeRate(exchange, crypto, fiat, function(rate) {
             var now = new Date()

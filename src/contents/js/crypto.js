@@ -100,8 +100,52 @@ var exchanges = {
 	}
 }
 
-function getExchangeName(id) {
-	return exchanges[id]['name']
+function exchangeExists(exchange) {
+	return exchange in exchanges
+}
+
+function getExchangeName(exchange) {
+	var result = exchangeExists(exchange) ? exchanges[exchange]['name'] : undefined
+	if (typeof result === 'undefined') console.error(`Invalid exchange id: '${exchange}`)
+	return result
+}
+
+function isCryptoSupported(exchange, crypto) {
+	var result = false
+	if (exchangeExists(exchange)) {
+		result = crypto in exchanges[exchange]['pairs']
+	} else {
+		console.error(`Invalid exchange id: '${exchange}`)
+	}
+	return result
+}
+
+// --------------------------------------------------------------------------------------------
+
+function getAllExchangeCryptos(exchange) {
+	var cryptoModel = null
+	if (exchangeExists(exchange)) {
+		cryptoModel = []
+		for(const key in exchanges[exchange]['pairs']) {
+			cryptoModel.push({'value': key, 'text': getCryptoName(key)})
+		}
+	} else {
+		console.error(`Invalid exchange id: '${exchange}`)
+	}
+	return cryptoModel
+}
+function getFiatsForCrypto(exchange, crypto) {
+	var currencyModel = null
+	if (isCryptoSupported(exchange, crypto)) {
+		currencyModel = []
+		for(const key in exchanges[exchange]['pairs'][crypto]) {
+			currencyModel.push({'value': key, 'text': getCurrencyName(key)})
+		}
+	} else {
+		var exName = getExchangeName(exchange)
+		console.error(`Can't get fiat pairs for '${crypto}' on '${exchange}' (${exName})`)
+	}
+	return currencyModel
 }
 
 // --------------------------------------------------------------------------------------------
@@ -110,10 +154,14 @@ function downloadExchangeRate(exchangeId, crypto, fiat, callback) {
 	var exchange = exchanges[exchangeId]
 	request(exchange['pairs'][crypto][fiat].url, function(data) {
 		if(data.length !== 0) {
-			callback(exchange.getRateFromExchangeData(JSON.parse(data)))
+			try {
+				var json = JSON.parse(data)
+				callback(exchange.getRateFromExchangeData(json))
+			} catch (error) {
+				console.error(`Failed parsing response from '${exchangeId}': ${error}`)
+			}
 		}
 	})
-	
 	return true
 }
 

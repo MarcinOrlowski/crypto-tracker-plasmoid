@@ -28,7 +28,7 @@
 			<default>bitstamp</default>
 		</entry>
 		<entry name="crypto0" type="String">
-			<default>BTC</default>
+			<default>ETH</default>
 		</entry>
 		<entry name="fiat0" type="String">
 			<default>USD</default>
@@ -43,13 +43,13 @@
 
 	<group name="Exchange1">
 		<entry name="exchange1" type="String">
-			<default>bitstamp</default>
+			<default>bitbay</default>
 		</entry>
 		<entry name="crypto1" type="String">
 			<default>BTC</default>
 		</entry>
 		<entry name="fiat1" type="String">
-			<default>USD</default>
+			<default>PLN</default>
 		</entry>
 		<entry name="refreshRate1" type="Int">
 			<default>5</default>

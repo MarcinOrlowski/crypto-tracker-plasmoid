@@ -30,42 +30,27 @@ Kirigami.FormLayout {
 
 	// ------------------------------------------------------------------------------------------------------------------------
 
-	function getAllExchangeCryptos(exchange) {
-		console.debug('1')
-		var cryptoModel = []
-		for(const key in Crypto.exchanges[exchange]['pairs']) {
-			cryptoModel.push({'value': key, 'text': Crypto.getCryptoName(key)})
-		}
-		return cryptoModel
-	}
-	function getFiatsForCrypto(exchange, crypto) {
-	console.debug('')	
-		var currencyModel = []
-		for(const key in Crypto.exchanges[exchange]['pairs'][crypto]) {
-			currencyModel.push({'value': key, 'text': Crypto.getCurrencyName(key)})
-		}
-		return currencyModel
-	}
-
-	// ------------------------------------------------------------------------------------------------------------------------
-
-	onExchangeChanged: cryptoComboBox.model = getAllExchangeCryptos(exchange)
-	onCryptoChanged: fiatComboBox.model = getFiatsForCrypto(exchange, crypto)
-
-	// ------------------------------------------------------------------------------------------------------------------------
-
 	// key of exchange
 	Text {
 		visible: false
 		id: exchangeId
 		text: exchange
+		onTextChanged: {
+			var model = Crypto.getAllExchangeCryptos(exchange)
+			if (model !== null) {
+				cryptoComboBox.model = model
+				exchange = text
+			}
+		}
 	}
+
 	PlasmaComponents.ComboBox {
 		Kirigami.FormData.label: i18n('Exchange')
-
 		textRole: "text"
-		model: []
-		Component.onCompleted: {
+		Component.onCompleted: populateModel()
+		onCurrentIndexChanged: exchangeId.text = model[currentIndex]['value']
+
+		function populateModel() {
 			var tmp = []
 			var idx = 0
 			var currentIdx = undefined
@@ -77,7 +62,6 @@ Kirigami.FormLayout {
 			model = tmp
 			if (typeof currentIdx !== 'undefined') currentIndex = currentIdx
 		}
-		onCurrentIndexChanged: exchange = model[currentIndex]['value']
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------------
@@ -86,14 +70,23 @@ Kirigami.FormLayout {
 		visible: false
 		id: cryptoId
 		text: crypto
+		onTextChanged: {
+			var model = Crypto.getFiatsForCrypto(exchange, crypto)
+			if (model !== null) {
+				fiatComboBox.model = model
+				crypto = text
+			}
+		}
 	}
+
 	PlasmaComponents.ComboBox {
 		id: cryptoComboBox
 		Kirigami.FormData.label: i18n('Crypto')
-
 		textRole: "text"
-		model: []
-		Component.onCompleted: {
+		Component.onCompleted: populateModel()
+		onCurrentIndexChanged: cryptoId.text = model[currentIndex]['value']
+
+		function populateModel() {
 			if (exchange in Crypto.exchanges) {
 				var tmp = []
 				var idx = 0
@@ -108,7 +101,6 @@ Kirigami.FormLayout {
 				if (typeof currentIdx !== 'undefined') currentIndex = currentIdx
 			}
 		}
-		onCurrentIndexChanged: crypto = model[currentIndex]['value']
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------------
@@ -117,10 +109,11 @@ Kirigami.FormLayout {
 		visible: false
 		id: fiatId
 		text: fiat
+		onTextChanged: fiat = text
 	}
 	PlasmaComponents.ComboBox {
 		id: fiatComboBox
-		Kirigami.FormData.label: i18n('Currency')
+		Kirigami.FormData.label: i18n('Fiat')
 
 		textRole: "text"
 		model: []
@@ -140,7 +133,7 @@ Kirigami.FormLayout {
 				if (typeof currentIdx !== 'undefined') currentIndex = currentIdx
 			}
 		}
-		onCurrentIndexChanged: fiat = model[currentIndex]['value']
+		onCurrentIndexChanged: fiatId.text = model[currentIndex]['value']
 	}
 
 	Kirigami.FormLayout {
@@ -169,4 +162,3 @@ Kirigami.FormLayout {
 	}
 
 }
-

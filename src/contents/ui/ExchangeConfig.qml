@@ -21,7 +21,6 @@ Kirigami.FormLayout {
 	property string exchange: undefined
     property string crypto: undefined
     property string fiat: undefined
-
     property int refreshRate: 5
     property bool hidePriceDecimals: false
 
@@ -62,7 +61,7 @@ Kirigami.FormLayout {
 		Kirigami.FormData.label: i18n('Exchange')
 		textRole: "text"
 		// Component.onCompleted: populateExchageModel()
-		onCurrentIndexChanged: exchangeId.text = model[currentIndex]['value']
+		onCurrentIndexChanged: exchange = model[currentIndex]['value']
 
         function updateModel(exchange) {
             var tmp = []

@@ -49,7 +49,7 @@ function getCryptoName(code) {
 // --------------------------------------------------------------------------------------------
 
 var exchanges = {
-	'bitbay': {
+	'bitbay-net': {
 		name: 'BitBay',
 		homepage: 'https://bitbay.net',
 		getRateFromExchangeData: function(data) {
@@ -76,8 +76,8 @@ var exchanges = {
 			}
 		}
 	},
-	'bitstamp': {
-		name: 'BitStamp.com',
+	'bitstamp-net': {
+		name: 'bitstamp.net',
 		homepage: 'https://www.bitstamp.net/',
 		getRateFromExchangeData: function(data) {
 			return data.ask
@@ -91,7 +91,7 @@ var exchanges = {
 			}
 		}
 	},
-	'kraken': {
+	'kraken-com': {
 		name: 'Kraken',
 		homepage: 'https://www.kraken.com',
 		getRateFromExchangeData: function(data) {

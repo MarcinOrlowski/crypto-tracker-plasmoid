@@ -15,7 +15,6 @@ import org.kde.kquickcontrols 2.0 as KQControls
 import org.kde.plasma.components 3.0 as PlasmaComponents
 import "../js/crypto.js" as Crypto
 
-
 ColumnLayout {
     Layout.fillWidth: true
 
@@ -32,32 +31,33 @@ ColumnLayout {
 
     // ------------------------------------------------------------------------------------------------------------------------
 
-    onExchangeChanged: {
-        if (typeof exchange !== 'undefined') {
-            exchangeComboBox.updateModel(exchange)
+    onExchangeChanged: updateModels()
+    onCryptoChanged: updateModels()
+    onFiatChanged: updateModels()
 
-            cryptoComboBox.updateModel(exchange)
-            // check if current value of crypto is supported by new exchange.
-            // In such case fallback to first supported crypto.
-            if (!Crypto.isCryptoSupported(exchange, crypto)) {
-                var cryptos = getAllExchangeCryptos(exchange)
-                crypto = cryptos[0]
-            }
-        } else {
-            console.debug('exchange is undefined')
+    function updateModels() {
+        if (typeof exchange === 'undefined' || exchange === '') {
+            // console.error(`Undefined exchange or empty: '${exchange}'`)
+            return
         }
-    }
+        if (typeof crypto === 'undefined' || crypto === '') {
+            // console.error(`Undefined crypto or empty: '${crypto}'`)
+        }
+        if (typeof fiat !== 'undefined' || fiat !== '') {
+            // console.error(`Undefined fiat or empty: '${fiat}'`)
+        }
 
-    onCryptoChanged: {
-        if (typeof crypto !== 'undefined') {
-            fiatComboBox.updateModel(exchange, crypto)
-            if (!Crypto.isFiatSupported(exchange, crypto, fiat)) {
-                var fiats = getFiatsForCrypto(exchange, crypto)
-                fiat = fiats[0]
-            }
-        } else {
-            console.debug('Invalid crypto name')
+        exchangeComboBox.updateModel(exchange)
+        cryptoComboBox.updateModel(exchange, crypto)
+        // check if current value of crypto is supported by new exchange.
+        // In such case fallback to first supported crypto.
+        if (!Crypto.isCryptoSupported(exchange, crypto)) {
+            var cryptos = Crypto.getAllExchangeCryptos(exchange)
+            crypto = cryptos[0]
+            cryptoComboBox.updateModel(exchange, cryptos)
         }
+
+        fiatComboBox.updateModel(exchange, crypto, fiat)
     }
 
     // ------------------------------------------------------------------------------------------------------------------------
@@ -85,15 +85,17 @@ ColumnLayout {
             function updateModel(exchange) {
                 var tmp = []
                 var idx = 0
-                var currentIdx = undefined
+                var currentIdx = 0
                 for(const key in Crypto.exchanges) {
                     tmp.push({'value': key, 'text': Crypto.getExchangeName(key)})
                     if (key === exchange) currentIdx = idx
                     idx++
                 }
                 model = tmp
-                currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
+                currentIndex = currentIdx
             }
+
+            Component.onCompleted: updateModel(exchange)
         }
 
         // ------------------------------------------------------------------------------------------------------------------------
@@ -102,23 +104,24 @@ ColumnLayout {
             id: cryptoComboBox
             Kirigami.FormData.label: i18n('Crypto')
             textRole: "text"
-            onCurrentIndexChanged: crypto = model[currentIndex]['value']
+            onCurrentIndexChanged: {
+                console.debug(`cryptoComboBox::onCurrentIndexChanged(): crypto: ${model[currentIndex]['value']}, currentIndex: ${currentIndex}`)
+                crypto = model[currentIndex]['value']
+            }
 
             function updateModel(exchange, crypto) {
-                var tmp = []
-                var currentIdx = undefined
+                console.debug(`cryptoComboBox::updateModel() ex: ${exchange}, crypto: ${crypto}`)
 
+                var tmp = []
+                var currentIdx = 0
                 if (exchange in Crypto.exchanges) {
                     var tmp = Crypto.getAllExchangeCryptos(exchange);
-                    var idx = 0
                     for (var i=0; i<tmp.length; i++) {
-                        if (tmp[i].key == crypto) currentIdx = idx
-                        idx++
+                        if (tmp[i].value == crypto) currentIdx = i
                     }
                 }
-
                 model = tmp
-                currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
+                currentIndex = currentIdx
             }
         }
 
@@ -130,22 +133,19 @@ ColumnLayout {
             textRole: "text"
             onCurrentIndexChanged: fiat = model[currentIndex]['value']
 
-            function updateModel(exchange, crypto) {
-                var tmp = []
-                var currentIdx = undefined
+            function updateModel(exchange, crypto, fiat) {
+                console.debug(`fiatComboBox::updateModel() ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
 
+                var tmp = []
+                var currentIdx = 0
                 if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {
                     tmp = Crypto.getFiatsForCrypto(exchange, crypto)
-
-                    var idx = 0
                     for (var i=0; i<tmp.length; i++) {
-                        if (tmp[i].key === fiat) currentIdx = idx
-                        idx++
+                        if (tmp[i].value === fiat) currentIdx = i
                     }
                 }
-
-                fiatComboBox.model = tmp
-                fiatComboBox.currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
+                model = tmp
+                currentIndex = currentIdx
             }
         }
 

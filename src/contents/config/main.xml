@@ -28,7 +28,7 @@
 			<default>true</default>
 		</entry>
 		<entry name="exchange0" type="String">
-			<default>bitstamp</default>
+			<default>bitstamp-net</default>
 		</entry>
 		<entry name="crypto0" type="String">
 			<default>BTC</default>
@@ -55,13 +55,13 @@
 			<default>false</default>
 		</entry>
 		<entry name="exchange1" type="String">
-			<default>bitbay</default>
+			<default>bitstamp-net</default>
 		</entry>
 		<entry name="crypto1" type="String">
 			<default>BTC</default>
 		</entry>
 		<entry name="fiat1" type="String">
-			<default>PLN</default>
+			<default>USD</default>
 		</entry>
 		<entry name="refreshRate1" type="Int">
 			<default>5</default>
@@ -82,13 +82,13 @@
 			<default>false</default>
 		</entry>
 		<entry name="exchange2" type="String">
-			<default>bitbay</default>
+			<default>bitstamp-net</default>
 		</entry>
 		<entry name="crypto2" type="String">
 			<default>BTC</default>
 		</entry>
 		<entry name="fiat2" type="String">
-			<default>PLN</default>
+			<default>USD</default>
 		</entry>
 		<entry name="refreshRate2" type="Int">
 			<default>5</default>
@@ -109,13 +109,13 @@
 			<default>false</default>
 		</entry>
 		<entry name="exchange3" type="String">
-			<default>bitbay</default>
+			<default>bitstamp-net</default>
 		</entry>
 		<entry name="crypto3" type="String">
 			<default>BTC</default>
 		</entry>
 		<entry name="fiat3" type="String">
-			<default>PLN</default>
+			<default>USD</default>
 		</entry>
 		<entry name="refreshRate3" type="Int">
 			<default>5</default>
@@ -136,13 +136,13 @@
 			<default>false</default>
 		</entry>
 		<entry name="exchange4" type="String">
-			<default>bitbay</default>
+			<default>bitstamp-net</default>
 		</entry>
 		<entry name="crypto4" type="String">
 			<default>BTC</default>
 		</entry>
 		<entry name="fiat4" type="String">
-			<default>PLN</default>
+			<default>USD</default>
 		</entry>
 		<entry name="refreshRate4" type="Int">
 			<default>5</default>
@@ -163,13 +163,13 @@
 			<default>false</default>
 		</entry>
 		<entry name="exchange5" type="String">
-			<default>bitbay</default>
+			<default>bitstamp-net</default>
 		</entry>
 		<entry name="crypto5" type="String">
 			<default>BTC</default>
 		</entry>
 		<entry name="fiat5" type="String">
-			<default>PLN</default>
+			<default>USD</default>
 		</entry>
 		<entry name="refreshRate5" type="Int">
 			<default>5</default>
@@ -184,8 +184,6 @@
 			<default></default>
 		</entry>
 	</group>
-
-
 
 	<group name="CustomColors">
 		<entry name="widgetBg" type="String">

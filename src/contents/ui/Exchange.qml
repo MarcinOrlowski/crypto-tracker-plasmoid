@@ -76,8 +76,6 @@ RowLayout {
 				}
 
 				updateRate = true
-
-				console.debug('updateTrending() direction: ' + trendingDirection)
 			}
 		}
 

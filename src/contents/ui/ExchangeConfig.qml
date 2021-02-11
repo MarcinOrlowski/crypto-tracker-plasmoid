@@ -34,6 +34,9 @@ ColumnLayout {
     property bool showTrendingMarker: true
     property int trendingTimeSpan: 60          // minutes
 
+    property bool flashOnPriceRaise: true
+    property bool flashOnPriceDrop: true
+
     // ------------------------------------------------------------------------------------------------------------------------
 
     onExchangeChanged: updateModels()
@@ -217,6 +220,19 @@ ColumnLayout {
         }
 
         // ------------------------------------------------------------------------------------------------------------------------
+
+        CheckBox {
+            text: i18n("Flash background on price raise")
+            checked: flashOnPriceRaise
+            onCheckedChanged: flashOnPriceRaise = checked
+        }
+
+        CheckBox {
+            text: i18n("Flash background on price drop")
+            checked: flashOnPriceDrop
+            onCheckedChanged: flashOnPriceDrop = checked
+        }
+
     }
 
     // ------------------------------------------------------------------------------------------------------------------------

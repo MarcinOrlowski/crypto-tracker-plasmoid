@@ -34,6 +34,9 @@ ColumnLayout {
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker0
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker0
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan0
+
+		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise0
+		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop0
 	}
 
 	Exchange {
@@ -50,6 +53,9 @@ ColumnLayout {
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker1
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker1
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan1
+
+		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise1
+		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop1
 	}
 
 	Exchange {
@@ -66,6 +72,9 @@ ColumnLayout {
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker2
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker2
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan2
+
+		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise2
+		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop2
 	}
 
 	Exchange {
@@ -82,6 +91,9 @@ ColumnLayout {
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker3
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker3
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan3
+
+		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise3
+		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop3
 	}
 
 	Exchange {
@@ -98,6 +110,9 @@ ColumnLayout {
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker4
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker4
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan4
+
+		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise4
+		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop4
 	}
 
 	Exchange {
@@ -114,6 +129,9 @@ ColumnLayout {
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker5
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker5
     	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan5
+
+		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise5
+		flashOnPriceDrop: plasmoid.configuration.flashOnPriceDrop5
 	}
 
 } // ColumnLayout

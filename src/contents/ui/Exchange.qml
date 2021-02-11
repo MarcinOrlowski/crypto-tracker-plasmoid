@@ -32,6 +32,9 @@ RowLayout {
     property bool showTrendingMarker: true
     property int trendingTimeSpan: 60          // minutes
 
+    property bool flashOnPriceRaise: true
+    property bool flashOnPriceDrop: true
+
     // --------------------------------------------------------------------------------------------
 
     function getColor(direction) {
@@ -186,10 +189,17 @@ RowLayout {
     onRateDirectionChangedChanged: {
         // console.debug('changed: ' + rateChangeDirection)
         if (rateChangeDirection !== 0) {
-            bgWall.color = getColor(rateChangeDirection)
-            bgWall.opacity = 1
-            bgWallFadeTimer.running = true
-            bgWallFadeTimer.start()
+            var flash = false
+
+            if (rateChangeDirection === +1 && flashOnPriceRaise) flash = true
+            if (rateChangeDirection === -1 && flashOnPriceDrop) flash = true
+
+            if (flash) {
+                bgWall.color = getColor(rateChangeDirection)
+                bgWall.opacity = 1
+                bgWallFadeTimer.running = true
+                bgWallFadeTimer.start()
+            }
         }
     }
 

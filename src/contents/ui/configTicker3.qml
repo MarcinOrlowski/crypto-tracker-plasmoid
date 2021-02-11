@@ -23,6 +23,9 @@ Item {
     property alias cfg_showTrendingMarker3: exchange.showTrendingMarker
     property alias cfg_trendingTimeSpan3: exchange.trendingTimeSpan
 
+    property alias cfg_flashOnPriceRaise3: exchange.flashOnPriceRaise
+    property alias cfg_flashOnPriceDrop3: exchange.flashOnPriceDrop
+
 	ExchangeConfig {
 		id: exchange
 	}

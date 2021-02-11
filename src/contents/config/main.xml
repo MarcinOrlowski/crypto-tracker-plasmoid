@@ -58,6 +58,13 @@
 		<entry name="trendingTimeSpan0" type="Int">
 			<default>60</default>
 		</entry>
+
+		<entry name="flashOnPriceRaise0" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="flashOnPriceDrop0" type="Bool">
+			<default>true</default>
+		</entry>
 	</group>
 
 	<group name="Exchange1">
@@ -94,6 +101,13 @@
 		</entry>
 		<entry name="trendingTimeSpan1" type="Int">
 			<default>60</default>
+		</entry>
+
+		<entry name="flashOnPriceRaise1" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="flashOnPriceDrop1" type="Bool">
+			<default>true</default>
 		</entry>
 	</group>
 
@@ -132,6 +146,13 @@
 		<entry name="trendingTimeSpan2" type="Int">
 			<default>60</default>
 		</entry>
+
+		<entry name="flashOnPriceRaise2" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="flashOnPriceDrop2" type="Bool">
+			<default>true</default>
+		</entry>
 	</group>
 	
 	<group name="Exchange3">
@@ -169,6 +190,13 @@
 		<entry name="trendingTimeSpan3" type="Int">
 			<default>60</default>
 		</entry>
+
+		<entry name="flashOnPriceRaise3" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="flashOnPriceDrop3" type="Bool">
+			<default>true</default>
+		</entry>
 	</group>
 
 	<group name="Exchange4">
@@ -204,6 +232,13 @@
 		</entry>
 		<entry name="trendingTimeSpan4" type="Int">
 			<default>60</default>
+		</entry>
+
+		<entry name="flashOnPriceRaise4" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="flashOnPriceDrop4" type="Bool">
+			<default>true</default>
 		</entry>
 	</group>
 
@@ -241,6 +276,14 @@
 		<entry name="trendingTimeSpan5" type="Int">
 			<default>60</default>
 		</entry>
+
+		<entry name="flashOnPriceRaise6" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="flashOnPriceDrop6" type="Bool">
+			<default>true</default>
+		</entry>
+
 	</group>
 
 	<group name="CustomColors">

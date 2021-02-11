@@ -28,7 +28,7 @@
 			<default>bitstamp</default>
 		</entry>
 		<entry name="crypto0" type="String">
-			<default>ETH</default>
+			<default>BTC</default>
 		</entry>
 		<entry name="fiat0" type="String">
 			<default>USD</default>

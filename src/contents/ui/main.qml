@@ -70,8 +70,7 @@ Item {
 	// ------------------------------------------------------------------------------------------------------------------------
 
 	Plasmoid.preferredRepresentation: Plasmoid.compactRepresentation
-	Plasmoid.compactRepresentation: Crypto { }
-//	Plasmoid.fullRepresentation: CalendarView { }
+	Plasmoid.compactRepresentation: Ticker { }
 
 	// ------------------------------------------------------------------------------------------------------------------------
 

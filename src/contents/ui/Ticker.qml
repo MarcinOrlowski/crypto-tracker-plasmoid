@@ -30,6 +30,10 @@ ColumnLayout {
 		refreshRate: plasmoid.configuration.refreshRate0
 		noDecimals: plasmoid.configuration.hidePriceDecimals0
 		localeToUse: plasmoid.configuration.useCustomLocale0 ? plasmoid.configuration.customLocaleName0 : ''
+
+		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker0
+		showTrendingMarker: plasmoid.configuration.showTrendingMarker0
+    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan0
 	}
 
 	Exchange {
@@ -42,6 +46,10 @@ ColumnLayout {
 		refreshRate: plasmoid.configuration.refreshRate1
 		noDecimals: plasmoid.configuration.hidePriceDecimals1
 		localeToUse: plasmoid.configuration.useCustomLocale1 ? plasmoid.configuration.customLocaleName1 : ''
+
+		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker1
+		showTrendingMarker: plasmoid.configuration.showTrendingMarker1
+    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan1
 	}
 
 	Exchange {
@@ -54,6 +62,10 @@ ColumnLayout {
 		refreshRate: plasmoid.configuration.refreshRate2
 		noDecimals: plasmoid.configuration.hidePriceDecimals2
 		localeToUse: plasmoid.configuration.useCustomLocale2 ? plasmoid.configuration.customLocaleName2 : ''
+
+		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker2
+		showTrendingMarker: plasmoid.configuration.showTrendingMarker2
+    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan2
 	}
 
 	Exchange {
@@ -66,6 +78,10 @@ ColumnLayout {
 		refreshRate: plasmoid.configuration.refreshRate3
 		noDecimals: plasmoid.configuration.hidePriceDecimals3
 		localeToUse: plasmoid.configuration.useCustomLocale3 ? plasmoid.configuration.customLocaleName3 : ''
+
+		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker3
+		showTrendingMarker: plasmoid.configuration.showTrendingMarker3
+    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan3
 	}
 
 	Exchange {
@@ -78,6 +94,10 @@ ColumnLayout {
 		refreshRate: plasmoid.configuration.refreshRate4
 		noDecimals: plasmoid.configuration.hidePriceDecimals4
 		localeToUse: plasmoid.configuration.useCustomLocale4 ? plasmoid.configuration.customLocaleName4 : ''
+
+		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker4
+		showTrendingMarker: plasmoid.configuration.showTrendingMarker4
+    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan4
 	}
 
 	Exchange {
@@ -90,5 +110,10 @@ ColumnLayout {
 		refreshRate: plasmoid.configuration.refreshRate5
 		noDecimals: plasmoid.configuration.hidePriceDecimals5
 		localeToUse: plasmoid.configuration.useCustomLocale5 ? plasmoid.configuration.customLocaleName5 : ''
+
+		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker5
+		showTrendingMarker: plasmoid.configuration.showTrendingMarker5
+    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan5
 	}
+
 } // ColumnLayout

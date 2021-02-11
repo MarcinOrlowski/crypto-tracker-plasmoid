@@ -23,11 +23,16 @@ ColumnLayout {
     property string exchange: undefined
     property string crypto: undefined
     property string fiat: undefined
-    property int refreshRate: 5
+    property int refreshRate: 5                 // minutes
     property bool hidePriceDecimals: false
 
     property bool useCustomLocale: false
     property string customLocaleName: ''
+
+    property bool showPriceChangeMarker: true
+
+    property bool showTrendingMarker: true
+    property int trendingTimeSpan: 60          // minutes
 
     // ------------------------------------------------------------------------------------------------------------------------
 
@@ -188,6 +193,30 @@ ColumnLayout {
 
         // ------------------------------------------------------------------------------------------------------------------------
 
+        CheckBox {
+            text: i18n("Show price change marker")
+            checked: showPriceChangeMarker
+            onCheckedChanged: showPriceChangeMarker = checked
+        }
+
+        CheckBox {
+            text: i18n("Show trending marker")
+            checked: showTrendingMarker
+            onCheckedChanged: showTrendingMarker = checked
+        }
+
+        PlasmaComponents.SpinBox {
+            enabled: showTrendingMarker
+            editable: true
+            from: 1
+            to: 600
+            stepSize: 15
+            Kirigami.FormData.label: i18n("Time span (minutes)")
+            value: trendingTimeSpan
+            onValueChanged: trendingTimeSpan = value
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------
     }
 
     // ------------------------------------------------------------------------------------------------------------------------

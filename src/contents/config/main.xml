@@ -48,6 +48,16 @@
 		<entry name="customLocaleName0" type="String">
 			<default></default>
 		</entry>
+
+		<entry name="showPriceChangeMarker0" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="showTrendingMarker0" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="trendingTimeSpan0" type="Int">
+			<default>60</default>
+		</entry>
 	</group>
 
 	<group name="Exchange1">
@@ -74,6 +84,16 @@
 		</entry>
 		<entry name="customLocaleName1" type="String">
 			<default></default>
+		</entry>
+
+		<entry name="showPriceChangeMarker1" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="showTrendingMarker1" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="trendingTimeSpan1" type="Int">
+			<default>60</default>
 		</entry>
 	</group>
 
@@ -102,6 +122,16 @@
 		<entry name="customLocaleName2" type="String">
 			<default></default>
 		</entry>
+
+		<entry name="showPriceChangeMarker2" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="showTrendingMarker2" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="trendingTimeSpan2" type="Int">
+			<default>60</default>
+		</entry>
 	</group>
 	
 	<group name="Exchange3">
@@ -128,6 +158,16 @@
 		</entry>
 		<entry name="customLocaleName3" type="String">
 			<default></default>
+		</entry>
+
+		<entry name="showPriceChangeMarker3" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="showTrendingMarker3" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="trendingTimeSpan3" type="Int">
+			<default>60</default>
 		</entry>
 	</group>
 
@@ -156,6 +196,15 @@
 		<entry name="customLocaleName4" type="String">
 			<default></default>
 		</entry>
+		<entry name="showPriceChangeMarker4" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="showTrendingMarker4" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="trendingTimeSpan4" type="Int">
+			<default>60</default>
+		</entry>
 	</group>
 
 	<group name="Exchange5">
@@ -182,6 +231,15 @@
 		</entry>
 		<entry name="customLocaleName5" type="String">
 			<default></default>
+		</entry>
+		<entry name="showPriceChangeMarker5" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="showTrendingMarker5" type="Bool">
+			<default>true</default>
+		</entry>
+		<entry name="trendingTimeSpan5" type="Int">
+			<default>60</default>
 		</entry>
 	</group>
 

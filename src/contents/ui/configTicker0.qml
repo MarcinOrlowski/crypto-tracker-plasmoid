@@ -19,6 +19,10 @@ Item {
 	property alias cfg_useCustomLocale0: exchange.useCustomLocale
 	property alias cfg_customLocaleName0: exchange.customLocaleName
 
+    property alias cfg_showPriceChangeMarker0: exchange.showPriceChangeMarker
+    property alias cfg_showTrendingMarker0: exchange.showTrendingMarker
+    property alias cfg_trendingTimeSpan0: exchange.trendingTimeSpan
+
 	ExchangeConfig {
 		id: exchange
 	}

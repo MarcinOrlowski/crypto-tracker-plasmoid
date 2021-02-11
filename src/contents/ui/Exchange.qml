@@ -28,6 +28,10 @@ RowLayout {
     property string colorUp: "#00ff00"
     property string colorDown: "#ff0000"
 
+    property bool showPriceChangeMarker: true
+    property bool showTrendingMarker: true
+    property int trendingTimeSpan: 60          // minutes
+
     // --------------------------------------------------------------------------------------------
 
     function getColor(direction) {
@@ -45,18 +49,6 @@ RowLayout {
 
     // --------------------------------------------------------------------------------------------
 
-	readonly property var trendingThreshold: 60 * 60 * 1000	// 1 hour
-/*
-	PlasmaCore.DataSource {
-		id: timeDataSource
-		engine: "time"
-		connectedSources: ["Local"]
-		interval: trendingThreshold
-		intervalAlignment: PlasmaCore.Types.AlignToHour
-		onNewData: updateTrending()
-	}
-*/
-
 	property var lastTrendingUpdateStamp: 0
 	property var lastTrendingRate: 0
 	property int trendingDirection: undefined		// -1, 0, 1
@@ -66,7 +58,7 @@ RowLayout {
 		// one hour
 		var updateRate = false
 		if (lastTrendingUpdateStamp != 0) {
-			if ((now.getTime() - lastTrendingUpdateStamp) >= (trendingThreshold)) {
+			if ((now.getTime() - lastTrendingUpdateStamp) >= (trendingTimeSpan * 60 * 1000)) {
 				if (rate > lastTrendingRate) {
 					trendingDirection = 1
 				} else if (currentRate < lastTrendingRate) {
@@ -122,7 +114,7 @@ RowLayout {
         var localeToUse = tickerRoot.localeToUse
         var noDecimals = tickerRoot.noDecimals
 
-        var color = getColor(rateChangeDirection)
+        var color = '#0000ff'
 
         var rate = currentRate
         if(noDecimals) rate = Math.round(rate)
@@ -130,15 +122,16 @@ RowLayout {
         var rateText = ''
 
         // https://unicode-table.com/en/sets/arrow-symbols/
-        // 1 hrs trending direction
-        var color = getColor(trendingDirection)
-        if (typeof trendingDirection !== 'undefined' && trendingDirection !== 0) {
-            // ↑ Upwards Arrow U+2191
-            rateText += `<span style="color: ${color};">`
-            if (trendingDirection == +1) rateText += '↑'
-            // ↓ Downwards Arrow U+2193
-            if (trendingDirection == -1) rateText += '↓'
-            rateText += '</span> '
+        if (showTrendingMarker) {
+            color = getColor(trendingDirection)
+            if (typeof trendingDirection !== 'undefined' && trendingDirection !== 0) {
+                // ↑ Upwards Arrow U+2191
+                rateText += `<span style="color: ${color};">`
+                if (trendingDirection == +1) rateText += '↑'
+                // ↓ Downwards Arrow U+2193
+                if (trendingDirection == -1) rateText += '↓'
+                rateText += '</span> '
+            }
         }
 
         // var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.currencySymbols[fiat])
@@ -148,18 +141,17 @@ RowLayout {
 
         // echange rate change direction
         // • Bullet black small circle U+2022
-        // var rateText = '• '
-        color = getColor(rateChangeDirection)
-        if (rateChangeDirection !== 0) {
-            // ▲ Black Up-Pointing Triangle U+25B2
-            rateText += ` <span style="color: ${color};">`
-            if (rateChangeDirection == +1) rateText += '▲'
-            // ▼ Black Down-Pointing Triangle U+25BC
-            if (rateChangeDirection == -1) rateText += '▼'
-            rateText += '</span>'
+        if (showPriceChangeMarker) {
+            color = getColor(rateChangeDirection)
+            if (rateChangeDirection !== 0) {
+                // ▲ Black Up-Pointing Triangle U+25B2
+                rateText += ` <span style="color: ${color};">`
+                if (rateChangeDirection == +1) rateText += '▲'
+                // ▼ Black Down-Pointing Triangle U+25BC
+                if (rateChangeDirection == -1) rateText += '▼'
+                rateText += '</span>'
+            }
         }
-
-        // console.debug(`${exchange}: ${rate} => ${rateText}`)
 
         return rateText
     }

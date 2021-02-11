@@ -12,13 +12,33 @@ import org.kde.plasma.configuration 2.0
 
 ConfigModel {
 	ConfigCategory {
-		name: i18n("Ticker 1")
+		name: i18n("Exchange 1")
 		icon: "view-visible"
 		source: "configTicker0.qml"
 	}
 	ConfigCategory {
-		name: i18n("Ticker 2")
+		name: i18n("Exchange 2")
 		icon: "view-visible"
 		source: "configTicker1.qml"
+	}
+	ConfigCategory {
+		name: i18n("Exchange 3")
+		icon: "view-visible"
+		source: "configTicker2.qml"
+	}
+	ConfigCategory {
+		name: i18n("Exchange 4")
+		icon: "view-visible"
+		source: "configTicker3.qml"
+	}
+	ConfigCategory {
+		name: i18n("Exchange 5")
+		icon: "view-visible"
+		source: "configTicker4.qml"
+	}
+	ConfigCategory {
+		name: i18n("Exchange 6")
+		icon: "view-visible"
+		source: "configTicker5.qml"
 	}
 }

@@ -77,6 +77,116 @@
 		</entry>
 	</group>
 
+	<group name="Exchange2">
+		<entry name="running2" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="exchange2" type="String">
+			<default>bitbay</default>
+		</entry>
+		<entry name="crypto2" type="String">
+			<default>BTC</default>
+		</entry>
+		<entry name="fiat2" type="String">
+			<default>PLN</default>
+		</entry>
+		<entry name="refreshRate2" type="Int">
+			<default>5</default>
+		</entry>
+		<entry name="hidePriceDecimals2" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="useCustomLocale2" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customLocaleName2" type="String">
+			<default></default>
+		</entry>
+	</group>
+	
+	<group name="Exchange3">
+		<entry name="running3" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="exchange3" type="String">
+			<default>bitbay</default>
+		</entry>
+		<entry name="crypto3" type="String">
+			<default>BTC</default>
+		</entry>
+		<entry name="fiat3" type="String">
+			<default>PLN</default>
+		</entry>
+		<entry name="refreshRate3" type="Int">
+			<default>5</default>
+		</entry>
+		<entry name="hidePriceDecimals3" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="useCustomLocale3" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customLocaleName3" type="String">
+			<default></default>
+		</entry>
+	</group>
+
+	<group name="Exchange4">
+		<entry name="running4" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="exchange4" type="String">
+			<default>bitbay</default>
+		</entry>
+		<entry name="crypto4" type="String">
+			<default>BTC</default>
+		</entry>
+		<entry name="fiat4" type="String">
+			<default>PLN</default>
+		</entry>
+		<entry name="refreshRate4" type="Int">
+			<default>5</default>
+		</entry>
+		<entry name="hidePriceDecimals4" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="useCustomLocale4" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customLocaleName4" type="String">
+			<default></default>
+		</entry>
+	</group>
+
+	<group name="Exchange5">
+		<entry name="running5" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="exchange5" type="String">
+			<default>bitbay</default>
+		</entry>
+		<entry name="crypto5" type="String">
+			<default>BTC</default>
+		</entry>
+		<entry name="fiat5" type="String">
+			<default>PLN</default>
+		</entry>
+		<entry name="refreshRate5" type="Int">
+			<default>5</default>
+		</entry>
+		<entry name="hidePriceDecimals5" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="useCustomLocale5" type="Bool">
+			<default>false</default>
+		</entry>
+		<entry name="customLocaleName5" type="String">
+			<default></default>
+		</entry>
+	</group>
+
+
+
 	<group name="CustomColors">
 		<entry name="widgetBg" type="String">
 			<default>#00000000</default>

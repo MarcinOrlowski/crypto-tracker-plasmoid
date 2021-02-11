@@ -21,13 +21,5 @@ Item {
 
 	ExchangeConfig {
 		id: exchange
-
-		// exchange: cfg_exchange0
-		// crypto: cfg_crypto0
-		// fiat: cfg_fiat0
-		// refreshRate: cfg_refreshRate0
-		// hidePriceDecimals: cfg_hidePriceDecimals0
-		// useCustomLocale: cfg_useCustomLocale0
-		// customLocaleName: cfg_customLocaleName0
 	}
 }

@@ -25,14 +25,6 @@ Kirigami.FormLayout {
     property int refreshRate: 5
     property bool hidePriceDecimals: false
 
-    function getIdxOfKey(model, key) {
-        for(var i=0; i<model.length; i++) {
-            console.debug(model[i]['value'])
-            if (model[i]['value'] == key) return i
-        }
-        return 0;
-    }
-
 	// ------------------------------------------------------------------------------------------------------------------------
 
     onExchangeChanged: {
@@ -59,7 +51,7 @@ Kirigami.FormLayout {
                 fiat = fiats[0]
             }
         } else {
-            console.error('Invalid crypto name')
+            console.debug('Invalid crypto name')
         }
     }
 
@@ -84,7 +76,6 @@ Kirigami.FormLayout {
             model = tmp
             currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
         }
-
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------------

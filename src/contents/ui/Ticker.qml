@@ -8,10 +8,23 @@
  */
 
 import QtQuick.Layouts 1.1
+import org.kde.plasma.components 3.0 as PlasmaComponents
 import "../js/crypto.js" as Crypto
 
 ColumnLayout {
+	readonly property bool anythingVisible: plasmoid.configuration.running0 | plasmoid.configuration.running1
+
+	PlasmaComponents.Label {
+		visible: !anythingVisible
+		Layout.alignment: Qt.AlignHCenter
+		// textFormat: Text.RichText
+		text: "Edit me!"
+	}
+    
 	Exchange {
+		running: plasmoid.configuration.running0
+		visible: running
+
 		exchange: plasmoid.configuration.exchange0
 		crypto: plasmoid.configuration.crypto0
 		fiat: plasmoid.configuration.fiat0
@@ -21,6 +34,9 @@ ColumnLayout {
 	}
 
 	Exchange {
+		running: plasmoid.configuration.running1
+		visible: running
+
 		exchange: plasmoid.configuration.exchange1
 		crypto: plasmoid.configuration.crypto1
 		fiat: plasmoid.configuration.fiat1

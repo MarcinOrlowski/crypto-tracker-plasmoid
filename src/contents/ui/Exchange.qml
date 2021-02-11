@@ -18,6 +18,7 @@ import "../js/crypto.js" as Crypto
 RowLayout {
     id: tickerRoot
 
+    property bool running: false
     property string exchange: 'bitstamp'
     property string crypto: Crypto.BTC
     property string fiat: 'PLN'
@@ -204,8 +205,7 @@ RowLayout {
 
 	Timer {
 		interval: tickerRoot.refreshRate * 60 * 1000
-        // interval: 15 * 1000
-		running: true
+		running: parent.running
 		repeat: true
 		triggeredOnStart: true
 		onTriggered: fetchRate()

@@ -10,6 +10,7 @@
 import QtQuick 2.0
 
 Item {
+	property alias cfg_running1: exchange.running
 	property alias cfg_exchange1: exchange.exchange
 	property alias cfg_crypto1: exchange.crypto
 	property alias cfg_fiat1: exchange.fiat
@@ -21,12 +22,13 @@ Item {
 	ExchangeConfig {
 		id: exchange
 
-		exchange: cfg_exchange1
-		crypto: cfg_crypto1
-		fiat: cfg_fiat1
-		refreshRate: cfg_refreshRate1
-		hidePriceDecimals: cfg_hidePriceDecimals1
-		useCustomLocale: cfg_useCustomLocale1
-		customLocaleName: cfg_customLocaleName1
+		// running: cfg_running1
+		// exchange: cfg_exchange1
+		// crypto: cfg_crypto1
+		// fiat: cfg_fiat1
+		// refreshRate: cfg_refreshRate1
+		// hidePriceDecimals: cfg_hidePriceDecimals1
+		// useCustomLocale: cfg_useCustomLocale1
+		// customLocaleName: cfg_customLocaleName1
 	}
 }

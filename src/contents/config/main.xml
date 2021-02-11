@@ -24,6 +24,9 @@
 	</group>
 
 	<group name="Exchange0">
+		<entry name="running0" type="Bool">
+			<default>true</default>
+		</entry>
 		<entry name="exchange0" type="String">
 			<default>bitstamp</default>
 		</entry>
@@ -48,6 +51,9 @@
 	</group>
 
 	<group name="Exchange1">
+		<entry name="running1" type="Bool">
+			<default>true</default>
+		</entry>
 		<entry name="exchange1" type="String">
 			<default>bitbay</default>
 		</entry>

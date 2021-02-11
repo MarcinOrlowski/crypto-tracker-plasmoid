@@ -70,128 +70,124 @@ ColumnLayout {
 
     // ------------------------------------------------------------------------------------------------------------------------
 
-    ColumnLayout {
+    Kirigami.FormLayout {
         enabled: running
 
         Layout.fillWidth: true
 
-        Kirigami.FormLayout {
-            enabled: running
+        PlasmaComponents.ComboBox {
+            id: exchangeComboBox
+            Kirigami.FormData.label: i18n('Exchange')
+            textRole: "text"
+            // Component.onCompleted: populateExchageModel()
+            onCurrentIndexChanged: exchange = model[currentIndex]['value']
 
-            PlasmaComponents.ComboBox {
-                id: exchangeComboBox
-                Kirigami.FormData.label: i18n('Exchange')
-                textRole: "text"
-                // Component.onCompleted: populateExchageModel()
-                onCurrentIndexChanged: exchange = model[currentIndex]['value']
+            function updateModel(exchange) {
+                var tmp = []
+                var idx = 0
+                var currentIdx = undefined
+                for(const key in Crypto.exchanges) {
+                    tmp.push({'value': key, 'text': Crypto.getExchangeName(key)})
+                    if (key === exchange) currentIdx = idx
+                    idx++
+                }
+                model = tmp
+                currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
+            }
+        }
 
-                function updateModel(exchange) {
-                    var tmp = []
+        // ------------------------------------------------------------------------------------------------------------------------
+
+        PlasmaComponents.ComboBox {
+            id: cryptoComboBox
+            Kirigami.FormData.label: i18n('Crypto')
+            textRole: "text"
+            onCurrentIndexChanged: crypto = model[currentIndex]['value']
+
+            function updateModel(exchange, crypto) {
+                var tmp = []
+                var currentIdx = undefined
+
+                if (exchange in Crypto.exchanges) {
+                    var tmp = Crypto.getAllExchangeCryptos(exchange);
                     var idx = 0
-                    var currentIdx = undefined
-                    for(const key in Crypto.exchanges) {
-                        tmp.push({'value': key, 'text': Crypto.getExchangeName(key)})
-                        if (key === exchange) currentIdx = idx
+                    for (var i=0; i<tmp.length; i++) {
+                        if (tmp[i].key == crypto) currentIdx = idx
                         idx++
                     }
-                    model = tmp
-                    currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
-                }
-            }
-
-            // ------------------------------------------------------------------------------------------------------------------------
-
-            PlasmaComponents.ComboBox {
-                id: cryptoComboBox
-                Kirigami.FormData.label: i18n('Crypto')
-                textRole: "text"
-                onCurrentIndexChanged: crypto = model[currentIndex]['value']
-
-                function updateModel(exchange, crypto) {
-                    var tmp = []
-                    var currentIdx = undefined
-
-                    if (exchange in Crypto.exchanges) {
-                        var tmp = Crypto.getAllExchangeCryptos(exchange);
-                        var idx = 0
-                        for (var i=0; i<tmp.length; i++) {
-                            if (tmp[i].key == crypto) currentIdx = idx
-                            idx++
-                        }
-                    }
-
-                    model = tmp
-                    currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
-                }
-            }
-
-            // ------------------------------------------------------------------------------------------------------------------------
-
-            PlasmaComponents.ComboBox {
-                id: fiatComboBox
-                Kirigami.FormData.label: i18n('Fiat')
-                textRole: "text"
-                onCurrentIndexChanged: fiat = model[currentIndex]['value']
-
-                function updateModel(exchange, crypto) {
-                    var tmp = []
-                    var currentIdx = undefined
-
-                    if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {
-                        tmp = Crypto.getFiatsForCrypto(exchange, crypto)
-
-                        var idx = 0
-                        for (var i=0; i<tmp.length; i++) {
-                            if (tmp[i].key === fiat) currentIdx = idx
-                            idx++
-                        }
-                    }
-
-                    fiatComboBox.model = tmp
-                    fiatComboBox.currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
-                }
-            }
-
-            // ------------------------------------------------------------------------------------------------------------------------
-
-            PlasmaComponents.SpinBox {
-                editable: true
-                from: 1
-                to: 600
-                stepSize: 15
-                Kirigami.FormData.label: i18n("Update interval (minutes)")
-                value: refreshRate
-                onValueChanged: refreshRate = value
-            }
-
-            // FIXME should be per Pair as we may have i.e. LTCBTC pair soon
-            // and this would make no sense then.
-            PlasmaComponents.CheckBox {
-                text: i18n("Hide price decimals")
-                checked: hidePriceDecimals
-                onCheckedChanged: hidePriceDecimals = checked
-            }
-
-            // ------------------------------------------------------------------------------------------------------------------------
-
-            RowLayout {
-                CheckBox {
-                    text: i18n("Locale to use")
-                    checked: useCustomLocale
-                    onCheckedChanged: useCustomLocale = checked
                 }
 
-                TextField {
-                    enabled: useCustomLocale
-                    placeholderText: "en_US"
-                    text: customLocaleName
-                    onTextChanged: customLocaleName = text
-                }
+                model = tmp
+                currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
             }
-
-            // ------------------------------------------------------------------------------------------------------------------------
-
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------
+
+        PlasmaComponents.ComboBox {
+            id: fiatComboBox
+            Kirigami.FormData.label: i18n('Fiat')
+            textRole: "text"
+            onCurrentIndexChanged: fiat = model[currentIndex]['value']
+
+            function updateModel(exchange, crypto) {
+                var tmp = []
+                var currentIdx = undefined
+
+                if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {
+                    tmp = Crypto.getFiatsForCrypto(exchange, crypto)
+
+                    var idx = 0
+                    for (var i=0; i<tmp.length; i++) {
+                        if (tmp[i].key === fiat) currentIdx = idx
+                        idx++
+                    }
+                }
+
+                fiatComboBox.model = tmp
+                fiatComboBox.currentIndex = (typeof currentIdx !== 'undefined') ? currentIdx : 0
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------
+
+        PlasmaComponents.SpinBox {
+            editable: true
+            from: 1
+            to: 600
+            stepSize: 15
+            Kirigami.FormData.label: i18n("Update interval (minutes)")
+            value: refreshRate
+            onValueChanged: refreshRate = value
+        }
+
+        // FIXME should be per Pair as we may have i.e. LTCBTC pair soon
+        // and this would make no sense then.
+        PlasmaComponents.CheckBox {
+            text: i18n("Hide price decimals")
+            checked: hidePriceDecimals
+            onCheckedChanged: hidePriceDecimals = checked
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------
+
+        RowLayout {
+            CheckBox {
+                text: i18n("Locale to use")
+                checked: useCustomLocale
+                onCheckedChanged: useCustomLocale = checked
+            }
+
+            TextField {
+                enabled: useCustomLocale
+                placeholderText: "en_US"
+                text: customLocaleName
+                onTextChanged: customLocaleName = text
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------
+
     }
 
     // ------------------------------------------------------------------------------------------------------------------------

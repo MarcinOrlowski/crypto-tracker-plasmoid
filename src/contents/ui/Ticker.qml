@@ -17,8 +17,7 @@ ColumnLayout {
 	PlasmaComponents.Label {
 		visible: !anythingVisible
 		Layout.alignment: Qt.AlignHCenter
-		// textFormat: Text.RichText
-		text: "Edit me!"
+		text: i18n("Edit me!")
 	}
     
 	Exchange {

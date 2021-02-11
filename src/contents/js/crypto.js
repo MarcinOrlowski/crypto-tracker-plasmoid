@@ -67,8 +67,13 @@ var exchanges = {
 				'USD': { url: 'https://bitbay.net/API/Public/ETHUSD/ticker.json' },
 				'EUR': { url: 'https://bitbay.net/API/Public/ETHEUR/ticker.json' },
 				'GBP': { url: 'https://bitbay.net/API/Public/ETHGBP/ticker.json' }
+			},
+			LTC: {
+				'PLN': { url: 'https://bitbay.net/API/Public/LTCPLN/ticker.json' },
+				'USD': { url: 'https://bitbay.net/API/Public/LTCUSD/ticker.json' },
+				'EUR': { url: 'https://bitbay.net/API/Public/LTCEUR/ticker.json' },
+				'GBP': { url: 'https://bitbay.net/API/Public/LTCGBP/ticker.json' }
 			}
-
 		}
 	},
 	'bitstamp': {
@@ -115,10 +120,21 @@ function isCryptoSupported(exchange, crypto) {
 	if (exchangeExists(exchange)) {
 		result = crypto in exchanges[exchange]['pairs']
 	} else {
-		console.error(`Invalid exchange id: '${exchange}`)
+		console.error(`Invalid exchange id: '${exchange}'`)
 	}
 	return result
 }
+
+function isFiatSupported(exchange, crypto, fiat) {
+	var result = false
+	if (isCryptoSupported(exchange, crypto)) {
+		result = fiat in exchanges[exchange]['pairs'][crypto]
+	} else {
+		console.error(`Invalid crypto '${crypto}' on '${exchange}'`)
+	}
+	return result
+}
+
 
 // --------------------------------------------------------------------------------------------
 
@@ -130,7 +146,7 @@ function getAllExchangeCryptos(exchange) {
 			cryptoModel.push({'value': key, 'text': getCryptoName(key)})
 		}
 	} else {
-		console.error(`Invalid exchange id: '${exchange}`)
+		console.error(`Invalid exchange id: '${exchange}'`)
 	}
 	return cryptoModel
 }
@@ -158,7 +174,8 @@ function downloadExchangeRate(exchangeId, crypto, fiat, callback) {
 				var json = JSON.parse(data)
 				callback(exchange.getRateFromExchangeData(json))
 			} catch (error) {
-				console.error(`Failed parsing response from '${exchangeId}': ${error}`)
+				console.error(`Failed parsing response from '${exchangeId}': '${error}'`)
+				console.error(`Response data: '${data}'`)
 			}
 		}
 	})

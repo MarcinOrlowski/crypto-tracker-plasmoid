@@ -21,9 +21,9 @@ RowLayout {
     property string exchange: 'bitstamp'
     property string crypto: Crypto.BTC
     property string fiat: 'PLN'
-    property string localeToUse: plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
+    property string localeToUse: ''     // plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
     
-    property int refreshRate: plasmoid.configuration.refreshRate
+    property int refreshRate: 5
     property bool noDecimals: false
     property string colorUp: "#00ff00"
     property string colorDown: "#ff0000"
@@ -134,7 +134,7 @@ RowLayout {
         // https://unicode-table.com/en/sets/arrow-symbols/
         // 1 hrs trending direction
         var color = getColor(trendingDirection)
-        if (typeof trendingDirection != 'undefined' && trendingDirection !== 0) {
+        if (typeof trendingDirection !== 'undefined' && trendingDirection !== 0) {
             // ↑ Upwards Arrow U+2191
             rateText += `<span style="color: ${color};">`
             if (trendingDirection == +1) rateText += '↑'

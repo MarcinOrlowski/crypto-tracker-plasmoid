@@ -112,6 +112,16 @@ ColumnLayout {
             Component.onCompleted: updateModel(exchange)
         }
 
+        PlasmaComponents.SpinBox {
+            editable: true
+            from: 1
+            to: 600
+            stepSize: 15
+            Kirigami.FormData.label: i18n("Update interval (minutes)")
+            value: refreshRate
+            onValueChanged: refreshRate = value
+        }
+
         // ------------------------------------------------------------------------------------------------------------------------
 
         RowLayout {
@@ -151,66 +161,38 @@ ColumnLayout {
 
         // ------------------------------------------------------------------------------------------------------------------------
 
-        PlasmaComponents.ComboBox {
-            id: fiatComboBox
-            Kirigami.FormData.label: i18n('Fiat')
-            textRole: "text"
-            onCurrentIndexChanged: fiat = model[currentIndex]['value']
-
-            function updateModel(exchange, crypto, fiat) {
-                console.debug(`fiatComboBox::updateModel() ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
-
-                var tmp = []
-                var currentIdx = 0
-                if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {
-                    tmp = Crypto.getFiatsForCrypto(exchange, crypto)
-                    for (var i=0; i<tmp.length; i++) {
-                        if (tmp[i].value === fiat) currentIdx = i
-                    }
-                }
-                model = tmp
-                currentIndex = currentIdx
-            }
-        }
-
-        // ------------------------------------------------------------------------------------------------------------------------
-
-        PlasmaComponents.SpinBox {
-            editable: true
-            from: 1
-            to: 600
-            stepSize: 15
-            Kirigami.FormData.label: i18n("Update interval (minutes)")
-            value: refreshRate
-            onValueChanged: refreshRate = value
-        }
-
-        // FIXME should be per Pair as we may have i.e. LTCBTC pair soon
-        // and this would make no sense then.
-        PlasmaComponents.CheckBox {
-            text: i18n("Hide price decimals")
-            checked: hidePriceDecimals
-            onCheckedChanged: hidePriceDecimals = checked
-        }
-
-        // ------------------------------------------------------------------------------------------------------------------------
-
         RowLayout {
-            CheckBox {
-                text: i18n("Locale to use")
-                checked: useCustomLocale
-                onCheckedChanged: useCustomLocale = checked
+            Kirigami.FormData.label: i18n('Fiat')
+
+            PlasmaComponents.ComboBox {
+                id: fiatComboBox
+                textRole: "text"
+                onCurrentIndexChanged: fiat = model[currentIndex]['value']
+
+                function updateModel(exchange, crypto, fiat) {
+                    console.debug(`fiatComboBox::updateModel() ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
+
+                    var tmp = []
+                    var currentIdx = 0
+                    if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {
+                        tmp = Crypto.getFiatsForCrypto(exchange, crypto)
+                        for (var i=0; i<tmp.length; i++) {
+                            if (tmp[i].value === fiat) currentIdx = i
+                        }
+                    }
+                    model = tmp
+                    currentIndex = currentIdx
+                }
             }
 
-            TextField {
-                enabled: useCustomLocale
-                placeholderText: "en_US"
-                text: customLocaleName
-                onTextChanged: customLocaleName = text
+            // FIXME should be per Pair as we may have i.e. LTCBTC pair soon
+            // and this would make no sense then.
+            PlasmaComponents.CheckBox {
+                text: i18n("Hide decimals")
+                checked: hidePriceDecimals
+                onCheckedChanged: hidePriceDecimals = checked
             }
         }
-
-        // ------------------------------------------------------------------------------------------------------------------------
 
         CheckBox {
             text: i18n("Show price change markers")
@@ -235,49 +217,75 @@ ColumnLayout {
             onValueChanged: trendingTimeSpan = value
         }
 
-        // ------------------------------------------------------------------------------------------------------------------------
-
-        CheckBox {
-            text: i18n("Flash background on price raise")
-            checked: flashOnPriceRaise
-            onCheckedChanged: flashOnPriceRaise = checked
-        }
         KQControls.ColorButton {
-            Kirigami.FormData.label: i18n('Price raise background color')
-            dialogTitle: i18n('Price raise background color')
-            color: flashOnPriceRaiseColor
-            onColorChanged: flashOnPriceRaiseColor = color.toString()
-        }
-
-        CheckBox {
-            text: i18n("Flash background on price drop")
-            checked: flashOnPriceDrop
-            onCheckedChanged: flashOnPriceDrop = checked
-        }
-        KQControls.ColorButton {
-            Kirigami.FormData.label: i18n('Price raise background color')
-            dialogTitle: i18n('Price raise background color')
-            color: flashOnPriceDropColor
-            onColorChanged: flashOnPriceDropColor = color.toString()
-        }
-
-        // ------------------------------------------------------------------------------------------------------------------------
-
-        KQControls.ColorButton {
-            Kirigami.FormData.label: i18n('Price raise marker color')
+            enabled: showPriceChangeMarker | showTrendingMarker
+            Kirigami.FormData.label: i18n('Price raise markers')
             dialogTitle: i18n('Price raise marker color')
             color: markerColorPriceRaise
             onColorChanged: markerColorPriceRaise = color.toString()
         }
 
         KQControls.ColorButton {
-            Kirigami.FormData.label: i18n('Price drop marker color')
+            enabled: showPriceChangeMarker | showTrendingMarker
+            Kirigami.FormData.label: i18n('Price drop markers')
             dialogTitle: i18n('Price drop marker color')
             color: markerColorPriceDrop
             onColorChanged: markerColorPriceDrop = color.toString()
         }
 
-    // ------------------------------------------------------------------------------------------------------------------------
+
+        // ------------------------------------------------------------------------------------------------------------------------
+
+        RowLayout {
+            Kirigami.FormData.label: i18n('Use custom locale')
+            CheckBox {
+                checked: useCustomLocale
+                onCheckedChanged: useCustomLocale = checked
+            }
+
+            TextField {
+                enabled: useCustomLocale
+                placeholderText: "en_US"
+                text: customLocaleName
+                onTextChanged: customLocaleName = text
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------------------
+
+        RowLayout {
+            Kirigami.FormData.label: i18n("Flash on price raise")
+            CheckBox {
+                checked: flashOnPriceRaise
+                onCheckedChanged: flashOnPriceRaise = checked
+            }
+            KQControls.ColorButton {
+                enabled: flashOnPriceRaise
+                dialogTitle: i18n('Price raise flash background color')
+                color: flashOnPriceRaiseColor
+                onColorChanged: flashOnPriceRaiseColor = color.toString()
+            }
+        }
+
+        RowLayout {
+            Kirigami.FormData.label: i18n("Flash on price drop")
+
+            CheckBox {
+                checked: flashOnPriceDrop
+                onCheckedChanged: flashOnPriceDrop = checked
+            }
+            KQControls.ColorButton {
+                enabled: flashOnPriceDrop
+                dialogTitle: i18n('Price raise flash background color')
+                color: flashOnPriceDropColor
+                onColorChanged: flashOnPriceDropColor = color.toString()
+            }
+
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------------------
+
 
     } // Kirigami.FormLayout
 

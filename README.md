@@ -1,5 +1,32 @@
-Crypto currency price widget
-============================
+![Crypto Tracker Logo](img/logo.png)
+
+Crypto Tracker for KDE
+======================
+Plasma/KDE crypto currency price tracker widget. Supports
+
+![Widget](img/widget01.png)
+
+Currently setup up to 6 different cryptos to track, but this is pretty artificial limit and will be soon
+lifted once I will have the time to rework configuration UI to properly handle unlimited number of entries
+(which is already internally supported).
+
+> Please note that current version may not support exchange or currency pair you like simply because
+> I did not need them. As long as there's JSON ticker available for the given pair on exchange of your
+> choice it can be easily added to the widget. Please [fill a new ticket](https://github.com/MarcinOrlowski/crypto-plasmoid/issues)
+> for specific exchange, pair to be added.
+
+## Ticker ##
+
+Widget will display separate ticker for each configured exchange:
+
+![Ticker](img/ticker.png)
+
+ 1. Crypto icon (optional)
+ 1. Price trend (calculated in wider time window)
+ 1. Current exchange rate
+ 1. Exchange rate since last update (so this one may go up/down pretty often)
+
+## Configuration ##
 
 ## Installation ##
 
@@ -46,6 +73,7 @@ other apps):
 
  * [Crypto Ticker widget in KDE store](https://www.pling.com/p/1473016/)
  * [Plasmoid developer helper tools](https://github.com/marcinorlowski/plasmoid-tools)
+ * [Logo font: Evil Empire](https://www.dafont.com/evil-empire.font?text=Crypto+Tracker)
 
 ---
 

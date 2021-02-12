@@ -12,7 +12,7 @@ lifted once I will have the time to rework configuration UI to properly handle u
 
 > Please note that current version may not support exchange or currency pair you like simply because
 > I did not need them. As long as there's JSON ticker available for the given pair on exchange of your
-> choice it can be easily added to the widget. Please [fill a new ticket](https://github.com/MarcinOrlowski/crypto-plasmoid/issues)
+> choice it can be easily added to the widget. Please [fill a new ticket](https://github.com/MarcinOrlowski/crypto-tracker-plasmoid/issues)
 > for specific exchange, pair to be added.
 
 ## Ticker ##
@@ -32,8 +32,8 @@ Widget will display separate ticker for each configured exchange:
 
 You should be able to install HTML Clock widget either using built-in Plasma Add-on installer
 or manually, by downloading `*.plasmoid` file either from project
-[Github repository](https://github.com/MarcinOrlowski/crypto-plasmoid/) or
-from [KDE Store](https://www.pling.com/p/1473016/)
+[Github repository](https://github.com/MarcinOrlowski/crypto-tracker-plasmoid/) or
+from [KDE Store](https://store.kde.org/p/1481524/)
 
 ### Using built-in installer ###
 
@@ -45,7 +45,7 @@ choosing "Download New Plasma Widgets...". Then search for "HTML Clock" in "Plas
 
 ### Manual installation ###
 
-Download `*.plasmoid` file from [project Release section](https://github.com/MarcinOrlowski/crypto-plasmoid/releases).
+Download `*.plasmoid` file from [project Release section](https://github.com/MarcinOrlowski/crypto-tracker-plasmoid/releases).
 Then you can either install it via Plasmashell's GUI, by clicking right mouse button over your desktop or panel and
 selecting "Add widgets...", then "Get new widgets..." eventually choosing "Install from local file..." and pointing to downloaded
 `*.plasmoid` file.
@@ -71,7 +71,7 @@ other apps):
 
 ## Additional resources ##
 
- * [Crypto Ticker widget in KDE store](https://www.pling.com/p/1473016/)
+ * [Crypto Ticker widget in KDE store](https://store.kde.org/p/1481524/)
  * [Plasmoid developer helper tools](https://github.com/marcinorlowski/plasmoid-tools)
  * [Logo font: Evil Empire](https://www.dafont.com/evil-empire.font?text=Crypto+Tracker)
 

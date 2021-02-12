@@ -26,6 +26,7 @@ ColumnLayout {
 
 		exchange: plasmoid.configuration.exchange0
 		crypto: plasmoid.configuration.crypto0
+		hideCryptoLogo: plasmoid.configuration.hideCryptoLogo0
 		fiat: plasmoid.configuration.fiat0
 		refreshRate: plasmoid.configuration.refreshRate0
 		noDecimals: plasmoid.configuration.hidePriceDecimals0
@@ -50,6 +51,7 @@ ColumnLayout {
 
 		exchange: plasmoid.configuration.exchange1
 		crypto: plasmoid.configuration.crypto1
+		hideCryptoLogo: plasmoid.configuration.hideCryptoLogo1
 		fiat: plasmoid.configuration.fiat1
 		refreshRate: plasmoid.configuration.refreshRate1
 		noDecimals: plasmoid.configuration.hidePriceDecimals1
@@ -74,6 +76,7 @@ ColumnLayout {
 
 		exchange: plasmoid.configuration.exchange2
 		crypto: plasmoid.configuration.crypto2
+		hideCryptoLogo: plasmoid.configuration.hideCryptoLogo2
 		fiat: plasmoid.configuration.fiat2
 		refreshRate: plasmoid.configuration.refreshRate2
 		noDecimals: plasmoid.configuration.hidePriceDecimals2
@@ -98,6 +101,7 @@ ColumnLayout {
 
 		exchange: plasmoid.configuration.exchange3
 		crypto: plasmoid.configuration.crypto3
+		hideCryptoLogo: plasmoid.configuration.hideCryptoLogo3
 		fiat: plasmoid.configuration.fiat3
 		refreshRate: plasmoid.configuration.refreshRate3
 		noDecimals: plasmoid.configuration.hidePriceDecimals3
@@ -122,6 +126,7 @@ ColumnLayout {
 
 		exchange: plasmoid.configuration.exchange4
 		crypto: plasmoid.configuration.crypto4
+		hideCryptoLogo: plasmoid.configuration.hideCryptoLogo4
 		fiat: plasmoid.configuration.fiat4
 		refreshRate: plasmoid.configuration.refreshRate4
 		noDecimals: plasmoid.configuration.hidePriceDecimals4
@@ -146,6 +151,7 @@ ColumnLayout {
 
 		exchange: plasmoid.configuration.exchange5
 		crypto: plasmoid.configuration.crypto5
+		hideCryptoLogo: plasmoid.configuration.hideCryptoLogo5
 		fiat: plasmoid.configuration.fiat5
 		refreshRate: plasmoid.configuration.refreshRate5
 		noDecimals: plasmoid.configuration.hidePriceDecimals5

@@ -22,6 +22,7 @@ ColumnLayout {
 
     property string exchange: undefined
     property string crypto: undefined
+    property bool hideCryptoLogo: false
     property string fiat: undefined
     property int refreshRate: 5                 // minutes
     property bool hidePriceDecimals: false
@@ -113,30 +114,40 @@ ColumnLayout {
 
         // ------------------------------------------------------------------------------------------------------------------------
 
-        PlasmaComponents.ComboBox {
-            id: cryptoComboBox
+        RowLayout {
             Kirigami.FormData.label: i18n('Crypto')
-            textRole: "text"
-            onCurrentIndexChanged: {
-                console.debug(`cryptoComboBox::onCurrentIndexChanged(): crypto: ${model[currentIndex]['value']}, currentIndex: ${currentIndex}`)
-                crypto = model[currentIndex]['value']
+
+            PlasmaComponents.ComboBox {
+                id: cryptoComboBox
+                textRole: "text"
+                onCurrentIndexChanged: {
+                    console.debug(`cryptoComboBox::onCurrentIndexChanged(): crypto: ${model[currentIndex]['value']}, currentIndex: ${currentIndex}`)
+                    crypto = model[currentIndex]['value']
+                }
+
+                function updateModel(exchange, crypto) {
+                    console.debug(`cryptoComboBox::updateModel() ex: ${exchange}, crypto: ${crypto}`)
+
+                    var tmp = []
+                    var currentIdx = 0
+                    if (exchange in Crypto.exchanges) {
+                        var tmp = Crypto.getAllExchangeCryptos(exchange);
+                        for (var i=0; i<tmp.length; i++) {
+                            if (tmp[i].value == crypto) currentIdx = i
+                        }
+                    }
+                    model = tmp
+                    currentIndex = currentIdx
+                }
             }
 
-            function updateModel(exchange, crypto) {
-                console.debug(`cryptoComboBox::updateModel() ex: ${exchange}, crypto: ${crypto}`)
-
-                var tmp = []
-                var currentIdx = 0
-                if (exchange in Crypto.exchanges) {
-                    var tmp = Crypto.getAllExchangeCryptos(exchange);
-                    for (var i=0; i<tmp.length; i++) {
-                        if (tmp[i].value == crypto) currentIdx = i
-                    }
-                }
-                model = tmp
-                currentIndex = currentIdx
+            CheckBox {
+                text: i18n("Hide icon")
+                checked: hideCryptoLogo
+                onCheckedChanged: hideCryptoLogo = checked
             }
         }
+
 
         // ------------------------------------------------------------------------------------------------------------------------
 
@@ -202,13 +213,13 @@ ColumnLayout {
         // ------------------------------------------------------------------------------------------------------------------------
 
         CheckBox {
-            text: i18n("Show price change marker")
+            text: i18n("Show price change markers")
             checked: showPriceChangeMarker
             onCheckedChanged: showPriceChangeMarker = checked
         }
 
         CheckBox {
-            text: i18n("Show trending marker")
+            text: i18n("Show trending markers")
             checked: showTrendingMarker
             onCheckedChanged: showTrendingMarker = checked
         }
@@ -219,7 +230,7 @@ ColumnLayout {
             from: 1
             to: 600
             stepSize: 15
-            Kirigami.FormData.label: i18n("Time span (minutes)")
+            Kirigami.FormData.label: i18n("Trending span (minutes)")
             value: trendingTimeSpan
             onValueChanged: trendingTimeSpan = value
         }

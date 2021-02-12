@@ -13,6 +13,7 @@ Item {
 	property alias cfg_running2: exchange.running
 	property alias cfg_exchange2: exchange.exchange
 	property alias cfg_crypto2: exchange.crypto
+	property alias cfg_hideCryptoLogo2: exchange.hideCryptoLogo
 	property alias cfg_fiat2: exchange.fiat
 	property alias cfg_refreshRate2: exchange.refreshRate
 	property alias cfg_hidePriceDecimals2: exchange.hidePriceDecimals

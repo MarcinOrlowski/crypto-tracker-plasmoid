@@ -15,12 +15,19 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 // import "../js/meta.js" as Meta
 import "../js/crypto.js" as Crypto
 
-RowLayout {
+GridLayout {
     id: tickerRoot
+
+    columns: 4
+    rows: 1
+
+    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+    Layout.fillWidth: true
 
     property bool running: false
     property string exchange: 'bitstamp'
     property string crypto: Crypto.BTC
+    property bool hideCryptoLogo: false
     property string fiat: 'PLN'
     property string localeToUse: ''     // plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
     property int refreshRate: 5
@@ -42,7 +49,7 @@ RowLayout {
 
     // --------------------------------------------------------------------------------------------
 
-    function getColor(direction, colorUp, colorDown) {
+    function getDirectionColor(direction, colorUp, colorDown) {
         var color = '#ffffff'
         switch(direction) {
             case +1: 
@@ -96,6 +103,7 @@ RowLayout {
 
     // --------------------------------------------------------------------------------------------
 
+    // must be first item in the layout hierarchy to stay behind all other elements
     Rectangle {
         id: bgWall
         anchors.fill: parent
@@ -116,7 +124,40 @@ RowLayout {
 
     // --------------------------------------------------------------------------------------------
 
-    function formatRateText() {
+    function getTrendingMarkerText() {
+        // https://unicode-table.com/en/sets/arrow-symbols/
+        var color = getDirectionColor(trendingDirection, markerColorPriceRaise, markerColorPriceDrop)
+        var rateText = ''
+        if (typeof trendingDirection !== 'undefined' && trendingDirection !== 0) {
+            // ↑ Upwards Arrow U+2191
+            rateText += `<span style="color: ${color};">`
+            if (trendingDirection == +1) rateText += '↑'
+            // ↓ Downwards Arrow U+2193
+            if (trendingDirection == -1) rateText += '↓'
+            rateText += '</span> '
+        }
+
+        return rateText
+    }
+
+    function getRateChangeMarkerText() {
+        // echange rate change direction
+        // • Bullet black small circle U+2022
+        var color = getDirectionColor(rateChangeDirection, markerColorPriceRaise, markerColorPriceDrop)
+        var rateText = ''
+        if (rateChangeDirection !== 0) {
+            // ▲ Black Up-Pointing Triangle U+25B2
+            rateText += ` <span style="color: ${color};">`
+            if (rateChangeDirection == +1) rateText += '▲'
+            // ▼ Black Down-Pointing Triangle U+25BC
+            if (rateChangeDirection == -1) rateText += '▼'
+            rateText += '</span>'
+        }
+
+        return rateText
+    }
+
+    function getCurrentRateText() {
         if (typeof currentRate === 'undefined') return '---'
 
         var localeToUse = tickerRoot.localeToUse
@@ -129,49 +170,54 @@ RowLayout {
 
         var rateText = ''
 
-        // https://unicode-table.com/en/sets/arrow-symbols/
-        if (showTrendingMarker) {
-            color = getColor(trendingDirection, markerColorPriceRaise, markerColorPriceDrop)
-            if (typeof trendingDirection !== 'undefined' && trendingDirection !== 0) {
-                // ↑ Upwards Arrow U+2191
-                rateText += `<span style="color: ${color};">`
-                if (trendingDirection == +1) rateText += '↑'
-                // ↓ Downwards Arrow U+2193
-                if (trendingDirection == -1) rateText += '↓'
-                rateText += '</span> '
-            }
-        }
-
         // var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.currencySymbols[fiat])
         var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
         if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
         rateText += `<span>${tmp}</span>`
 
-        // echange rate change direction
-        // • Bullet black small circle U+2022
-        if (showPriceChangeMarker) {
-            color = getColor(rateChangeDirection, markerColorPriceRaise, markerColorPriceDrop)
-            if (rateChangeDirection !== 0) {
-                // ▲ Black Up-Pointing Triangle U+25B2
-                rateText += ` <span style="color: ${color};">`
-                if (rateChangeDirection == +1) rateText += '▲'
-                // ▼ Black Down-Pointing Triangle U+25BC
-                if (rateChangeDirection == -1) rateText += '▼'
-                rateText += '</span>'
-            }
-        }
 
         return rateText
     }
 
-    PlasmaComponents.Label {
-        id: rateLabel
+    // --------------------------------------------------------------------------------------------
 
+    Image {
+        id: cryptoIcon
+        visible: !hideCryptoLogo
+
+        width: 20
+        height: 20
+        Layout.minimumWidth: 20
+        Layout.minimumHeight: 20
+        Layout.maximumWidth: 20
+        Layout.maximumHeight: 20
+        // Layout.alignment: Qt.AlignHCenter
+        // fillMode: Image.PreserveAspectFit
+        source: plasmoid.file('', 'images/' + Crypto.getCryptoIcon(crypto))
+    }
+
+    PlasmaComponents.Label {
+        visible: showTrendingMarker
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
 
         Layout.alignment: Qt.AlignHCenter
-        Layout.fillWidth: true
+        // Layout.fillWidth: true
+        height: 20
+        textFormat: Text.RichText
+        fontSizeMode: Text.Fit
+        // minimumPixelSize: bitcoinIcon.width * 0.7
+        minimumPixelSize: 8
+        // font.pixelSize: 12			
+        text: getTrendingMarkerText()
+    }
+
+    PlasmaComponents.Label {
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+
+        Layout.alignment: Qt.AlignHCenter
+        // Layout.fillWidth: true
         height: 20
 
         textFormat: Text.RichText
@@ -179,8 +225,25 @@ RowLayout {
         // minimumPixelSize: bitcoinIcon.width * 0.7
         minimumPixelSize: 8
         // font.pixelSize: 12			
-        // text: 'N/A'
-        text: formatRateText()
+        text: getCurrentRateText()
+    }
+
+    PlasmaComponents.Label {
+        visible: showPriceChangeMarker
+
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+
+        Layout.alignment: Qt.AlignHCenter
+        // Layout.fillWidth: true
+        height: 16
+
+        textFormat: Text.RichText
+        fontSizeMode: Text.Fit
+        // minimumPixelSize: bitcoinIcon.width * 0.7
+        minimumPixelSize: 8
+        // font.pixelSize: 12			
+        text: getRateChangeMarkerText()
     }
 
     // --------------------------------------------------------------------------------------------
@@ -200,7 +263,7 @@ RowLayout {
             if (rateChangeDirection === -1 && flashOnPriceDrop) flash = true
 
             if (flash) {
-                bgWall.color = getColor(rateChangeDirection, flashOnPriceRaiseColor, flashOnPriceDropColor)
+                bgWall.color = getDirectionColor(rateChangeDirection, flashOnPriceRaiseColor, flashOnPriceDropColor)
                 bgWall.opacity = 1
                 bgWallFadeTimer.running = true
                 bgWallFadeTimer.start()

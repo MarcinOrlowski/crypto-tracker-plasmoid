@@ -33,23 +33,20 @@ function getCurrencySymbol(code) {
 
 var cryptos = {
 	BTC: {
-		name: 'Bitcoin',
-		icon: 'btc.svg'
+		name: 'Bitcoin'
 	},
 	ETH: {
-		name: 'Ethereum',
-		icon: 'eth.svg'
+		name: 'Ethereum'
 	},
 	LTC: {
-		name: 'Litecoin',
-		icon: 'ltc.svg'
+		name: 'Litecoin'
 	}
 }
 function getCryptoName(code) {
 	return `${cryptos[code]['name']} (${code})`
 }
 function getCryptoIcon(code) {
-	return cryptos[code]['icon']
+	return code.toLowerCase() + '.svg'
 }
 
 // --------------------------------------------------------------------------------------------

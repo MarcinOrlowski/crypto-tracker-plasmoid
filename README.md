@@ -2,7 +2,7 @@
 
 Crypto Tracker for KDE
 ======================
-Plasma/KDE crypto currency price tracker widget. Supports
+Plasma/KDE multi crypto currency price tracker widget.
 
 ![Widget](img/widget01.png)
 

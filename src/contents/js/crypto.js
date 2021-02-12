@@ -19,8 +19,7 @@ var currencySymbols = {
 	'GBP': '£',					// British Pound Sterling
 	'JPY': '¥',					// Japanese Yen
 	'PLN': 'zł',				// Polish Zloty
-	'USD': '$',					// US Dollar
-	'USDT': 'T$',				// USDT
+	'USD': '$'					// US Dollar
 }
 function getCurrencyName(code) {
 	return `${code} (${currencySymbols[code]})`
@@ -40,13 +39,16 @@ var cryptos = {
 	},
 	LTC: {
 		name: 'Litecoin'
+	},
+	XRP: {
+		name: 'Ripple'
 	}
 }
 function getCryptoName(code) {
 	return `${cryptos[code]['name']} (${code})`
 }
 function getCryptoIcon(code) {
-	return code.toLowerCase() + '.svg'
+	return `${code}.svg`
 }
 
 // --------------------------------------------------------------------------------------------
@@ -75,6 +77,12 @@ var exchanges = {
 				'GBP',
 			],
 			LTC: [
+				'PLN',
+				'USD',
+				'EUR',
+				'GBP',
+			],
+			XRP: [
 				'PLN',
 				'USD',
 				'EUR',
@@ -150,7 +158,6 @@ function isFiatSupported(exchange, crypto, fiat) {
 	}
 	return result
 }
-
 
 // --------------------------------------------------------------------------------------------
 

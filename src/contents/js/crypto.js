@@ -48,7 +48,9 @@ function getCryptoName(code) {
 	return `${cryptos[code]['name']} (${code})`
 }
 function getCryptoIcon(code) {
-	return `${code}.svg`
+	var icon = `${code}.svg`
+	console.debug(icon)
+	return icon
 }
 
 // --------------------------------------------------------------------------------------------

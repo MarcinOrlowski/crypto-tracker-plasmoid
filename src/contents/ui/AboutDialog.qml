@@ -49,7 +49,9 @@ Dialog {
 			text: `${Meta.title} v${Meta.version}`
 		}
 
-		CopyrightLabel { }
+		CopyrightLabel {
+			Layout.alignment: Qt.AlignHCenter
+		}
 
 		Item {
 			height: 20

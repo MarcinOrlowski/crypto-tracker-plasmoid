@@ -61,25 +61,28 @@ var exchanges = {
 		getRateFromExchangeData: function(data) {
 			return data.ask
 		},
+		getUrl: function(crypto, fiat) {
+			return `https://bitbay.net/API/Public/${crypto}${fiat}/ticker.json`
+		},
 		pairs: {
-			BTC: {
-				'PLN': { url: 'https://bitbay.net/API/Public/BTCPLN/ticker.json' },
-				'USD': { url: 'https://bitbay.net/API/Public/BTCUSD/ticker.json' },
-				'EUR': { url: 'https://bitbay.net/API/Public/BTCEUR/ticker.json' },
-				'GBP': { url: 'https://bitbay.net/API/Public/BTCGBP/ticker.json' }
-			},
-			ETH: {
-				'PLN': { url: 'https://bitbay.net/API/Public/ETHPLN/ticker.json' },
-				'USD': { url: 'https://bitbay.net/API/Public/ETHUSD/ticker.json' },
-				'EUR': { url: 'https://bitbay.net/API/Public/ETHEUR/ticker.json' },
-				'GBP': { url: 'https://bitbay.net/API/Public/ETHGBP/ticker.json' }
-			},
-			LTC: {
-				'PLN': { url: 'https://bitbay.net/API/Public/LTCPLN/ticker.json' },
-				'USD': { url: 'https://bitbay.net/API/Public/LTCUSD/ticker.json' },
-				'EUR': { url: 'https://bitbay.net/API/Public/LTCEUR/ticker.json' },
-				'GBP': { url: 'https://bitbay.net/API/Public/LTCGBP/ticker.json' }
-			}
+			BTC: [
+				'PLN',
+				'USD',
+				'EUR',
+				'GBP',
+			],
+			ETH: [
+				'PLN',
+				'USD',
+				'EUR',
+				'GBP',
+			],
+			LTC: [
+				'PLN',
+				'USD',
+				'EUR',
+				'GBP',
+			],
 		}
 	},
 	'bitstamp-net': {
@@ -88,13 +91,16 @@ var exchanges = {
 		getRateFromExchangeData: function(data) {
 			return data.ask
 		},
+		getUrl: function(crypto, fiat) {
+			return `https://www.bitstamp.net/api/v2/ticker/${crypto}${fiat}/`
+		},
 		pairs: {
-			BTC: { 
-				'USD': { url: 'https://www.bitstamp.net/api/v2/ticker/BTCUSD/' }
-			},
-			ETH: {
-				'USD': { url: 'https://www.bitstamp.net/api/v2/ticker/ETHUSD/' }
-			}
+			BTC: [
+				'USD'
+			],
+			ETH: [
+				'USD'
+			],
 		}
 	},
 	'kraken-com': {
@@ -103,10 +109,13 @@ var exchanges = {
 		getRateFromExchangeData: function(data) {
 			return data.result.XXBTZUSD.a[0]
 		},
+		getUrl: function(crypto, fiat) {
+			return `https://api.kraken.com/0/public/Ticker?pair=${crypto}${fiat}`
+		},
 		pairs: {
-			BTC: {
-				'USD': { url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD' }
-			}
+			BTC: [
+				'USD',
+			]
 		}
 	}
 }
@@ -119,6 +128,10 @@ function getExchangeName(exchange) {
 	var result = exchangeExists(exchange) ? exchanges[exchange]['name'] : undefined
 	if (typeof result === 'undefined') console.error(`Invalid exchange id: '${exchange}`)
 	return result
+}
+
+function isExchangeValid(exchange) {
+	return exchange in exchanges
 }
 
 function isCryptoSupported(exchange, crypto) {
@@ -134,7 +147,7 @@ function isCryptoSupported(exchange, crypto) {
 function isFiatSupported(exchange, crypto, fiat) {
 	var result = false
 	if (isCryptoSupported(exchange, crypto)) {
-		result = fiat in exchanges[exchange]['pairs'][crypto]
+		result = (exchanges[exchange]['pairs'][crypto].indexOf(fiat) !== -1)
 	} else {
 		console.error(`Invalid crypto '${crypto}' on '${exchange}'`)
 	}
@@ -160,7 +173,9 @@ function getFiatsForCrypto(exchange, crypto) {
 	var currencyModel = null
 	if (isCryptoSupported(exchange, crypto)) {
 		currencyModel = []
-		for(const key in exchanges[exchange]['pairs'][crypto]) {
+		var fiats = exchanges[exchange]['pairs'][crypto]
+		for(var i = 0; i < fiats.length; i++) {
+			var key = fiats[i]
 			currencyModel.push({'value': key, 'text': getCurrencyName(key)})
 		}
 	} else {
@@ -174,7 +189,7 @@ function getFiatsForCrypto(exchange, crypto) {
 
 function downloadExchangeRate(exchangeId, crypto, fiat, callback) {
 	var exchange = exchanges[exchangeId]
-	request(exchange['pairs'][crypto][fiat].url, function(data) {
+	request(exchange.getUrl(crypto, fiat), function(data) {
 		if(data.length !== 0) {
 			try {
 				var json = JSON.parse(data)

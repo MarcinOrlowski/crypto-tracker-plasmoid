@@ -285,15 +285,15 @@ GridLayout {
 
         updateInProgress = true;
 
-        if (!(exchange in Crypto.exchanges)) {
+        if (!Crypto.isExchangeValid(exchange)) {
             console.debug(`fetchRate(): invalid exchange: '${exchange}'`)
             return
         }
-        if (!(crypto in Crypto.exchanges[exchange]['pairs'])) {
+        if (!Crypto.isCryptoSupported(exchange, crypto)) {
             console.debug(`fetchRate(): invalid crypto: '${crypto}' for exchange: '${exchange}'`)
             return
         }
-        if (!(fiat in Crypto.exchanges[exchange]['pairs'][crypto])) {
+        if (!Crypto.isFiatSupported(exchange, crypto, fiat)) {
             console.debug(`fetchRate(): invalid fiat: '${fiat}' for crypto: '${crypto}' and exchange: '${exchange}'`)
             return
         }

@@ -70,7 +70,7 @@ Item {
 	// ------------------------------------------------------------------------------------------------------------------------
 
 	Plasmoid.preferredRepresentation: Plasmoid.compactRepresentation
-	Plasmoid.compactRepresentation: Ticker { }
+	Plasmoid.compactRepresentation: ExchangeContainer { }
 
 	// ------------------------------------------------------------------------------------------------------------------------
 

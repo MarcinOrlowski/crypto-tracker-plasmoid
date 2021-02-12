@@ -130,14 +130,9 @@ ColumnLayout {
             PlasmaComponents.ComboBox {
                 id: cryptoComboBox
                 textRole: "text"
-                onCurrentIndexChanged: {
-                    console.debug(`cryptoComboBox::onCurrentIndexChanged(): crypto: ${model[currentIndex]['value']}, currentIndex: ${currentIndex}`)
-                    crypto = model[currentIndex]['value']
-                }
+                onCurrentIndexChanged: crypto = model[currentIndex]['value']
 
                 function updateModel(exchange, crypto) {
-                    console.debug(`cryptoComboBox::updateModel() ex: ${exchange}, crypto: ${crypto}`)
-
                     var tmp = []
                     var currentIdx = 0
                     if (exchange in Crypto.exchanges) {
@@ -170,8 +165,6 @@ ColumnLayout {
                 onCurrentIndexChanged: fiat = model[currentIndex]['value']
 
                 function updateModel(exchange, crypto, fiat) {
-                    console.debug(`fiatComboBox::updateModel() ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
-
                     var tmp = []
                     var currentIdx = 0
                     if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {

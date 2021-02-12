@@ -32,8 +32,6 @@ GridLayout {
     property string localeToUse: ''     // plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
     property int refreshRate: 5
     property bool noDecimals: false
-    // property string colorUp: "#00ff00"
-    // property string colorDown: "#ff0000"
 
     property bool showPriceChangeMarker: true
     property bool showTrendingMarker: true

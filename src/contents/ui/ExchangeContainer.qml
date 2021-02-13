@@ -7,11 +7,23 @@
  * @link      https://github.com/MarcinOrlowski/crypto-plasmoid
  */
 
+import QtQuick 2.0
 import QtQuick.Layouts 1.1
+import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents
 import "../js/crypto.js" as Crypto
 
-ColumnLayout {
+GridLayout {
+	readonly property bool vericalOrientation: plasmoid.formFactor == PlasmaCore.Types.Vertical
+	readonly property string defaultLocale: ''
+
+	rows: vericalOrientation ? 6 : 1
+	columns: vericalOrientation ? 1 : 6
+
+	Component.onCompleted: {
+		console.debug('orient vert: ' + vericalOrientation)
+	}
+
 	readonly property bool anythingVisible: plasmoid.configuration.running0 | plasmoid.configuration.running1
 
 	PlasmaComponents.Label {
@@ -27,10 +39,9 @@ ColumnLayout {
 		exchange: plasmoid.configuration.exchange0
 		crypto: plasmoid.configuration.crypto0
 		hideCryptoLogo: plasmoid.configuration.hideCryptoLogo0
-		fiat: plasmoid.configuration.fiat0
 		refreshRate: plasmoid.configuration.refreshRate0
 		noDecimals: plasmoid.configuration.hidePriceDecimals0
-		localeToUse: plasmoid.configuration.useCustomLocale0 ? plasmoid.configuration.customLocaleName0 : ''
+		localeToUse: plasmoid.configuration.useCustomLocale0 ? plasmoid.configuration.customLocaleName0 : defaultLocale
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker0
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker0
@@ -55,7 +66,7 @@ ColumnLayout {
 		fiat: plasmoid.configuration.fiat1
 		refreshRate: plasmoid.configuration.refreshRate1
 		noDecimals: plasmoid.configuration.hidePriceDecimals1
-		localeToUse: plasmoid.configuration.useCustomLocale1 ? plasmoid.configuration.customLocaleName1 : ''
+		localeToUse: plasmoid.configuration.useCustomLocale1 ? plasmoid.configuration.customLocaleName1 : defaultLocale
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker1
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker1
@@ -80,7 +91,7 @@ ColumnLayout {
 		fiat: plasmoid.configuration.fiat2
 		refreshRate: plasmoid.configuration.refreshRate2
 		noDecimals: plasmoid.configuration.hidePriceDecimals2
-		localeToUse: plasmoid.configuration.useCustomLocale2 ? plasmoid.configuration.customLocaleName2 : ''
+		localeToUse: plasmoid.configuration.useCustomLocale2 ? plasmoid.configuration.customLocaleName2 : defaultLocale
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker2
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker2
@@ -105,7 +116,7 @@ ColumnLayout {
 		fiat: plasmoid.configuration.fiat3
 		refreshRate: plasmoid.configuration.refreshRate3
 		noDecimals: plasmoid.configuration.hidePriceDecimals3
-		localeToUse: plasmoid.configuration.useCustomLocale3 ? plasmoid.configuration.customLocaleName3 : ''
+		localeToUse: plasmoid.configuration.useCustomLocale3 ? plasmoid.configuration.customLocaleName3 : defaultLocale
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker3
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker3
@@ -130,7 +141,7 @@ ColumnLayout {
 		fiat: plasmoid.configuration.fiat4
 		refreshRate: plasmoid.configuration.refreshRate4
 		noDecimals: plasmoid.configuration.hidePriceDecimals4
-		localeToUse: plasmoid.configuration.useCustomLocale4 ? plasmoid.configuration.customLocaleName4 : ''
+		localeToUse: plasmoid.configuration.useCustomLocale4 ? plasmoid.configuration.customLocaleName4 : defaultLocale
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker4
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker4
@@ -155,7 +166,7 @@ ColumnLayout {
 		fiat: plasmoid.configuration.fiat5
 		refreshRate: plasmoid.configuration.refreshRate5
 		noDecimals: plasmoid.configuration.hidePriceDecimals5
-		localeToUse: plasmoid.configuration.useCustomLocale5 ? plasmoid.configuration.customLocaleName5 : ''
+		localeToUse: plasmoid.configuration.useCustomLocale5 ? plasmoid.configuration.customLocaleName5 : defaultLocale
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker5
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker5

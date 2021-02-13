@@ -327,7 +327,7 @@ GridLayout {
             return
         }
 
-        console.debug(`fetchRate(): ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
+        // console.debug(`fetchRate(): ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
 
         Crypto.downloadExchangeRate(exchange, crypto, fiat, function(rate) {
             var now = new Date()

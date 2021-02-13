@@ -194,15 +194,15 @@ function getFiatsForCrypto(exchange, crypto) {
 function downloadExchangeRate(exchangeId, crypto, fiat, callback) {
 	var exchange = exchanges[exchangeId]
 	var url = exchange.getUrl(crypto, fiat)
-	console.debug(`downloadExchangeRate() url: ${url}'`)
 	request(url, function(data) {
 		if(data.length !== 0) {
 			try {
 				var json = JSON.parse(data)
 				callback(exchange.getRateFromExchangeData(json))
 			} catch (error) {
-				console.error(`Failed parsing response from '${exchangeId}': '${error}'`)
-				console.error(`Response data: '${data}'`)
+				console.error(`downloadExchangeRate(): Response parsing failed for '${url}'`)
+				console.error(`downloadExchangeRate(): error: '${error}'`)
+				console.error(`downloadExchangeRate(): data: '${data}'`)
 			}
 		}
 	})

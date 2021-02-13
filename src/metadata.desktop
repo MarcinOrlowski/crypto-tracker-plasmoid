@@ -15,7 +15,7 @@ X-KDE-PluginInfo-FirstReleaseYear=2021
 
 X-KDE-PluginInfo-Email=
 X-KDE-PluginInfo-License=MIT
-X-KDE-PluginInfo-Name=com.marcinorlowski.kde.crypto
+X-KDE-PluginInfo-Name=com.marcinorlowski.kde.crypto-tracker
 X-KDE-PluginInfo-Version=1.0.0
 X-KDE-PluginInfo-Website=https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
 X-KDE-ServiceTypes=Plasma/Applet

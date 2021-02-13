@@ -36,39 +36,6 @@ Item {
 
 	// ------------------------------------------------------------------------------------------------------------------------
 
-	property string tooltipMainText: ''
-	property string tooltipSubText: ''
-
-/*
-	PlasmaCore.DataSource {
-		engine: "time"
-		connectedSources: ["Local"]
-		interval: 1000
-		intervalAlignment: PlasmaCore.Types.NoAlignment
-		onDataChanged: {
-			var mainText = i18n("Widget is in Fake Parameters mode now.")
-			var subText = i18n("Disable it in Settings/User Theme.")
-
-			if (!plasmoid.configuration.useFakeParameters) {
-				var localeToUse = plasmoid.configuration.useSpecificLocaleEnabled
-						? plasmoid.configuration.useSpecificLocaleLocaleName
-						: ''
-
-				mainText = DTF.format(plasmoid.configuration.tooltipFirstLineFormat, localeToUse)
-				subText = DTF.format(plasmoid.configuration.tooltipSecondLineFormat, localeToUse)
-			}
-
-			tooltipMainText = mainText
-			tooltipSubText = subText
-		}
-	}
-*/
-
-	// Plasmoid.toolTipMainText: tooltipMainText
-	// Plasmoid.toolTipSubText: tooltipSubText
-
-	// ------------------------------------------------------------------------------------------------------------------------
-
 	Plasmoid.preferredRepresentation: Plasmoid.compactRepresentation
 	Plasmoid.compactRepresentation: ExchangeContainer { }
 

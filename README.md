@@ -4,7 +4,7 @@ Crypto Tracker for KDE
 ======================
 Plasma/KDE multi crypto currency price tracker widget, with support for multiple exchanges and currency pairs.
 
-![Widget](img/widget01.png)
+![Widget vertical](img/widget01.png) ![Widget horizontal](img/widget02.png)
 
 Currently setup up to 6 different cryptos to track, but this is pretty artificial limit and will be soon
 lifted once I will have the time to rework configuration UI to properly handle unlimited number of entries

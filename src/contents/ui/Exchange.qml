@@ -47,6 +47,12 @@ GridLayout {
 
     // --------------------------------------------------------------------------------------------
 
+    onExchangeChanged: fetchRate(exchange, crypto, fiat)
+    onCryptoChanged: fetchRate(exchange, crypto, fiat)
+    onFiatChanged: fetchRate(exchange, crypto, fiat)
+
+    // --------------------------------------------------------------------------------------------
+
     function getDirectionColor(direction, colorUp, colorDown) {
         var color = '#ffffff'
         switch(direction) {
@@ -79,7 +85,6 @@ GridLayout {
 				} else {
 					trendingDirection = 0
 				}
-
 				updateRate = true
 			}
 		}
@@ -88,7 +93,6 @@ GridLayout {
 			lastTrendingUpdateStamp = now.getTime()
 			lastTrendingRate = rate
 		}
-
 	}
 
     // --------------------------------------------------------------------------------------------
@@ -171,7 +175,6 @@ GridLayout {
         var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
         if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
         rateText += `<span>${tmp}</span>`
-
 
         return rateText
     }

@@ -363,7 +363,8 @@ GridLayout {
         var exchange = Crypto.exchanges[exchangeId]
         var url = exchange.getUrl(crypto, fiat)
 
-        console.debug(`Download url: '${url}'`)
+        // console.debug(`Download url: '${url}'`)
+
         request(url, function(data) {
             if(data.length !== 0) {
                 try {

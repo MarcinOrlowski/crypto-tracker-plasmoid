@@ -47,9 +47,18 @@ GridLayout {
 
     // --------------------------------------------------------------------------------------------
 
-    onExchangeChanged: fetchRate(exchange, crypto, fiat)
-    onCryptoChanged: fetchRate(exchange, crypto, fiat)
-    onFiatChanged: fetchRate(exchange, crypto, fiat)
+    onExchangeChanged: {
+        invalidateExchangeData();
+        fetchRate(exchange, crypto, fiat)
+    }
+    onCryptoChanged: {
+        invalidateExchangeData();
+        fetchRate(exchange, crypto, fiat)
+    }
+    onFiatChanged: {
+        invalidateExchangeData();
+        fetchRate(exchange, crypto, fiat)
+    }
 
     // --------------------------------------------------------------------------------------------
 
@@ -70,12 +79,27 @@ GridLayout {
 
 	property var lastTrendingUpdateStamp: 0
 	property var lastTrendingRate: 0
-	property int trendingDirection: undefined		// -1, 0, 1
+	property int trendingDirection: 0		// -1, 0, 1
+    property bool trendingCalculated: false
+
+    function invalidateExchangeData() {
+        lastTrendingUpdateStamp = 0
+        lastTrendingRate: 0
+        trendingDirection = 0
+        trendingCalculated = false
+
+        currentRate = 0
+        currentRateValid = false
+        lastRate = 0
+        lastRateValid = false
+
+        rateChangeDirection = 0
+        rateChangeDirectionCalculated = false
+    }
+
 	function updateTrending(rate) {
 		var now = new Date()
-
-		// one hour
-		var updateRate = false
+		var updateTrending = false
 		if (lastTrendingUpdateStamp != 0) {
 			if ((now.getTime() - lastTrendingUpdateStamp) >= (trendingTimeSpan * 60 * 1000)) {
 				if (rate > lastTrendingRate) {
@@ -85,15 +109,32 @@ GridLayout {
 				} else {
 					trendingDirection = 0
 				}
-				updateRate = true
+				updateTrending = true
+                trendingCalculated = true
 			}
 		}
 
-		if (lastTrendingUpdateStamp == 0 || updateRate) {
+		if (lastTrendingUpdateStamp == 0 || updateTrending) {
 			lastTrendingUpdateStamp = now.getTime()
 			lastTrendingRate = rate
 		}
 	}
+
+    function getTrendingMarkerText() {
+        // https://unicode-table.com/en/sets/arrow-symbols/
+        var color = getDirectionColor(trendingDirection, markerColorPriceRaise, markerColorPriceDrop)
+        var rateText = ''
+        if (trendingCalculated && (trendingDirection !== 0)) {
+            // ↑ Upwards Arrow U+2191
+            rateText += `<span style="color: ${color};">`
+            if (trendingDirection == +1) rateText += '↑'
+            // ↓ Downwards Arrow U+2193
+            if (trendingDirection == -1) rateText += '↓'
+            rateText += '</span> '
+        }
+
+        return rateText
+    }
 
     // --------------------------------------------------------------------------------------------
 
@@ -101,6 +142,45 @@ GridLayout {
         id: mouseArea
         anchors.fill: parent
         onClicked: fetchRate(exchange, crypto, fiat)
+    }
+
+    // --------------------------------------------------------------------------------------------
+
+    function getRateChangeMarkerText() {
+        // echange rate change direction
+        // • Bullet black small circle U+2022
+        var color = getDirectionColor(rateChangeDirection, markerColorPriceRaise, markerColorPriceDrop)
+        var rateText = ''
+        if (rateChangeDirection !== 0) {
+            // ▲ Black Up-Pointing Triangle U+25B2
+            rateText += ` <span style="color: ${color};">`
+            if (rateChangeDirection == +1) rateText += '▲'
+            // ▼ Black Down-Pointing Triangle U+25BC
+            if (rateChangeDirection == -1) rateText += '▼'
+            rateText += '</span>'
+        }
+
+        return rateText
+    }
+
+    function getCurrentRateText() {
+        if (!currentRateValid) return '---'
+
+        var localeToUse = tickerRoot.localeToUse
+        var noDecimals = tickerRoot.noDecimals
+
+        var color = '#0000ff'
+
+        var rate = currentRate
+        if(noDecimals) rate = Math.round(rate)
+
+        var rateText = ''
+
+        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
+        if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
+        rateText += `<span>${tmp}</span>`
+
+        return rateText
     }
 
     // --------------------------------------------------------------------------------------------
@@ -123,61 +203,6 @@ GridLayout {
             running = (bgWall.opacity !== 0)
         }
 	}
-
-    // --------------------------------------------------------------------------------------------
-
-    function getTrendingMarkerText() {
-        // https://unicode-table.com/en/sets/arrow-symbols/
-        var color = getDirectionColor(trendingDirection, markerColorPriceRaise, markerColorPriceDrop)
-        var rateText = ''
-        if (typeof trendingDirection !== 'undefined' && trendingDirection !== 0) {
-            // ↑ Upwards Arrow U+2191
-            rateText += `<span style="color: ${color};">`
-            if (trendingDirection == +1) rateText += '↑'
-            // ↓ Downwards Arrow U+2193
-            if (trendingDirection == -1) rateText += '↓'
-            rateText += '</span> '
-        }
-
-        return rateText
-    }
-
-    function getRateChangeMarkerText() {
-        // echange rate change direction
-        // • Bullet black small circle U+2022
-        var color = getDirectionColor(rateChangeDirection, markerColorPriceRaise, markerColorPriceDrop)
-        var rateText = ''
-        if (rateChangeDirection !== 0) {
-            // ▲ Black Up-Pointing Triangle U+25B2
-            rateText += ` <span style="color: ${color};">`
-            if (rateChangeDirection == +1) rateText += '▲'
-            // ▼ Black Down-Pointing Triangle U+25BC
-            if (rateChangeDirection == -1) rateText += '▼'
-            rateText += '</span>'
-        }
-
-        return rateText
-    }
-
-    function getCurrentRateText() {
-        if (typeof currentRate === 'undefined') return '---'
-
-        var localeToUse = tickerRoot.localeToUse
-        var noDecimals = tickerRoot.noDecimals
-
-        var color = '#0000ff'
-
-        var rate = currentRate
-        if(noDecimals) rate = Math.round(rate)
-
-        var rateText = ''
-
-        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
-        if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
-        rateText += `<span>${tmp}</span>`
-
-        return rateText
-    }
 
     // --------------------------------------------------------------------------------------------
 
@@ -249,14 +274,17 @@ GridLayout {
     // --------------------------------------------------------------------------------------------
 
     property var lastUpdateMillis: 0
-    property var currentRate: undefined
-    property var lastRate: undefined
+    property bool currentRateValid: false
+    property var currentRate: 0
+    property bool lastRateValid: false
+    property var lastRate: 0
     property int rateChangeDirection: 0             // -1, 0, 1
+    property bool rateChangeDirectionCalculated: false
 
     property bool rateDirectionChanged: false
     onRateDirectionChangedChanged: {
         // console.debug('changed: ' + rateChangeDirection)
-        if (rateChangeDirection !== 0) {
+        if (rateChangeDirectionCalculated && (rateChangeDirection !== 0)) {
             var flash = false
 
             if (rateChangeDirection === +1 && flashOnPriceRaise) flash = true
@@ -283,11 +311,7 @@ GridLayout {
 
     property bool updateInProgress: false
     function fetchRate(exchange, crypto, fiat) {
-        if (updateInProgress) {
-            console.debug('updateInProgres: true')
-            return
-        }
-
+        if (updateInProgress) return
         updateInProgress = true;
 
         if (!Crypto.isExchangeValid(exchange)) {
@@ -309,20 +333,27 @@ GridLayout {
             var now = new Date()
             lastUpdateMillis = now.getTime()
 
-            lastRate = currentRate
-            currentRate = rate
-
-            var lastRateChangeDirection = rateChangeDirection
-            if (currentRate > lastRate) {
-                rateChangeDirection = 1
-            } else if (currentRate < lastRate) {
-                rateChangeDirection = -1
-            } else { 
-                rateChangeDirection = 0
+            if (currentRateValid) {
+                lastRate = currentRate
+                lastRateValid = true
             }
-            rateDirectionChanged = (lastRateChangeDirection !== rateChangeDirection)
+            currentRate = rate
+            currentRateValid = true
 
-			updateTrending(currentRate)
+            if (lastRateValid) {
+                var lastRateChangeDirection = rateChangeDirection
+                if (currentRate > lastRate) {
+                    rateChangeDirection = 1
+                } else if (currentRate < lastRate) {
+                    rateChangeDirection = -1
+                } else { 
+                    rateChangeDirection = 0
+                }
+                rateDirectionChanged = (lastRateChangeDirection !== rateChangeDirection)
+                rateChangeDirectionCalculated = true
+            }
+
+            updateTrending(currentRate)
 
             updateInProgress = false
         });

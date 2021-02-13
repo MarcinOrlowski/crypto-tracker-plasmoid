@@ -309,10 +309,10 @@ GridLayout {
 
     // --------------------------------------------------------------------------------------------
 
-    property bool updateInProgress: false
+    property bool dataDownloadInProgress: false
     function fetchRate(exchange, crypto, fiat) {
-        if (updateInProgress) return
-        updateInProgress = true;
+        if (dataDownloadInProgress) return
+        dataDownloadInProgress = true;
 
         if (!Crypto.isExchangeValid(exchange)) {
             console.debug(`fetchRate(): unknown exchange: '${exchange}'`)
@@ -329,7 +329,7 @@ GridLayout {
 
         // console.debug(`fetchRate(): ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
 
-        Crypto.downloadExchangeRate(exchange, crypto, fiat, function(rate) {
+        downloadExchangeRate(exchange, crypto, fiat, function(rate) {
             var now = new Date()
             lastUpdateMillis = now.getTime()
 
@@ -354,9 +354,41 @@ GridLayout {
             }
 
             updateTrending(currentRate)
-
-            updateInProgress = false
         });
+    }
+
+    // --------------------------------------------------------------------------------------------
+
+    function downloadExchangeRate(exchangeId, crypto, fiat, callback) {
+        var exchange = Crypto.exchanges[exchangeId]
+        var url = exchange.getUrl(crypto, fiat)
+
+        console.debug(`Download url: '${url}'`)
+        request(url, function(data) {
+            if(data.length !== 0) {
+                try {
+                    var json = JSON.parse(data)
+                    callback(exchange.getRateFromExchangeData(json))
+                } catch (error) {
+                    console.error(`downloadExchangeRate(): Response parsing failed for '${url}'`)
+                    console.error(`downloadExchangeRate(): error: '${error}'`)
+                    console.error(`downloadExchangeRate(): data: '${data}'`)
+                }
+            }
+            dataDownloadInProgress = false
+        })
+        return true
+    }
+
+    function request(url, callback) {
+        var xhr = new XMLHttpRequest()
+        xhr.onreadystatechange = function() {
+            if(xhr.readyState === 4) {
+                callback(xhr.responseText)
+            }
+        }
+        xhr.open('GET', url, true)
+        xhr.send('')
     }
 
     // --------------------------------------------------------------------------------------------

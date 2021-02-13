@@ -17,7 +17,6 @@ const LTC='LTC'
 var currencySymbols = {
 	'EUR': '€',					// Euro
 	'GBP': '£',					// British Pound Sterling
-	'JPY': '¥',					// Japanese Yen
 	'PLN': 'zł',				// Polish Zloty
 	'USD': '$'					// US Dollar
 }
@@ -56,7 +55,7 @@ function getCryptoIcon(code) {
 var exchanges = {
 	'bitbay-net': {
 		name: 'BitBay',
-		homepage: 'https://bitbay.net/',
+		url: 'https://bitbay.net/',
 		getRateFromExchangeData: function(data) {
 			return data.ask
 		},
@@ -91,8 +90,8 @@ var exchanges = {
 		}
 	},
 	'bitstamp-net': {
-		name: 'bitstamp.net',
-		homepage: 'https://www.bitstamp.net/',
+		name: 'BitStamp',
+		url: 'https://www.bitstamp.net/',
 		getRateFromExchangeData: function(data) {
 			return data.ask
 		},
@@ -110,7 +109,7 @@ var exchanges = {
 	},
 	'kraken-com': {
 		name: 'Kraken',
-		homepage: 'https://www.kraken.com/',
+		url: 'https://www.kraken.com/',
 		getRateFromExchangeData: function(data) {
 			return data.result.XXBTZUSD.a[0]
 		},
@@ -187,35 +186,4 @@ function getFiatsForCrypto(exchange, crypto) {
 		console.error(`Can't get fiat pairs for '${crypto}' on '${exchange}' (${exName})`)
 	}
 	return currencyModel
-}
-
-// --------------------------------------------------------------------------------------------
-
-function downloadExchangeRate(exchangeId, crypto, fiat, callback) {
-	var exchange = exchanges[exchangeId]
-	var url = exchange.getUrl(crypto, fiat)
-	request(url, function(data) {
-		if(data.length !== 0) {
-			try {
-				var json = JSON.parse(data)
-				callback(exchange.getRateFromExchangeData(json))
-			} catch (error) {
-				console.error(`downloadExchangeRate(): Response parsing failed for '${url}'`)
-				console.error(`downloadExchangeRate(): error: '${error}'`)
-				console.error(`downloadExchangeRate(): data: '${data}'`)
-			}
-		}
-	})
-	return true
-}
-
-function request(url, callback) {
-	var xhr = new XMLHttpRequest()
-	xhr.onreadystatechange = function() {
-		if(xhr.readyState === 4) {
-			callback(xhr.responseText)
-		}
-	}
-	xhr.open('GET', url, true)
-	xhr.send('')
 }

@@ -39,6 +39,7 @@ GridLayout {
 		exchange: plasmoid.configuration.exchange0
 		crypto: plasmoid.configuration.crypto0
 		hideCryptoLogo: plasmoid.configuration.hideCryptoLogo0
+		fiat: plasmoid.configuration.fiat0
 		refreshRate: plasmoid.configuration.refreshRate0
 		noDecimals: plasmoid.configuration.hidePriceDecimals0
 		localeToUse: plasmoid.configuration.useCustomLocale0 ? plasmoid.configuration.customLocaleName0 : defaultLocale

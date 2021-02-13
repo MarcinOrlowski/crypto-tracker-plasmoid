@@ -25,10 +25,10 @@ GridLayout {
     Layout.fillWidth: true
 
     property bool running: false
-    property string exchange: 'bitstamp'
-    property string crypto: Crypto.BTC
+    property string exchange: ''
+    property string crypto: ''
     property bool hideCryptoLogo: false
-    property string fiat: 'PLN'
+    property string fiat: ''
     property string localeToUse: ''     // plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
     property int refreshRate: 5
     property bool noDecimals: false
@@ -96,7 +96,7 @@ GridLayout {
     MouseArea {
         id: mouseArea
         anchors.fill: parent
-        onClicked: fetchRate()
+        onClicked: fetchRate(exchange, crypto, fiat)
     }
 
     // --------------------------------------------------------------------------------------------
@@ -168,7 +168,6 @@ GridLayout {
 
         var rateText = ''
 
-        // var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.currencySymbols[fiat])
         var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
         if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
         rateText += `<span>${tmp}</span>`
@@ -274,29 +273,34 @@ GridLayout {
 		running: parent.running
 		repeat: true
 		triggeredOnStart: true
-		onTriggered: fetchRate()
+		onTriggered: fetchRate(exchange, crypto, fiat)
 	}
 
     // --------------------------------------------------------------------------------------------
 
     property bool updateInProgress: false
-    function fetchRate() {
-        if (updateInProgress) return
+    function fetchRate(exchange, crypto, fiat) {
+        if (updateInProgress) {
+            console.debug('updateInProgres: true')
+            return
+        }
 
         updateInProgress = true;
 
         if (!Crypto.isExchangeValid(exchange)) {
-            console.debug(`fetchRate(): invalid exchange: '${exchange}'`)
+            console.debug(`fetchRate(): unknown exchange: '${exchange}'`)
             return
         }
         if (!Crypto.isCryptoSupported(exchange, crypto)) {
-            console.debug(`fetchRate(): invalid crypto: '${crypto}' for exchange: '${exchange}'`)
+            console.debug(`fetchRate(): unsupported crypto: '${crypto}' on exchange: '${exchange}'`)
             return
         }
         if (!Crypto.isFiatSupported(exchange, crypto, fiat)) {
-            console.debug(`fetchRate(): invalid fiat: '${fiat}' for crypto: '${crypto}' and exchange: '${exchange}'`)
+            console.debug(`fetchRate(): unsupported fiat: '${fiat}' for crypto: '${crypto}' on exchange: '${exchange}'`)
             return
         }
+
+        console.debug(`fetchRate(): ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
 
         Crypto.downloadExchangeRate(exchange, crypto, fiat, function(rate) {
             var now = new Date()

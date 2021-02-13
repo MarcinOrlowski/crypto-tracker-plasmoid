@@ -48,9 +48,7 @@ function getCryptoName(code) {
 	return `${cryptos[code]['name']} (${code})`
 }
 function getCryptoIcon(code) {
-	var icon = `${code}.svg`
-	console.debug(icon)
-	return icon
+	return `${code}.svg`
 }
 
 // --------------------------------------------------------------------------------------------
@@ -58,7 +56,7 @@ function getCryptoIcon(code) {
 var exchanges = {
 	'bitbay-net': {
 		name: 'BitBay',
-		homepage: 'https://bitbay.net',
+		homepage: 'https://bitbay.net/',
 		getRateFromExchangeData: function(data) {
 			return data.ask
 		},
@@ -99,7 +97,7 @@ var exchanges = {
 			return data.ask
 		},
 		getUrl: function(crypto, fiat) {
-			return `https://www.bitstamp.net/api/v2/ticker/${crypto}${fiat}/`
+			return `https://www.bitstamp.net/api/v2/ticker/${crypto}${fiat}`
 		},
 		pairs: {
 			BTC: [
@@ -112,7 +110,7 @@ var exchanges = {
 	},
 	'kraken-com': {
 		name: 'Kraken',
-		homepage: 'https://www.kraken.com',
+		homepage: 'https://www.kraken.com/',
 		getRateFromExchangeData: function(data) {
 			return data.result.XXBTZUSD.a[0]
 		},
@@ -195,7 +193,9 @@ function getFiatsForCrypto(exchange, crypto) {
 
 function downloadExchangeRate(exchangeId, crypto, fiat, callback) {
 	var exchange = exchanges[exchangeId]
-	request(exchange.getUrl(crypto, fiat), function(data) {
+	var url = exchange.getUrl(crypto, fiat)
+	console.debug(`downloadExchangeRate() url: ${url}'`)
+	request(url, function(data) {
 		if(data.length !== 0) {
 			try {
 				var json = JSON.parse(data)

@@ -141,7 +141,12 @@ GridLayout {
     MouseArea {
         id: mouseArea
         anchors.fill: parent
-        onClicked: fetchRate(exchange, crypto, fiat)
+        onClicked: {
+            if (!dataDownloadInProgress) {
+                tickerRoot.opacity = 0.5
+                fetchRate(exchange, crypto, fiat)
+            }
+        }
     }
 
     // --------------------------------------------------------------------------------------------
@@ -166,16 +171,12 @@ GridLayout {
     function getCurrentRateText() {
         if (!currentRateValid) return '---'
 
-        var localeToUse = tickerRoot.localeToUse
-        var noDecimals = tickerRoot.noDecimals
-
         var color = '#0000ff'
 
         var rate = currentRate
         if(noDecimals) rate = Math.round(rate)
 
         var rateText = ''
-
         var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
         if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
         rateText += `<span>${tmp}</span>`
@@ -300,7 +301,7 @@ GridLayout {
     }
 
 	Timer {
-		interval: tickerRoot.refreshRate * 60 * 1000
+		interval: refreshRate * 60 * 1000
 		running: parent.running
 		repeat: true
 		triggeredOnStart: true
@@ -376,6 +377,7 @@ GridLayout {
                     console.error(`downloadExchangeRate(): data: '${data}'`)
                 }
             }
+            tickerRoot.opacity = 1
             dataDownloadInProgress = false
         })
         return true

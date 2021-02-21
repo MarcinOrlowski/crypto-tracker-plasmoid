@@ -48,14 +48,17 @@ GridLayout {
     // --------------------------------------------------------------------------------------------
 
     onExchangeChanged: {
+        console.debug('1')
         invalidateExchangeData();
         fetchRate(exchange, crypto, fiat)
     }
     onCryptoChanged: {
+        console.debug('2')
         invalidateExchangeData();
         fetchRate(exchange, crypto, fiat)
     }
     onFiatChanged: {
+        console.debug('3')
         invalidateExchangeData();
         fetchRate(exchange, crypto, fiat)
     }

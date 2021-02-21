@@ -55,22 +55,17 @@ ColumnLayout {
             return
         }
         if (typeof crypto === 'undefined' || crypto === '') {
-            // console.error(`Undefined crypto or empty: '${crypto}'`)
+            var cryptos = Crypto.getAllExchangeCryptos(exchange);
+            crypto = cryptos[0].value
+
         }
         if (typeof fiat !== 'undefined' || fiat !== '') {
-            // console.error(`Undefined fiat or empty: '${fiat}'`)
+            var fiats = Crypto.getFiatsForCrypto(exchange, crypto)
+            fiat = fiats[0].value
         }
 
         exchangeComboBox.updateModel(exchange)
         cryptoComboBox.updateModel(exchange, crypto)
-        // check if current value of crypto is supported by new exchange.
-        // In such case fallback to first supported crypto.
-        if (!Crypto.isCryptoSupported(exchange, crypto)) {
-            var cryptos = Crypto.getAllExchangeCryptos(exchange)
-            crypto = cryptos[0]
-            cryptoComboBox.updateModel(exchange, cryptos)
-        }
-
         fiatComboBox.updateModel(exchange, crypto, fiat)
     }
 
@@ -138,6 +133,7 @@ ColumnLayout {
                 onCurrentIndexChanged: crypto = model[currentIndex]['value']
 
                 function updateModel(exchange, crypto) {
+                    console.debug(`crypto:UpdateModel: ${exchange}, ${crypto}`)
                     var tmp = []
                     var currentIdx = 0
                     if (exchange in Crypto.exchanges) {
@@ -148,6 +144,10 @@ ColumnLayout {
                     }
                     model = tmp
                     currentIndex = currentIdx
+
+                    // as the model is swapped, different crypto can be at already set index
+                    // so we need to ensure we do not use old value any more.
+                    crypto = model[currentIndex]['value']
                 }
             }
 
@@ -169,6 +169,7 @@ ColumnLayout {
                 onCurrentIndexChanged: fiat = model[currentIndex]['value']
 
                 function updateModel(exchange, crypto, fiat) {
+                    console.debug(`fiat:UpdateModel: ${exchange}, ${crypto}, ${fiat}`)
                     var tmp = []
                     var currentIdx = 0
                     if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {
@@ -179,6 +180,10 @@ ColumnLayout {
                     }
                     model = tmp
                     currentIndex = currentIdx
+
+                    // as the model is swapped, different fiat can be at already set index
+                    // so we need to ensure we do not use old value any more.
+                    fiat = model[currentIndex]['value']
                 }
             }
 

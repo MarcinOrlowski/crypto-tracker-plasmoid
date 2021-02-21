@@ -370,7 +370,7 @@ GridLayout {
             if(data.length !== 0) {
                 try {
                     var json = JSON.parse(data)
-                    callback(exchange.getRateFromExchangeData(json))
+                    callback(exchange.getRateFromExchangeData(json, crypto, fiat))
                 } catch (error) {
                     console.error(`downloadExchangeRate(): Response parsing failed for '${url}'`)
                     console.error(`downloadExchangeRate(): error: '${error}'`)

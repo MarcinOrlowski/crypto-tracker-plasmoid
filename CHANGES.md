@@ -1,4 +1,5 @@
 * @dev
+  * Added more pairs for Kraken and Bitstamp
   * Widget now fades during data downloading for manually triggered refreshes
 
 * v1.0.0 (2021-02-13)

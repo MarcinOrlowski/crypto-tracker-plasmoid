@@ -18,7 +18,8 @@ var currencySymbols = {
 	'EUR': '€',					// Euro
 	'GBP': '£',					// British Pound Sterling
 	'PLN': 'zł',				// Polish Zloty
-	'USD': '$'					// US Dollar
+	'USD': '$',					// US Dollar
+	'JPY': '¥',					// Japanese Yen
 }
 function getCurrencyName(code) {
 	return `${code} (${currencySymbols[code]})`
@@ -56,7 +57,7 @@ var exchanges = {
 	'bitbay-net': {
 		name: 'BitBay',
 		url: 'https://bitbay.net/',
-		getRateFromExchangeData: function(data) {
+		getRateFromExchangeData: function(data, crypto, fiat) {
 			return data.ask
 		},
 		getUrl: function(crypto, fiat) {
@@ -92,7 +93,7 @@ var exchanges = {
 	'bitstamp-net': {
 		name: 'BitStamp',
 		url: 'https://www.bitstamp.net/',
-		getRateFromExchangeData: function(data) {
+		getRateFromExchangeData: function(data, crypto, fiat) {
 			return data.ask
 		},
 		getUrl: function(crypto, fiat) {
@@ -100,18 +101,41 @@ var exchanges = {
 		},
 		pairs: {
 			BTC: [
-				'USD'
+				'USD',
+				'EUR',
+				'GBP',
 			],
 			ETH: [
-				'USD'
+				'USD',
+				'EUR',
+				'GBP',
+			],
+			LTC: [
+				'USD',
+				'EUR',
+				'GBP',
+			],
+			XRP: [
+				'USD',
+				'EUR',
+				'GBP',
 			],
 		}
 	},
 	'kraken-com': {
 		name: 'Kraken',
 		url: 'https://www.kraken.com/',
-		getRateFromExchangeData: function(data) {
-			return data.result.XXBTZUSD.a[0]
+		getRateFromExchangeData: function(data, crypto, fiat) {
+			// FIXME hardcoded mapping
+			switch (crypto) {
+				case 'BTC':
+					crypto = 'XBT'
+					break
+				default:
+					// do nothing
+					break
+			}
+			return data.result[`X${crypto}Z${fiat}`].a[0]
 		},
 		getUrl: function(crypto, fiat) {
 			return `https://api.kraken.com/0/public/Ticker?pair=${crypto}${fiat}`
@@ -119,7 +143,28 @@ var exchanges = {
 		pairs: {
 			BTC: [
 				'USD',
-			]
+				'EUR',
+				'GBP',
+				'JPY',
+			],
+			ETH: [
+				'USD',
+				'EUR',
+				'GBP',
+				'JPY',
+			],
+			LTC: [
+				'USD',
+				'EUR',
+				'GBP',
+				'JPY',
+			],
+			XRP: [
+				'USD',
+				'EUR',
+				'GBP',
+				'JPY',
+			],
 		}
 	}
 }

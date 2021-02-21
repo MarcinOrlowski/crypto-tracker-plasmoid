@@ -20,6 +20,7 @@ var currencySymbols = {
 	'PLN': 'zł',				// Polish Zloty
 	'USD': '$',					// US Dollar
 	'JPY': '¥',					// Japanese Yen
+	'CZK': 'Kč',				// Czech Krown
 }
 function getCurrencyName(code) {
 	return `${code} (${currencySymbols[code]})`
@@ -119,6 +120,34 @@ var exchanges = {
 				'USD',
 				'EUR',
 				'GBP',
+			],
+		}
+	},
+	'coinmate-io': {
+		name: 'Coinmate',
+		url: 'https://coinmate.io/',
+		getRateFromExchangeData: function(data, crypto, fiat) {
+			return data.data.ask
+		},
+		getUrl: function(crypto, fiat) {
+			return `https://coinmate.io/api/ticker?currencyPair=${cryptp}_${fiat}`
+		},
+		pairs: {
+			BTC: [
+				'CZK',
+				'EUR',
+			],
+			ETH: [
+				'CZK',
+				'EUR',
+			],
+			LTC: [
+				'CZK',
+				'EUR',
+			],
+			XRP: [
+				'CZK',
+				'EUR',
 			],
 		}
 	},

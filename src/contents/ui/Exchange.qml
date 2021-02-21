@@ -313,7 +313,6 @@ GridLayout {
     property bool dataDownloadInProgress: false
     function fetchRate(exchange, crypto, fiat) {
         if (dataDownloadInProgress) return
-        dataDownloadInProgress = true;
 
         if (!Crypto.isExchangeValid(exchange)) {
             console.debug(`fetchRate(): unknown exchange: '${exchange}'`)
@@ -327,6 +326,7 @@ GridLayout {
             console.debug(`fetchRate(): unsupported fiat: '${fiat}' for crypto: '${crypto}' on exchange: '${exchange}'`)
             return
         }
+        dataDownloadInProgress = true;
 
         // console.debug(`fetchRate(): ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
 

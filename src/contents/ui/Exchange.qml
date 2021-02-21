@@ -1,10 +1,10 @@
 /**
- * Crypto Ticker widget for KDE
+ * Crypto Tracker widget for KDE
  *
  * @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
  * @copyright 2021 Marcin Orlowski
  * @license   http://www.opensource.org/licenses/mit-license.php MIT
- * @link      https://github.com/MarcinOrlowski/crypto-plasmoid
+ * @link      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
  */
 
 import QtQuick 2.1
@@ -48,14 +48,17 @@ GridLayout {
     // --------------------------------------------------------------------------------------------
 
     onExchangeChanged: {
+        console.debug('1')
         invalidateExchangeData();
         fetchRate(exchange, crypto, fiat)
     }
     onCryptoChanged: {
+        console.debug('2')
         invalidateExchangeData();
         fetchRate(exchange, crypto, fiat)
     }
     onFiatChanged: {
+        console.debug('3')
         invalidateExchangeData();
         fetchRate(exchange, crypto, fiat)
     }
@@ -141,7 +144,12 @@ GridLayout {
     MouseArea {
         id: mouseArea
         anchors.fill: parent
-        onClicked: fetchRate(exchange, crypto, fiat)
+        onClicked: {
+            if (!dataDownloadInProgress) {
+                tickerRoot.opacity = 0.5
+                fetchRate(exchange, crypto, fiat)
+            }
+        }
     }
 
     // --------------------------------------------------------------------------------------------
@@ -166,16 +174,12 @@ GridLayout {
     function getCurrentRateText() {
         if (!currentRateValid) return '---'
 
-        var localeToUse = tickerRoot.localeToUse
-        var noDecimals = tickerRoot.noDecimals
-
         var color = '#0000ff'
 
         var rate = currentRate
         if(noDecimals) rate = Math.round(rate)
 
         var rateText = ''
-
         var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
         if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
         rateText += `<span>${tmp}</span>`
@@ -300,7 +304,7 @@ GridLayout {
     }
 
 	Timer {
-		interval: tickerRoot.refreshRate * 60 * 1000
+		interval: refreshRate * 60 * 1000
 		running: parent.running
 		repeat: true
 		triggeredOnStart: true
@@ -312,9 +316,8 @@ GridLayout {
     property bool dataDownloadInProgress: false
     function fetchRate(exchange, crypto, fiat) {
         if (dataDownloadInProgress) return
-        dataDownloadInProgress = true;
 
-        if (!Crypto.isExchangeValid(exchange)) {
+        if (!Crypto.exchangeExists(exchange)) {
             console.debug(`fetchRate(): unknown exchange: '${exchange}'`)
             return
         }
@@ -326,6 +329,7 @@ GridLayout {
             console.debug(`fetchRate(): unsupported fiat: '${fiat}' for crypto: '${crypto}' on exchange: '${exchange}'`)
             return
         }
+        dataDownloadInProgress = true;
 
         // console.debug(`fetchRate(): ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
 
@@ -369,13 +373,14 @@ GridLayout {
             if(data.length !== 0) {
                 try {
                     var json = JSON.parse(data)
-                    callback(exchange.getRateFromExchangeData(json))
+                    callback(exchange.getRateFromExchangeData(json, crypto, fiat))
                 } catch (error) {
                     console.error(`downloadExchangeRate(): Response parsing failed for '${url}'`)
                     console.error(`downloadExchangeRate(): error: '${error}'`)
                     console.error(`downloadExchangeRate(): data: '${data}'`)
                 }
             }
+            tickerRoot.opacity = 1
             dataDownloadInProgress = false
         })
         return true

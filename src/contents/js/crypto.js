@@ -1,10 +1,10 @@
 /**
- * Crypto Ticker widget for KDE
+ * Crypto Tracker widget for KDE
  *
  * @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
  * @copyright 2021 Marcin Orlowski
  * @license   http://www.opensource.org/licenses/mit-license.php MIT
- * @link      https://github.com/MarcinOrlowski/crypto-plasmoid
+ * @link      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
  */
 
 // https://doc.qt.io/qt-5/qtqml-javascript-resources.html
@@ -18,7 +18,9 @@ var currencySymbols = {
 	'EUR': '€',					// Euro
 	'GBP': '£',					// British Pound Sterling
 	'PLN': 'zł',				// Polish Zloty
-	'USD': '$'					// US Dollar
+	'USD': '$',					// US Dollar
+	'JPY': '¥',					// Japanese Yen
+	'CZK': 'Kč',				// Czech Krown
 }
 function getCurrencyName(code) {
 	return `${code} (${currencySymbols[code]})`
@@ -56,7 +58,7 @@ var exchanges = {
 	'bitbay-net': {
 		name: 'BitBay',
 		url: 'https://bitbay.net/',
-		getRateFromExchangeData: function(data) {
+		getRateFromExchangeData: function(data, crypto, fiat) {
 			return data.ask
 		},
 		getUrl: function(crypto, fiat) {
@@ -92,7 +94,7 @@ var exchanges = {
 	'bitstamp-net': {
 		name: 'BitStamp',
 		url: 'https://www.bitstamp.net/',
-		getRateFromExchangeData: function(data) {
+		getRateFromExchangeData: function(data, crypto, fiat) {
 			return data.ask
 		},
 		getUrl: function(crypto, fiat) {
@@ -100,18 +102,69 @@ var exchanges = {
 		},
 		pairs: {
 			BTC: [
-				'USD'
+				'USD',
+				'EUR',
+				'GBP',
 			],
 			ETH: [
-				'USD'
+				'USD',
+				'EUR',
+				'GBP',
+			],
+			LTC: [
+				'USD',
+				'EUR',
+				'GBP',
+			],
+			XRP: [
+				'USD',
+				'EUR',
+				'GBP',
+			],
+		}
+	},
+	'coinmate-io': {
+		name: 'Coinmate',
+		url: 'https://coinmate.io/',
+		getRateFromExchangeData: function(data, crypto, fiat) {
+			return data.data.ask
+		},
+		getUrl: function(crypto, fiat) {
+			return `https://coinmate.io/api/ticker?currencyPair=${crypto}_${fiat}`
+		},
+		pairs: {
+			BTC: [
+				'CZK',
+				'EUR',
+			],
+			ETH: [
+				'CZK',
+				'EUR',
+			],
+			LTC: [
+				'CZK',
+				'EUR',
+			],
+			XRP: [
+				'CZK',
+				'EUR',
 			],
 		}
 	},
 	'kraken-com': {
 		name: 'Kraken',
 		url: 'https://www.kraken.com/',
-		getRateFromExchangeData: function(data) {
-			return data.result.XXBTZUSD.a[0]
+		getRateFromExchangeData: function(data, crypto, fiat) {
+			// FIXME hardcoded mapping
+			switch (crypto) {
+				case 'BTC':
+					crypto = 'XBT'
+					break
+				default:
+					// do nothing
+					break
+			}
+			return data.result[`X${crypto}Z${fiat}`].a[0]
 		},
 		getUrl: function(crypto, fiat) {
 			return `https://api.kraken.com/0/public/Ticker?pair=${crypto}${fiat}`
@@ -119,7 +172,28 @@ var exchanges = {
 		pairs: {
 			BTC: [
 				'USD',
-			]
+				'EUR',
+				'GBP',
+				'JPY',
+			],
+			ETH: [
+				'USD',
+				'EUR',
+				'GBP',
+				'JPY',
+			],
+			LTC: [
+				'USD',
+				'EUR',
+				'GBP',
+				'JPY',
+			],
+			XRP: [
+				'USD',
+				'EUR',
+				'GBP',
+				'JPY',
+			],
 		}
 	}
 }
@@ -134,8 +208,10 @@ function getExchangeName(exchange) {
 	return result
 }
 
-function isExchangeValid(exchange) {
-	return exchange in exchanges
+function getExchangeUrl(exchange) {
+	var result = exchangeExists(exchange) ? exchanges[exchange]['url'] : undefined
+	if (typeof result === 'undefined') console.error(`Invalid exchange id: '${exchange}`)
+	return result
 }
 
 function isCryptoSupported(exchange, crypto) {

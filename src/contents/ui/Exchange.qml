@@ -314,7 +314,7 @@ GridLayout {
     function fetchRate(exchange, crypto, fiat) {
         if (dataDownloadInProgress) return
 
-        if (!Crypto.isExchangeValid(exchange)) {
+        if (!Crypto.exchangeExists(exchange)) {
             console.debug(`fetchRate(): unknown exchange: '${exchange}'`)
             return
         }

@@ -112,6 +112,11 @@ ColumnLayout {
             Component.onCompleted: updateModel(exchange)
         }
 
+        ClickableLabel { 
+            text: '<u>' + Crypto.getExchangeUrl(exchange) + '</u>'
+            url: Crypto.getExchangeUrl(exchange)
+        }
+
         PlasmaComponents.SpinBox {
             editable: true
             from: 1

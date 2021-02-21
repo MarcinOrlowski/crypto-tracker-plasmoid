@@ -208,8 +208,10 @@ function getExchangeName(exchange) {
 	return result
 }
 
-function isExchangeValid(exchange) {
-	return exchange in exchanges
+function getExchangeUrl(exchange) {
+	var result = exchangeExists(exchange) ? exchanges[exchange]['url'] : undefined
+	if (typeof result === 'undefined') console.error(`Invalid exchange id: '${exchange}`)
+	return result
 }
 
 function isCryptoSupported(exchange, crypto) {

@@ -1,5 +1,6 @@
 * @dev
   * Added more pairs for Kraken and Bitstamp
+  * Added support for coinmate.io
   * Widget now fades during data downloading for manually triggered refreshes
 
 * v1.0.0 (2021-02-13)

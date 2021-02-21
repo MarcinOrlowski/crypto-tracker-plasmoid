@@ -130,7 +130,7 @@ var exchanges = {
 			return data.data.ask
 		},
 		getUrl: function(crypto, fiat) {
-			return `https://coinmate.io/api/ticker?currencyPair=${cryptp}_${fiat}`
+			return `https://coinmate.io/api/ticker?currencyPair=${crypto}_${fiat}`
 		},
 		pairs: {
 			BTC: [

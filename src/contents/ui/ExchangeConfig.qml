@@ -132,7 +132,6 @@ ColumnLayout {
                 onCurrentIndexChanged: crypto = model[currentIndex]['value']
 
                 function updateModel(exchange, crypto) {
-                    console.debug(`crypto:UpdateModel: ${exchange}, ${crypto}`)
                     var tmp = []
                     var currentIdx = 0
                     if (exchange in Crypto.exchanges) {
@@ -168,7 +167,6 @@ ColumnLayout {
                 onCurrentIndexChanged: fiat = model[currentIndex]['value']
 
                 function updateModel(exchange, crypto, fiat) {
-                    console.debug(`fiat:UpdateModel: ${exchange}, ${crypto}, ${fiat}`)
                     var tmp = []
                     var currentIdx = 0
                     if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {

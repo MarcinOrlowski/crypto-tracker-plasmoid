@@ -51,7 +51,6 @@ ColumnLayout {
 
     function updateModels() {
         if (typeof exchange === 'undefined' || exchange === '') {
-            // console.error(`Undefined exchange or empty: '${exchange}'`)
             return
         }
         if (typeof crypto === 'undefined' || crypto === '') {
@@ -59,7 +58,7 @@ ColumnLayout {
             crypto = cryptos[0].value
 
         }
-        if (typeof fiat !== 'undefined' || fiat !== '') {
+        if (typeof fiat === 'undefined' || fiat === '') {
             var fiats = Crypto.getFiatsForCrypto(exchange, crypto)
             fiat = fiats[0].value
         }

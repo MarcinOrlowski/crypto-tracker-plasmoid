@@ -129,7 +129,7 @@ GridLayout {
         var rateText = ''
         if (trendingCalculated && (trendingDirection !== 0)) {
             // ↑ Upwards Arrow U+2191
-            rateText += `<span style="color: ${color};">`
+            rateText += '<span style="color: ' + color + ';">'
             if (trendingDirection == +1) rateText += '↑'
             // ↓ Downwards Arrow U+2193
             if (trendingDirection == -1) rateText += '↓'
@@ -161,7 +161,7 @@ GridLayout {
         var rateText = ''
         if (rateChangeDirection !== 0) {
             // ▲ Black Up-Pointing Triangle U+25B2
-            rateText += ` <span style="color: ${color};">`
+            rateText += ' <span style="color: ' + color + ';">'
             if (rateChangeDirection == +1) rateText += '▲'
             // ▼ Black Down-Pointing Triangle U+25BC
             if (rateChangeDirection == -1) rateText += '▼'
@@ -182,7 +182,7 @@ GridLayout {
         var rateText = ''
         var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
         if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
-        rateText += `<span>${tmp}</span>`
+        rateText += '<span>' + tmp + '</span>'
 
         return rateText
     }
@@ -318,15 +318,15 @@ GridLayout {
         if (dataDownloadInProgress) return
 
         if (!Crypto.exchangeExists(exchange)) {
-            console.debug(`fetchRate(): unknown exchange: '${exchange}'`)
+            console.debug("fetchRate(): unknown exchange: '" + exchange + "'")
             return
         }
         if (!Crypto.isCryptoSupported(exchange, crypto)) {
-            console.debug(`fetchRate(): unsupported crypto: '${crypto}' on exchange: '${exchange}'`)
+            console.debug("fetchRate(): unsupported crypto: '" + crypto + "' on exchange: '" + exchange + "'")
             return
         }
         if (!Crypto.isFiatSupported(exchange, crypto, fiat)) {
-            console.debug(`fetchRate(): unsupported fiat: '${fiat}' for crypto: '${crypto}' on exchange: '${exchange}'`)
+            console.debug("fetchRate(): unsupported fiat: '" + fiat + "' for crypto: '" + crypto + "' on exchange: '" + exchange + "'")
             return
         }
         dataDownloadInProgress = true;
@@ -375,9 +375,9 @@ GridLayout {
                     var json = JSON.parse(data)
                     callback(exchange.getRateFromExchangeData(json, crypto, fiat))
                 } catch (error) {
-                    console.error(`downloadExchangeRate(): Response parsing failed for '${url}'`)
-                    console.error(`downloadExchangeRate(): error: '${error}'`)
-                    console.error(`downloadExchangeRate(): data: '${data}'`)
+                    console.error("downloadExchangeRate(): Response parsing failed for '" + url + "'")
+                    console.error("downloadExchangeRate(): error: '" + error + "'")
+                    console.error("downloadExchangeRate(): data: '" + data + "'")
                 }
             }
             tickerRoot.opacity = 1

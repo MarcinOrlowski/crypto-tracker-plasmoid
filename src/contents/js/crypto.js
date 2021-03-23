@@ -23,7 +23,7 @@ var currencySymbols = {
 	'CZK': 'Kč',				// Czech Krown
 }
 function getCurrencyName(code) {
-	return code + ' ' currencySymbols[code]}
+	return code + ' ' + currencySymbols[code]
 }
 function getCurrencySymbol(code) {
 	return currencySymbols[code]
@@ -244,7 +244,7 @@ function getAllExchangeCryptos(exchange) {
 			cryptoModel.push({'value': key, 'text': getCryptoName(key)})
 		}
 	} else {
-		console.error("Invalid exchange id: '" + ${exchange} + "'")
+		console.error("Invalid exchange id: '" + exchange + "'")
 	}
 	return cryptoModel
 }

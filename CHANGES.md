@@ -1,3 +1,6 @@
+* dev
+  * Removed use of backtick syntax due to problems on Debian 10 using old Plasma.
+
 * v1.1.1 (2021-02-25)
   * Fixed exchange configuration not allowing to change fiats under some circumstances.
 

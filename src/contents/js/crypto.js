@@ -23,7 +23,7 @@ var currencySymbols = {
 	'CZK': 'Kč',				// Czech Krown
 }
 function getCurrencyName(code) {
-	return `${code} (${currencySymbols[code]})`
+	return code + ' ' + currencySymbols[code]
 }
 function getCurrencySymbol(code) {
 	return currencySymbols[code]
@@ -46,10 +46,10 @@ var cryptos = {
 	}
 }
 function getCryptoName(code) {
-	return `${cryptos[code]['name']} (${code})`
+	return cryptos[code]['name'] + ' (' + code + ')'
 }
 function getCryptoIcon(code) {
-	return `${code}.svg`
+	return code + '.svg'
 }
 
 // --------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ var exchanges = {
 			return data.ask
 		},
 		getUrl: function(crypto, fiat) {
-			return `https://bitbay.net/API/Public/${crypto}${fiat}/ticker.json`
+			return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'
 		},
 		pairs: {
 			BTC: [
@@ -98,7 +98,7 @@ var exchanges = {
 			return data.ask
 		},
 		getUrl: function(crypto, fiat) {
-			return `https://www.bitstamp.net/api/v2/ticker/${crypto}${fiat}`
+			return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat
 		},
 		pairs: {
 			BTC: [
@@ -130,7 +130,7 @@ var exchanges = {
 			return data.data.ask
 		},
 		getUrl: function(crypto, fiat) {
-			return `https://coinmate.io/api/ticker?currencyPair=${crypto}_${fiat}`
+			return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat
 		},
 		pairs: {
 			BTC: [
@@ -164,10 +164,10 @@ var exchanges = {
 					// do nothing
 					break
 			}
-			return data.result[`X${crypto}Z${fiat}`].a[0]
+			return data.result['X' + crypto + 'Z' + fiat].a[0]
 		},
 		getUrl: function(crypto, fiat) {
-			return `https://api.kraken.com/0/public/Ticker?pair=${crypto}${fiat}`
+			return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat
 		},
 		pairs: {
 			BTC: [
@@ -204,13 +204,13 @@ function exchangeExists(exchange) {
 
 function getExchangeName(exchange) {
 	var result = exchangeExists(exchange) ? exchanges[exchange]['name'] : undefined
-	if (typeof result === 'undefined') console.error(`Invalid exchange id: '${exchange}`)
+	if (typeof result === 'undefined') console.error("Invalid exchange id: '" + exchange + "'")
 	return result
 }
 
 function getExchangeUrl(exchange) {
 	var result = exchangeExists(exchange) ? exchanges[exchange]['url'] : undefined
-	if (typeof result === 'undefined') console.error(`Invalid exchange id: '${exchange}`)
+	if (typeof result === 'undefined') console.error("Invalid exchange id: '" + exchange + "'")
 	return result
 }
 
@@ -219,7 +219,7 @@ function isCryptoSupported(exchange, crypto) {
 	if (exchangeExists(exchange)) {
 		result = crypto in exchanges[exchange]['pairs']
 	} else {
-		console.error(`Invalid exchange id: '${exchange}'`)
+		console.error("Invalid exchange id: '" + exchange + "'")
 	}
 	return result
 }
@@ -229,7 +229,7 @@ function isFiatSupported(exchange, crypto, fiat) {
 	if (isCryptoSupported(exchange, crypto)) {
 		result = (exchanges[exchange]['pairs'][crypto].indexOf(fiat) !== -1)
 	} else {
-		console.error(`Invalid crypto '${crypto}' on '${exchange}'`)
+		console.error("Invalid crypto '" + crypto + "' on '" + exchange + "'")
 	}
 	return result
 }
@@ -244,7 +244,7 @@ function getAllExchangeCryptos(exchange) {
 			cryptoModel.push({'value': key, 'text': getCryptoName(key)})
 		}
 	} else {
-		console.error(`Invalid exchange id: '${exchange}'`)
+		console.error("Invalid exchange id: '" + exchange + "'")
 	}
 	return cryptoModel
 }
@@ -259,7 +259,7 @@ function getFiatsForCrypto(exchange, crypto) {
 		}
 	} else {
 		var exName = getExchangeName(exchange)
-		console.error(`Can't get fiat pairs for '${crypto}' on '${exchange}' (${exName})`)
+		console.error("Can't get fiat pairs for '" + crypto + "' on '" + exchange + "' (" + exName + ")")
 	}
 	return currencyModel
 }

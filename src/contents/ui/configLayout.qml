@@ -31,7 +31,7 @@ Kirigami.FormLayout {
 
 		property string gridLayout: cfg_containerLayoutGridLayout
 
-        Kirigami.FormData.label: i18n('Grid Layout')
+        Kirigami.FormData.label: i18n('Exchange grid layout')
         textRole: "text"
         onCurrentIndexChanged: gridLayout = model[currentIndex]['value']
 

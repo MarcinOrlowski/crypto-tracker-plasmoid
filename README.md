@@ -37,6 +37,8 @@ This pane controls how the widgets places exchange details in its internal layou
   instead. Grid is defined as `COLUMNS x ROWS` and is applied regardless of Panel orientation. 
   So if you i.e. use thick horizontal Panel and want to have all six exchanges shown in more
   compact form you can try i.e. `3x2` layout which means 3 columns, 2 rows each.
+* **Transparent background**: When checked, widget background be fully transparent. Otherwise theme
+  derrived background is used.
 
 ## Installation ##
 

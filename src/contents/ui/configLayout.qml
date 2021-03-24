@@ -22,6 +22,7 @@ Kirigami.FormLayout {
 	id: controlRoot
 
 	property alias cfg_containerLayoutGridLayout: layoutGrid.gridLayout
+	property alias cfg_containerLayoutTransparentBackgroundEnabled: transparentBackground.checked
 
 	// ------------------------------------------------------------------------------------------------------------------------
 
@@ -47,6 +48,12 @@ Kirigami.FormLayout {
 			currentIndex = currentIdx
 		}
 		Component.onCompleted: updateModel(cfg_containerLayoutGridLayout)
+	}
+
+	CheckBox {
+		id: transparentBackground
+		text: i18n("Transparent background")
+		checked: cfg_containerLayoutTransparentBackgroundEnabled
 	}
 
 	Item {

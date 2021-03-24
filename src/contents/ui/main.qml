@@ -36,6 +36,7 @@ Item {
 
 	// ------------------------------------------------------------------------------------------------------------------------
 
+	Plasmoid.backgroundHints: plasmoid.configuration. containerLayoutTransparentBackgroundEnabled ? "NoBackground" : "StandardBackground"
 	Plasmoid.preferredRepresentation: Plasmoid.compactRepresentation
 	Plasmoid.compactRepresentation: ExchangeContainer { }
 

@@ -24,6 +24,9 @@
 	</group>
 
 	<group name="ExchangeContainerLayout">
+		<entry name="containerLayoutTransparentBackgroundEnabled" type="Bool">
+			<default>false</default>
+		</entry>
 		<entry name="containerLayoutGridLayout" type="String">
 			<default>_default_</default>
 		</entry>

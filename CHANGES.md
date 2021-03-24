@@ -1,5 +1,6 @@
 * dev
   * Internal widget layout grid is configurable now. Requested by @Foul [#11]
+  * Widget background can now be set transparent.
 
 * v1.1.2 (2021-03-23)
   * Removed use of backtick syntax due to problems on Debian 10 using old Plasma.

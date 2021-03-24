@@ -12,6 +12,12 @@ import org.kde.plasma.configuration 2.0
 
 ConfigModel {
 	ConfigCategory {
+		name: i18n("Layout")
+		icon: "view-visible"
+		source: "configLayout.qml"
+	}
+
+	ConfigCategory {
 		name: i18n("Exchange 1")
 		icon: "view-visible"
 		source: "configTicker0.qml"

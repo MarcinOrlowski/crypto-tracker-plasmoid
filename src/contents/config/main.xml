@@ -23,6 +23,12 @@
 		</entry>
 	</group>
 
+	<group name="ExchangeContainerLayout">
+		<entry name="containerLayoutGridLayout" type="String">
+			<default>_default_</default>
+		</entry>
+	</group>
+
 	<group name="Exchange0">
 		<entry name="running0" type="Bool">
 			<default>true</default>

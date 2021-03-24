@@ -18,38 +18,36 @@ import "../js/layouts.js" as Layouts
 
 
 Kirigami.FormLayout {
-    Layout.fillWidth: true
+	Layout.fillWidth: true
 	id: controlRoot
 
-//	property alias cfg_useCustomContainerLayout: useCustomContainerLayout.checked
 	property alias cfg_containerLayoutGridLayout: layoutGrid.gridLayout
 
-    // ------------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------------------------------
 
-    PlasmaComponents.ComboBox {
-        id: layoutGrid
+	PlasmaComponents.ComboBox {
+		id: layoutGrid
 
 		property string gridLayout: cfg_containerLayoutGridLayout
 
-        Kirigami.FormData.label: i18n('Exchange grid layout')
-        textRole: "text"
-        onCurrentIndexChanged: gridLayout = model[currentIndex]['value']
+		Kirigami.FormData.label: i18n('Exchange grid layout')
+		textRole: "text"
+		onCurrentIndexChanged: gridLayout = model[currentIndex]['value']
 
-        function updateModel(layout) {
-                var tmp = []
-                var idx = 0
-                var currentIdx = 0
-                for(const key in Layouts.layouts) {
-                    tmp.push({'value': key, 'text': Layouts.getLayoutName(key)})
-                    if (key === layout) currentIdx = idx
-                    idx++
-                }
-                model = tmp
-                currentIndex = currentIdx
-            }
-
-            Component.onCompleted: updateModel(cfg_containerLayoutGridLayout)
-    }
+		function updateModel(layout) {
+			var tmp = []
+			var idx = 0
+			var currentIdx = 0
+			for(const key in Layouts.layouts) {
+				tmp.push({'value': key, 'text': Layouts.getLayoutName(key)})
+					if (key === layout) currentIdx = idx
+					idx++
+			}
+			model = tmp
+			currentIndex = currentIdx
+		}
+		Component.onCompleted: updateModel(cfg_containerLayoutGridLayout)
+	}
 
 	Item {
 		Layout.fillWidth: true

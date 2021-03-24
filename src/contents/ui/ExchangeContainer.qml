@@ -12,16 +12,31 @@ import QtQuick.Layouts 1.1
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents
 import "../js/crypto.js" as Crypto
+import "../js/layouts.js" as Layouts
 
 GridLayout {
 	readonly property bool vericalOrientation: plasmoid.formFactor == PlasmaCore.Types.Vertical
 	readonly property string defaultLocale: ''
+	property string containerLayoutId: plasmoid.configuration.containerLayoutGridLayout
 
-	rows: vericalOrientation ? 6 : 1
-	columns: vericalOrientation ? 1 : 6
+	readonly property int maxExchangeCount: 6
 
-	Component.onCompleted: {
-		console.debug('orient vert: ' + vericalOrientation)
+	rows: {
+		var rows = vericalOrientation ? maxExchangeCount : 1
+		if (containerLayoutId !== Layouts.DEFAULT) {
+			var layout = Layouts.getLayout(containerLayoutId)
+			rows = layout.rows
+		}
+		return rows
+	}
+
+	columns: {
+		var columns = vericalOrientation ? 1 : maxExchangeCount
+		if (containerLayoutId !== Layouts.DEFAULT) {
+			var layout = Layouts.getLayout(containerLayoutId)
+			columns = layout.columns
+		}
+		return columns
 	}
 
 	readonly property bool anythingVisible: plasmoid.configuration.running0 | plasmoid.configuration.running1
@@ -31,7 +46,7 @@ GridLayout {
 		Layout.alignment: Qt.AlignHCenter
 		text: i18n("Edit me!")
 	}
-    
+
 	Exchange {
 		running: plasmoid.configuration.running0
 		visible: running
@@ -46,7 +61,7 @@ GridLayout {
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker0
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker0
-    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan0
+		trendingTimeSpan: plasmoid.configuration.trendingTimeSpan0
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise0
 		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor0
@@ -71,7 +86,7 @@ GridLayout {
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker1
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker1
-    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan1
+		trendingTimeSpan: plasmoid.configuration.trendingTimeSpan1
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise1
 		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor1
@@ -96,7 +111,7 @@ GridLayout {
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker2
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker2
-    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan2
+		trendingTimeSpan: plasmoid.configuration.trendingTimeSpan2
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise2
 		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor2
@@ -121,7 +136,7 @@ GridLayout {
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker3
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker3
-    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan3
+		trendingTimeSpan: plasmoid.configuration.trendingTimeSpan3
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise3
 		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor3
@@ -146,7 +161,7 @@ GridLayout {
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker4
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker4
-    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan4
+		trendingTimeSpan: plasmoid.configuration.trendingTimeSpan4
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise4
 		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor4
@@ -171,7 +186,7 @@ GridLayout {
 
 		showPriceChangeMarker: plasmoid.configuration.showPriceChangeMarker5
 		showTrendingMarker: plasmoid.configuration.showTrendingMarker5
-    	trendingTimeSpan: plasmoid.configuration.trendingTimeSpan5
+		trendingTimeSpan: plasmoid.configuration.trendingTimeSpan5
 
 		flashOnPriceRaise: plasmoid.configuration.flashOnPriceRaise5
 		flashOnPriceRaiseColor: plasmoid.configuration.flashOnPriceRaiseColor5

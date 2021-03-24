@@ -1,3 +1,7 @@
+* dev
+  * Added support for Plasma 5.19+ widget background controls.
+
+
 * v1.2.0 (2021-03-24)
   * Internal widget layout grid is configurable now. Requested by @Foul [#11]
   * Widget background can now be set transparent.

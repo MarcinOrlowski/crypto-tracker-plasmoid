@@ -28,6 +28,16 @@ Widget will display separate ticker for each configured exchange:
 
 ## Configuration ##
 
+### Layout ###
+
+This pane controls how the widgets places exchange details in its internal layout grid.
+
+* **Exchange grid layout**: By default it puts all enabled exchanges either in singe row or single
+  column, depending on your Panel orientation, but you can select any predefined grid layout
+  instead. Grid is defined as `COLUMNS x ROWS` and is applied regardless of Panel orientation. 
+  So if you i.e. use thick horizontal Panel and want to have all six exchanges shown in more
+  compact form you can try i.e. `3x2` layout which means 3 columns, 2 rows each.
+
 ## Installation ##
 
 You should be able to install HTML Clock widget either using built-in Plasma Add-on installer

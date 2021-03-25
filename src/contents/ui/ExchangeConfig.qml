@@ -18,8 +18,6 @@ import "../js/crypto.js" as Crypto
 ColumnLayout {
     Layout.fillWidth: true
 
-    property bool running: true
-
     property string exchange: undefined
     property string crypto: undefined
     property bool hideCryptoLogo: false
@@ -70,17 +68,7 @@ ColumnLayout {
 
     // ------------------------------------------------------------------------------------------------------------------------
 
-    CheckBox {
-        text: i18n("Exchange enabled")
-        checked: running
-        onCheckedChanged: running = checked
-    }
-
-    // ------------------------------------------------------------------------------------------------------------------------
-
     Kirigami.FormLayout {
-        enabled: running
-
         Layout.fillWidth: true
 
         PlasmaComponents.ComboBox {

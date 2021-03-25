@@ -24,7 +24,8 @@ GridLayout {
     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
     Layout.fillWidth: true
 
-    property bool running: false
+    property var json: undefined
+
     property string exchange: ''
     property string crypto: ''
     property bool hideCryptoLogo: false
@@ -44,6 +45,32 @@ GridLayout {
 
     property string markerColorPriceRaise: '#00ff00'
     property string markerColorPriceDrop: '#ff0000'
+
+    // --------------------------------------------------------------------------------------------
+
+    Component.onCompleted: {
+        if (json !== undefined) {
+            exchange = json.exchange
+            crypto = json.crypto
+            hideCryptoLogo = json.hideCryptoLogo
+            fiat = json.fiat
+            refreshRate = json.refreshRate
+            hidePriceDecimals = json.hidePriceDecimals
+            useCustomLocale = json.useCustomLocale
+            customLocaleName = json.customLocaleName
+
+            showPriceChangeMarker = json.showPriceChangeMarker
+            showTrendingMarker = json.showTrendingMarker
+            trendingTimeSpan = json.trendingTimeSpan
+
+            flashOnPriceRaise = json.flashOnPriceRaise
+            flashOnPriceDrop = json.flashOnPriceDrop
+            flashOnPriceDropColor = json.flashOnPriceDropColor
+            flashOnPriceRaiseColor = json.flashOnPriceRaiseColor
+            markerColorPriceRaise = json.markerColorPriceRaise
+            markerColorPriceDrop = json.markerColorPriceDrop
+        }
+    }
 
     // --------------------------------------------------------------------------------------------
 
@@ -305,7 +332,7 @@ GridLayout {
 
 	Timer {
 		interval: refreshRate * 60 * 1000
-		running: parent.running
+		running: true
 		repeat: true
 		triggeredOnStart: true
 		onTriggered: fetchRate(exchange, crypto, fiat)

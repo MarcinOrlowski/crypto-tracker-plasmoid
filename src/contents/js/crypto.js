@@ -23,7 +23,7 @@ var currencySymbols = {
 	'CZK': 'Kč',				// Czech Krown
 }
 function getCurrencyName(code) {
-	return code + ' ' + currencySymbols[code]
+	return code + ' (' + currencySymbols[code] + ')'
 }
 function getCurrencySymbol(code) {
 	return currencySymbols[code]

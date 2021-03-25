@@ -32,6 +32,13 @@
 		</entry>
 	</group>
 
+	<group name="Exchanges">
+		<entry name="exchanges" type="String">
+			<default>[]</default>
+		</entry>
+	</group>
+
+
 	<group name="Exchange0">
 		<entry name="running0" type="Bool">
 			<default>true</default>

@@ -148,29 +148,8 @@ Item {
 		// to check for that case here.
 		if ((idx+1) > exchangesModel.count) return
 
-		var ex = exchangesModel.get(idx)
+		exchange.fromJson(exchangesModel.get(idx))
 
-		exchange.exchange = ex.exchange
-		exchange.crypto = ex.crypto
-		exchange.hideCryptoLogo = ex.hideCryptoLogo
-		exchange.fiat = ex.fiat
-		exchange.refreshRate = ex.refreshRate
-		exchange.hidePriceDecimals = ex.hidePriceDecimals
-		exchange.useCustomLocale = ex.useCustomLocale
-		exchange.customLocaleName = ex.customLocaleName
-
-		exchange.showPriceChangeMarker = ex.showPriceChangeMarker
-		exchange.showTrendingMarker = ex.showTrendingMarker
-		exchange.trendingTimeSpan = ex.trendingTimeSpan
-
-		exchange.flashOnPriceRaise = ex.flashOnPriceRaise
-		exchange.flashOnPriceDrop = ex.flashOnPriceDrop
-		exchange.flashOnPriceDropColor = ex.flashOnPriceDropColor
-		exchange.flashOnPriceRaiseColor = ex.flashOnPriceRaiseColor
-		exchange.markerColorPriceRaise = ex.markerColorPriceRaise
-		exchange.markerColorPriceDrop = ex.markerColorPriceDrop
-
-		// address.text = ex.address
 		selectedRow = idx
 		exchangeEditDialog.visible = true
 	}
@@ -196,28 +175,7 @@ Item {
 		standardButtons: StandardButton.Save | StandardButton.Cancel
 
 		onAccepted: {
-			var ex = {
-				exchange: exchange.exchange,
-				crypto: exchange.crypto,
-				hideCryptoLogo: exchange.hideCryptoLogo,
-				fiat: exchange.fiat,
-				refreshRate: exchange.refreshRate,
-				hidePriceDecimals: exchange.hidePriceDecimals,
-				useCustomLocale: exchange.useCustomLocale,
-				customLocaleName: exchange.customLocaleName,
-
-				showPriceChangeMarker: exchange.showPriceChangeMarker,
-				showTrendingMarker: exchange.showTrendingMarker,
-				trendingTimeSpan: exchange.trendingTimeSpan,
-
-				flashOnPriceRaise: exchange.flashOnPriceRaise,
-				flashOnPriceDrop: exchange.flashOnPriceDrop,
-				flashOnPriceDropColor: exchange.flashOnPriceDropColor,
-				flashOnPriceRaiseColor: exchange.flashOnPriceRaiseColor,
-				markerColorPriceRaise: exchange.markerColorPriceRaise,
-				markerColorPriceDrop: exchange.markerColorPriceDrop,
-			}
-
+			var ex = exchange.toJson()
 			if (selectedRow === -1) {
 				exchangesModel.append(ex)
 			} else {

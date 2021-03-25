@@ -43,6 +43,54 @@ ColumnLayout {
 
     // ------------------------------------------------------------------------------------------------------------------------
 
+    function fromJson(json) {
+		exchange = json.exchange
+		crypto = json.crypto
+		hideCryptoLogo = json.hideCryptoLogo
+		fiat = json.fiat
+		refreshRate = json.refreshRate
+		hidePriceDecimals = json.hidePriceDecimals
+		useCustomLocale = json.useCustomLocale
+		customLocaleName = json.customLocaleName
+
+		showPriceChangeMarker = json.showPriceChangeMarker
+		showTrendingMarker = json.showTrendingMarker
+		trendingTimeSpan = json.trendingTimeSpan
+
+		flashOnPriceRaise = json.flashOnPriceRaise
+		flashOnPriceDrop = json.flashOnPriceDrop
+		flashOnPriceDropColor = json.flashOnPriceDropColor
+		flashOnPriceRaiseColor = json.flashOnPriceRaiseColor
+		markerColorPriceRaise = json.markerColorPriceRaise
+		markerColorPriceDrop = json.markerColorPriceDrop
+    }
+
+    function toJson() {
+        return {
+            exchange: exchange,
+            crypto: crypto,
+            hideCryptoLogo: hideCryptoLogo,
+            fiat: fiat,
+            refreshRate: refreshRate,
+            hidePriceDecimals: hidePriceDecimals,
+            useCustomLocale: useCustomLocale,
+            customLocaleName: customLocaleName,
+
+            showPriceChangeMarker: showPriceChangeMarker,
+            showTrendingMarker: showTrendingMarker,
+            trendingTimeSpan: trendingTimeSpan,
+
+            flashOnPriceRaise: flashOnPriceRaise,
+            flashOnPriceDrop: flashOnPriceDrop,
+            flashOnPriceDropColor: flashOnPriceDropColor,
+            flashOnPriceRaiseColor: flashOnPriceRaiseColor,
+            markerColorPriceRaise: markerColorPriceRaise,
+            markerColorPriceDrop: markerColorPriceDrop,
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------------
+
     onExchangeChanged: updateModels()
     onCryptoChanged: updateModels()
     onFiatChanged: updateModels()
@@ -51,12 +99,11 @@ ColumnLayout {
         if (typeof exchange === 'undefined' || exchange === '') {
             return
         }
-        if (typeof crypto === 'undefined' || crypto === '') {
+        if (typeof crypto === 'undefined' || crypto === '' || !Crypto.isCryptoSupported(exchange, crypto)) {
             var cryptos = Crypto.getAllExchangeCryptos(exchange);
             crypto = cryptos[0].value
-
         }
-        if (typeof fiat === 'undefined' || fiat === '') {
+        if (typeof fiat === 'undefined' || fiat === '' || !Crypto.isFiatSupported(exchange, crypto, fiat)) {
             var fiats = Crypto.getFiatsForCrypto(exchange, crypto)
             fiat = fiats[0].value
         }
@@ -64,7 +111,6 @@ ColumnLayout {
         exchangeComboBox.updateModel(exchange)
         cryptoComboBox.updateModel(exchange, crypto)
         fiatComboBox.updateModel(exchange, crypto, fiat)
-    }
 
     // ------------------------------------------------------------------------------------------------------------------------
 
@@ -83,7 +129,6 @@ ColumnLayout {
                 var idx = 0
                 var currentIdx = 0
                 for(const key in Crypto.exchanges) {
-                    console.debug('value ' + key)
                     tmp.push({'value': key, 'text': Crypto.getExchangeName(key)})
                     if (key === exchange) currentIdx = idx
                     idx++

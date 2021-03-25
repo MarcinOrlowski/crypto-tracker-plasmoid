@@ -345,14 +345,15 @@ GridLayout {
         if (dataDownloadInProgress) return
 
         if (!Crypto.exchangeExists(exchange)) {
-            console.debug("fetchRate(): unknown exchange: '" + exchange + "'")
+            if (exchange !== '') console.debug("fetchRate(): unknown exchange: '" + exchange + "'")
             return
         }
         if (!Crypto.isCryptoSupported(exchange, crypto)) {
-            console.debug("fetchRate(): unsupported crypto: '" + crypto + "' on exchange: '" + exchange + "'")
+            if (crypto !== '') console.debug("fetchRate(): unsupported crypto: '" + crypto + "' on exchange: '" + exchange + "'")
             return
         }
         if (!Crypto.isFiatSupported(exchange, crypto, fiat)) {
+            if (fiat !== '') 
             console.debug("fetchRate(): unsupported fiat: '" + fiat + "' for crypto: '" + crypto + "' on exchange: '" + exchange + "'")
             return
         }

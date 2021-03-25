@@ -206,8 +206,9 @@ GridLayout {
         if(hidePriceDecimals) rate = Math.round(rate)
 
         var rateText = ''
-        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(customLocaleName), Crypto.getCurrencySymbol(fiat))
-        if(hidePriceDecimals) tmp = tmp.replace(Qt.locale(customLocaleName).decimalPoint + '00', '')
+        var localeName = useCustomLocale ? customLocaleName : ''
+        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeName), Crypto.getCurrencySymbol(fiat))
+        if(hidePriceDecimals) tmp = tmp.replace(Qt.locale(localeName).decimalPoint + '00', '')
         rateText += '<span>' + tmp + '</span>'
 
         return rateText

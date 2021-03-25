@@ -18,8 +18,8 @@ ConfigModel {
 	}
 
 	ConfigCategory {
-		name: i18n("Layout")
+		name: i18n("Exchanges")
 		icon: "view-visible"
-		source: "configLayout.qml"
+		source: "configExchanges.qml"
 	}
 }

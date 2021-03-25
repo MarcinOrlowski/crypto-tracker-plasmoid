@@ -30,9 +30,10 @@ GridLayout {
     property string crypto: ''
     property bool hideCryptoLogo: false
     property string fiat: ''
-    property string localeToUse: ''     // plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
+    property bool useCustomLocale: false
+    property string localeToUse: ''
     property int refreshRate: 5
-    property bool noDecimals: false
+    property bool hidePriceDecimals: false
 
     property bool showPriceChangeMarker: true
     property bool showTrendingMarker: true
@@ -57,16 +58,16 @@ GridLayout {
             refreshRate = json.refreshRate
             hidePriceDecimals = json.hidePriceDecimals
             useCustomLocale = json.useCustomLocale
-            customLocaleName = json.customLocaleName
+            localeToUse = json.localeToUse
 
             showPriceChangeMarker = json.showPriceChangeMarker
             showTrendingMarker = json.showTrendingMarker
             trendingTimeSpan = json.trendingTimeSpan
 
             flashOnPriceRaise = json.flashOnPriceRaise
+            flashOnPriceRaiseColor = json.flashOnPriceRaiseColor
             flashOnPriceDrop = json.flashOnPriceDrop
             flashOnPriceDropColor = json.flashOnPriceDropColor
-            flashOnPriceRaiseColor = json.flashOnPriceRaiseColor
             markerColorPriceRaise = json.markerColorPriceRaise
             markerColorPriceDrop = json.markerColorPriceDrop
         }
@@ -204,11 +205,11 @@ GridLayout {
         var color = '#0000ff'
 
         var rate = currentRate
-        if(noDecimals) rate = Math.round(rate)
+        if(hidePriceDecimals) rate = Math.round(rate)
 
         var rateText = ''
         var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
-        if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
+        if(hidePriceDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
         rateText += '<span>' + tmp + '</span>'
 
         return rateText

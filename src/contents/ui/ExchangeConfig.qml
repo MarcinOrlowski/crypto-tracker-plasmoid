@@ -83,6 +83,7 @@ ColumnLayout {
                 var idx = 0
                 var currentIdx = 0
                 for(const key in Crypto.exchanges) {
+                    console.debug('value ' + key)
                     tmp.push({'value': key, 'text': Crypto.getExchangeName(key)})
                     if (key === exchange) currentIdx = idx
                     idx++

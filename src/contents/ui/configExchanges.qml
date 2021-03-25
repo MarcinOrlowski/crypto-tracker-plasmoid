@@ -62,6 +62,8 @@ Item {
 							case 1: return Crypto.getCryptoName(styleData.value)
 							case 2: return Crypto.getCurrencyName(styleData.value)
 						}
+
+						return '??? col: ' + column + ' val: ' + value
 					}
 				}
 			}
@@ -119,12 +121,76 @@ Item {
 		} // ColumnLayout
 	} // RowLayout
 
-	// ---------
+	// ------------------------------------------------------------------------------------------------------------------------
 
 	property int selectedRow: -1
 
+	function saveExchanges() {
+		var exchanges = []
+		for(var i=0; i<exchangesModel.count; i++) {
+			exchanges.push(exchangesModel.get(i))
+		}
+		serializedExchanges.text = JSON.stringify(exchanges)
+
+		console.debug('SAVE: ' + serializedExchanges.text)
+	}
+
+	function addExchange() {
+		selectedRow = -1
+		exchangeEditDialog.visible = true
+	}
+
+	function editExchange(idx) {
+		if (idx === -1) return
+
+		// TableView seem to have a bug that makes it think row 0 is selected
+		// even if there's no data in model and table view is empty. So we need
+		// to check for that case here.
+		if ((idx+1) > exchangesModel.count) return
+
+		var ex = exchangesModel.get(idx)
+
+		exchange.exchange = ex.exchange
+		exchange.crypto = ex.crypto
+		exchange.hideCryptoLogo = ex.hideCryptoLogo
+		exchange.fiat = ex.fiat
+		exchange.refreshRate = ex.refreshRate
+		exchange.hidePriceDecimals = ex.hidePriceDecimals
+		exchange.useCustomLocale = ex.useCustomLocale
+		exchange.customLocaleName = ex.customLocaleName
+
+		exchange.showPriceChangeMarker = ex.showPriceChangeMarker
+		exchange.showTrendingMarker = ex.showTrendingMarker
+		exchange.trendingTimeSpan = ex.trendingTimeSpan
+
+		exchange.flashOnPriceRaise = ex.flashOnPriceRaise
+		exchange.flashOnPriceDrop = ex.flashOnPriceDrop
+		exchange.flashOnPriceDropColor = ex.flashOnPriceDropColor
+		exchange.flashOnPriceRaiseColor = ex.flashOnPriceRaiseColor
+		exchange.markerColorPriceRaise = ex.markerColorPriceRaise
+		exchange.markerColorPriceDrop = ex.markerColorPriceDrop
+
+		// address.text = ex.address
+		selectedRow = idx
+		exchangeEditDialog.visible = true
+	}
+
+	function removeExchange(idx) {
+		if (idx === -1) return
+
+		// TableView seem to have a bug that makes it think row 0 is selected
+		// even if there's no data in model and table view is empty. So we need
+		// to check for that case here.
+		if ((idx+1) > exchangesModel.count) return
+
+		exchangesTable.model.remove(idx)
+		saveExchanges()
+	}
+
+	// ------------------------------------------------------------------------------------------------------------------------
+
 	Dialog {
-		id: exchangeDialog
+		id: exchangeEditDialog
 		visible: false
 		title: i18n("Exchange")
 		standardButtons: StandardButton.Save | StandardButton.Cancel
@@ -152,7 +218,7 @@ Item {
 				markerColorPriceDrop: exchange.markerColorPriceDrop,
 			}
 
-			if (selectedRow == -1) {
+			if (selectedRow === -1) {
 				exchangesModel.append(ex)
 			} else {
 				exchangesModel.set(selectedRow, ex)
@@ -165,68 +231,6 @@ Item {
 			id: exchange
 		}
 	}
-	
-	function saveExchanges() {
-		var exchanges = []
-		for(var i=0; i<exchangesModel.count; i++) {
-			exchanges.push(exchangesModel.get(i))
-		}
-		serializedExchanges.text = JSON.stringify(exchanges)
 
-		console.debug('SAVE: ' + serializedExchanges.text)
-	}
-
-	function addExchange() {
-		selectedRow = -1
-		exchangeDialog.visible = true
-	}
-
-	function editExchange(idx) {
-		if (idx === -1) return
-
-		// TableView seem to have a bug that makes it think row 0 is selected
-		// even if there's no data in model and table view is empty. So we need
-		// to check for that case here.
-		if ((idx+1) > exchangesModel.count) return
-
-		selectedRow = idx
-
-		var ex = exchangesModel.get(idx)
-
-		exchange.exchange = ex.exchange
-		exchange.crypto = ex.crypto
-		exchange.hideCryptoLogo = ex.hideCryptoLogo
-		exchange.fiat = ex.fiat
-		exchange.refreshRate = ex.refreshRate
-		exchange.hidePriceDecimals = ex.hidePriceDecimals
-		exchange.useCustomLocale = ex.useCustomLocale
-		exchange.customLocaleName = ex.customLocaleName
-
-		exchange.showPriceChangeMarker = ex.showPriceChangeMarker
-		exchange.showTrendingMarker = ex.showTrendingMarker
-		exchange.trendingTimeSpan = ex.trendingTimeSpan
-
-		exchange.flashOnPriceRaise = ex.flashOnPriceRaise
-		exchange.flashOnPriceDrop = ex.flashOnPriceDrop
-		exchange.flashOnPriceDropColor = ex.flashOnPriceDropColor
-		exchange.flashOnPriceRaiseColor = ex.flashOnPriceRaiseColor
-		exchange.markerColorPriceRaise = ex.markerColorPriceRaise
-		exchange.markerColorPriceDrop = ex.markerColorPriceDrop
-
-		// address.text = ex.address
-		exchangeDialog.visible = true
-	}
-
-	function removeExchange(idx) {
-		if (idx === -1) return
-
-		// TableView seem to have a bug that makes it think row 0 is selected
-		// even if there's no data in model and table view is empty. So we need
-		// to check for that case here.
-		if ((idx+1) > exchangesModel.count) return
-
-		exchangesTable.model.remove(idx)
-		saveExchanges()
-	}
 
 } // Item

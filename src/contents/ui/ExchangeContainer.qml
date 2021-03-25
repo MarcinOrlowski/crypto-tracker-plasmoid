@@ -18,7 +18,7 @@ GridLayout {
 	readonly property bool vericalOrientation: plasmoid.formFactor == PlasmaCore.Types.Vertical
 	readonly property string defaultLocale: ''
 	property var exchanges: {
-		console.debug('xxxxxx ' + plasmoid.configuration.exchanges)
+		console.debug('exchanges set: ' + plasmoid.configuration.exchanges)
 		return JSON.parse(plasmoid.configuration.exchanges)
 	}
 	readonly property int maxExchangeCount: exchanges.length
@@ -54,7 +54,10 @@ GridLayout {
 	Repeater {
 		model: maxExchangeCount
 		Exchange {
-			json: exchanges[index]
+			json: {
+				console.debug('IDX ' + index + ': ' + JSON.stringify(exchanges[index]))
+				return exchanges[index]
+			}
 		}
 	}
 

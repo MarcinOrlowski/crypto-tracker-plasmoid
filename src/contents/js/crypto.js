@@ -46,6 +46,7 @@ var cryptos = {
 	}
 }
 function getCryptoName(code) {
+	console.debug('code: ' + code)
 	return cryptos[code]['name'] + ' (' + code + ')'
 }
 function getCryptoIcon(code) {

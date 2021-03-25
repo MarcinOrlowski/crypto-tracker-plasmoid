@@ -29,7 +29,7 @@ GridLayout {
     property bool hideCryptoLogo: false
     property string fiat: ''
     property bool useCustomLocale: false
-    property string localeToUse: ''
+    property string customLocaleName: ''
     property int refreshRate: 5
     property bool hidePriceDecimals: false
 
@@ -56,7 +56,7 @@ GridLayout {
             refreshRate = json.refreshRate
             hidePriceDecimals = json.hidePriceDecimals
             useCustomLocale = json.useCustomLocale
-            localeToUse = json.localeToUse
+            customLocaleName = json.customLocaleName
 
             showPriceChangeMarker = json.showPriceChangeMarker
             showTrendingMarker = json.showTrendingMarker
@@ -206,8 +206,8 @@ GridLayout {
         if(hidePriceDecimals) rate = Math.round(rate)
 
         var rateText = ''
-        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
-        if(hidePriceDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
+        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(customLocaleName), Crypto.getCurrencySymbol(fiat))
+        if(hidePriceDecimals) tmp = tmp.replace(Qt.locale(customLocaleName).decimalPoint + '00', '')
         rateText += '<span>' + tmp + '</span>'
 
         return rateText

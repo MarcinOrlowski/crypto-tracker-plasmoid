@@ -202,6 +202,12 @@ function exchangeExists(exchange) {
 	return exchange in exchanges
 }
 
+function getExchange(exchange) {
+	var result = exchangeExists(exchange) ? exchanges[exchange] : undefined
+	if (typeof result === 'undefined') console.error("Invalid exchange id: '" + exchange + "'")
+	return result
+}
+
 function getExchangeName(exchange) {
 	var result = exchangeExists(exchange) ? exchanges[exchange]['name'] : undefined
 	if (typeof result === 'undefined') console.error("Invalid exchange id: '" + exchange + "'")

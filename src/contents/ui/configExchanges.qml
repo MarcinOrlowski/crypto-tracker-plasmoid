@@ -61,7 +61,11 @@ Item {
 					text: {
 						if (styleData.value !== '') {
 							switch (styleData.column) {
-								case 0: return Crypto.getExchangeName(styleData.value)
+								case 0: {
+									var ex = exchangesModel.get(styleData.row)
+									var res = ex['enabled'] ? '' : '(L) '
+									return res + Crypto.getExchangeName(ex['exchange'])
+								}
 								case 1: return Crypto.getCryptoName(styleData.value)
 								case 2: return Crypto.getCurrencyName(styleData.value)
 							}

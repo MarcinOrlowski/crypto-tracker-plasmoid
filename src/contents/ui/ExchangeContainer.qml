@@ -17,7 +17,7 @@ import "../js/layouts.js" as Layouts
 GridLayout {
 	readonly property bool vericalOrientation: plasmoid.formFactor == PlasmaCore.Types.Vertical
 	readonly property string defaultLocale: ''
-	property var exchanges: JSON.parse(plasmoid.configuration.exchanges)
+	property var exchanges: JSON.parse(plasmoid.configuration.exchanges).filter(ex => ex['enabled'])
 
 	// Lame trick to force re-evaluation. It's needed because if we reorder exchanges, then
 	// exchange count is unchanged, so (unless there's better way?) Repeater will not be 

@@ -44,6 +44,8 @@ ColumnLayout {
     // ------------------------------------------------------------------------------------------------------------------------
 
     function fromJson(json) {
+        exchangeEnabled.checked = json.enabled
+
 		exchange = json.exchange
 		crypto = json.crypto
 		hideCryptoLogo = json.hideCryptoLogo
@@ -67,6 +69,8 @@ ColumnLayout {
 
     function toJson() {
         return {
+            enabled: exchangeEnabled.checked,
+
             exchange: exchange,
             crypto: crypto,
             hideCryptoLogo: hideCryptoLogo,
@@ -117,9 +121,16 @@ ColumnLayout {
 
     Kirigami.FormLayout {
         Layout.fillWidth: true
+        CheckBox {
+            id: exchangeEnabled
+            Kirigami.FormData.label: i18n('Enabled')
+            checked: true
+        }
 
         PlasmaComponents.ComboBox {
             id: exchangeComboBox
+
+            enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Exchange')
             textRole: "text"
             // Component.onCompleted: populateExchageModel()
@@ -147,6 +158,7 @@ ColumnLayout {
         }
 
         PlasmaComponents.SpinBox {
+            enabled: exchangeEnabled.checked
             editable: true
             from: 1
             to: 600
@@ -160,6 +172,7 @@ ColumnLayout {
 
         RowLayout {
             Kirigami.FormData.label: i18n('Crypto')
+            enabled: exchangeEnabled.checked
 
             PlasmaComponents.ComboBox {
                 id: cryptoComboBox
@@ -195,6 +208,7 @@ ColumnLayout {
 
         RowLayout {
             Kirigami.FormData.label: i18n('Fiat')
+            enabled: exchangeEnabled.checked
 
             PlasmaComponents.ComboBox {
                 id: fiatComboBox
@@ -232,16 +246,18 @@ ColumnLayout {
             text: i18n("Show price change markers")
             checked: showPriceChangeMarker
             onCheckedChanged: showPriceChangeMarker = checked
+            enabled: exchangeEnabled.checked
         }
 
         CheckBox {
             text: i18n("Show trending markers")
             checked: showTrendingMarker
             onCheckedChanged: showTrendingMarker = checked
+            enabled: exchangeEnabled.checked
         }
 
         PlasmaComponents.SpinBox {
-            enabled: showTrendingMarker
+            enabled: showTrendingMarker && exchangeEnabled.checked
             editable: true
             from: 1
             to: 600
@@ -252,7 +268,7 @@ ColumnLayout {
         }
 
         KQControls.ColorButton {
-            enabled: showPriceChangeMarker | showTrendingMarker
+            enabled: (showPriceChangeMarker | showTrendingMarker) && exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Price raise markers')
             dialogTitle: i18n('Price raise marker color')
             color: markerColorPriceRaise
@@ -260,7 +276,7 @@ ColumnLayout {
         }
 
         KQControls.ColorButton {
-            enabled: showPriceChangeMarker | showTrendingMarker
+            enabled: (showPriceChangeMarker | showTrendingMarker) && exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Price drop markers')
             dialogTitle: i18n('Price drop marker color')
             color: markerColorPriceDrop
@@ -270,6 +286,7 @@ ColumnLayout {
         // ------------------------------------------------------------------------------------------------------------------------
 
         RowLayout {
+            enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Use custom locale')
             CheckBox {
                 checked: useCustomLocale
@@ -287,6 +304,7 @@ ColumnLayout {
         // ------------------------------------------------------------------------------------------------------------------------
 
         RowLayout {
+            enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n("Flash on price raise")
             CheckBox {
                 checked: flashOnPriceRaise
@@ -301,6 +319,7 @@ ColumnLayout {
         }
 
         RowLayout {
+            enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n("Flash on price drop")
 
             CheckBox {

@@ -13,7 +13,8 @@ import QtQuick.Layouts 1.1
 import org.kde.kirigami 2.5 as Kirigami
 import org.kde.kquickcontrols 2.0 as KQControls
 import org.kde.plasma.components 3.0 as PlasmaComponents
-import "../js/crypto.js" as Crypto
+import "../../js/crypto.js" as Crypto
+import ".."
 
 ColumnLayout {
     Layout.fillWidth: true

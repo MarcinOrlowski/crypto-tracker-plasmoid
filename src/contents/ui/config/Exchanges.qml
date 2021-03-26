@@ -12,7 +12,8 @@ import QtQuick.Controls 1.4 as QtControls
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 import org.kde.plasma.components 3.0 as PlasmaComponents
-import "../js/crypto.js" as Crypto
+import "../../js/crypto.js" as Crypto
+import ".."
 
 Item {
 	id: configExchanges
@@ -58,7 +59,7 @@ Item {
 			itemDelegate: Item {
 				PlasmaComponents.Label {
 					text: {
-						if (styleData.value !== '') {
+						if ((styleData.row >= 0) && (styleData.value !== '')) {
 							switch (styleData.column) {
 								case 0: {
 									var ex = exchangesModel.get(styleData.row)
@@ -69,7 +70,7 @@ Item {
 								case 2: return Crypto.getCurrencyName(styleData.value)
 							}
 						}
-						return '??? col: ' + styleData.column + ' val: ' + styleData.value
+						return '??? row/col: ' + styleData.row + '/' + styleData.column + ' val: ' + styleData.value
 					}
 				}
 			}

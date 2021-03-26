@@ -21,17 +21,17 @@ GridLayout {
 	// Lame trick to force re-evaluation. It's needed because if we reorder exchanges, then
 	// exchange count is unchanged, so (unless there's better way?) Repeater will not be 
 	// triggered and exchanges will not be redrawn in new order.
-	property int maxExchangeCount: 0
+	property int exchangeCount: 0
 	onExchangesChanged: {
-		maxExchangeCount = 0
-		maxExchangeCount = exchanges.length
+		exchangeCount = 0
+		exchangeCount = exchanges.length
 	}
 	
 	rows: (!plasmoid.configuration.customContainerLayoutEnabled) 
-			? (vericalOrientation ? maxExchangeCount : 1) 
+			? (vericalOrientation ? exchangeCount : 1)
 			: plasmoid.configuration.containerLayoutRows
 	columns: (!plasmoid.configuration.customContainerLayoutEnabled)
-			? (vericalOrientation ? 1 : maxExchangeCount)
+			? (vericalOrientation ? 1 : exchangeCount)
 			: plasmoid.configuration.containerLayoutColumns
 
 	PlasmaComponents.Label {
@@ -41,7 +41,7 @@ GridLayout {
 	}
 
 	Repeater {
-		model: maxExchangeCount
+		model: exchangeCount
 		Exchange {
 			json: exchanges[index]
 		}

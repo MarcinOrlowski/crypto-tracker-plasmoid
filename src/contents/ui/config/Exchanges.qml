@@ -27,10 +27,9 @@ Item {
 		visible: false
 		onTextChanged: {
 			exchangesModel.clear()
-			var ex = JSON.parse(serializedExchanges.text)
-			for(var i=0; i<ex.length; i++) {
-				exchangesModel.append(ex[i])
-			}
+			JSON.parse(serializedExchanges.text).forEach(
+				ex => exchangesModel.append(ex)
+			)
 		}
 	}
 

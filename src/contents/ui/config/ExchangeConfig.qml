@@ -70,27 +70,27 @@ ColumnLayout {
 
     function toJson() {
         return {
-            enabled: exchangeEnabled.checked,
+            'enabled': exchangeEnabled.checked,
 
-            exchange: exchange,
-            crypto: crypto,
-            hideCryptoLogo: hideCryptoLogo,
-            fiat: fiat,
-            refreshRate: refreshRate,
-            hidePriceDecimals: hidePriceDecimals,
-            useCustomLocale: useCustomLocale,
-            customLocaleName: customLocaleName,
+            'exchange': exchange,
+            'crypto': crypto,
+            'hideCryptoLogo': hideCryptoLogo,
+            'fiat': fiat,
+            'refreshRate': refreshRate,
+            'hidePriceDecimals': hidePriceDecimals,
+            'useCustomLocale': useCustomLocale,
+            'customLocaleName': customLocaleName,
 
-            showPriceChangeMarker: showPriceChangeMarker,
-            showTrendingMarker: showTrendingMarker,
-            trendingTimeSpan: trendingTimeSpan,
+            'showPriceChangeMarker': showPriceChangeMarker,
+            'showTrendingMarker': showTrendingMarker,
+            'trendingTimeSpan': trendingTimeSpan,
 
-            flashOnPriceRaise: flashOnPriceRaise,
-            flashOnPriceRaiseColor: flashOnPriceRaiseColor,
-            flashOnPriceDrop: flashOnPriceDrop,
-            flashOnPriceDropColor: flashOnPriceDropColor,
-            markerColorPriceRaise: markerColorPriceRaise,
-            markerColorPriceDrop: markerColorPriceDrop,
+            'flashOnPriceRaise': flashOnPriceRaise,
+            'flashOnPriceRaiseColor': flashOnPriceRaiseColor,
+            'flashOnPriceDrop': flashOnPriceDrop,
+            'flashOnPriceDropColor': flashOnPriceDropColor,
+            'markerColorPriceRaise': markerColorPriceRaise,
+            'markerColorPriceDrop': markerColorPriceDrop,
         }
     }
 
@@ -333,11 +333,9 @@ ColumnLayout {
                 color: flashOnPriceDropColor
                 onColorChanged: flashOnPriceDropColor = color.toString()
             }
-
         }
 
         // ------------------------------------------------------------------------------------------------------------------------
 
     } // Kirigami.FormLayout
-
-}
+} // ColumnLayout

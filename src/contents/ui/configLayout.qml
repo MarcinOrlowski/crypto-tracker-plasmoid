@@ -13,41 +13,46 @@ import QtQuick.Layouts 1.1
 import org.kde.kirigami 2.5 as Kirigami
 import org.kde.kquickcontrols 2.0 as KQControls
 import org.kde.plasma.components 3.0 as PlasmaComponents
+import org.kde.plasma.core 2.0 as PlasmaCore
 import "../js/crypto.js" as Crypto
-import "../js/layouts.js" as Layouts
 
 
 Kirigami.FormLayout {
 	Layout.fillWidth: true
 	id: controlRoot
 
-	property alias cfg_containerLayoutGridLayout: layoutGrid.gridLayout
+	property alias cfg_customContainerLayoutEnabled: customContainerLayoutEnabled.checked
+	property alias cfg_containerLayoutRows: layoutRows.value
+	property alias cfg_containerLayoutColumns: layoutColumns.value
 	property alias cfg_containerLayoutTransparentBackgroundEnabled: transparentBackground.checked
 
 	// ------------------------------------------------------------------------------------------------------------------------
 
-	PlasmaComponents.ComboBox {
-		id: layoutGrid
+	CheckBox {
+		id: customContainerLayoutEnabled
+		text: i18n("Use custom grid layout")
+		checked: cfg_customContainerLayoutEnabled
+	}
 
-		property string gridLayout: cfg_containerLayoutGridLayout
-
-		Kirigami.FormData.label: i18n('Exchange grid layout')
-		textRole: "text"
-		onCurrentIndexChanged: gridLayout = model[currentIndex]['value']
-
-		function updateModel(layout) {
-			var tmp = []
-			var idx = 0
-			var currentIdx = 0
-			for(const key in Layouts.layouts) {
-				tmp.push({'value': key, 'text': Layouts.getLayoutName(key)})
-					if (key === layout) currentIdx = idx
-					idx++
-			}
-			model = tmp
-			currentIndex = currentIdx
-		}
-		Component.onCompleted: updateModel(cfg_containerLayoutGridLayout)
+	PlasmaComponents.SpinBox {
+		id: layoutRows
+		editable: true
+		from: 1
+		to: 25
+		stepSize: 1
+		Kirigami.FormData.label: i18n("Rows")
+		value: cfg_containerLayoutRows
+		enabled: cfg_customContainerLayoutEnabled
+	}
+	PlasmaComponents.SpinBox {
+		id: layoutColumns
+		editable: true
+		from: 1
+		to: 25
+		stepSize: 1
+		Kirigami.FormData.label: i18n("Columns")
+		value: cfg_containerLayoutColumns
+		enabled: cfg_customContainerLayoutEnabled
 	}
 
 	CheckBox {

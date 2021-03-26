@@ -18,8 +18,6 @@ import "../js/crypto.js" as Crypto
 ColumnLayout {
     Layout.fillWidth: true
 
-    property bool running: true
-
     property string exchange: undefined
     property string crypto: undefined
     property bool hideCryptoLogo: false
@@ -45,6 +43,58 @@ ColumnLayout {
 
     // ------------------------------------------------------------------------------------------------------------------------
 
+    function fromJson(json) {
+        exchangeEnabled.checked = json.enabled
+
+		exchange = json.exchange
+		crypto = json.crypto
+		hideCryptoLogo = json.hideCryptoLogo
+		fiat = json.fiat
+		refreshRate = json.refreshRate
+		hidePriceDecimals = json.hidePriceDecimals
+		useCustomLocale = json.useCustomLocale
+		customLocaleName = json.customLocaleName
+
+		showPriceChangeMarker = json.showPriceChangeMarker
+		showTrendingMarker = json.showTrendingMarker
+		trendingTimeSpan = json.trendingTimeSpan
+
+		flashOnPriceRaise = json.flashOnPriceRaise
+		flashOnPriceRaiseColor = json.flashOnPriceRaiseColor
+		flashOnPriceDrop = json.flashOnPriceDrop
+		flashOnPriceDropColor = json.flashOnPriceDropColor
+		markerColorPriceRaise = json.markerColorPriceRaise
+		markerColorPriceDrop = json.markerColorPriceDrop
+    }
+
+    function toJson() {
+        return {
+            enabled: exchangeEnabled.checked,
+
+            exchange: exchange,
+            crypto: crypto,
+            hideCryptoLogo: hideCryptoLogo,
+            fiat: fiat,
+            refreshRate: refreshRate,
+            hidePriceDecimals: hidePriceDecimals,
+            useCustomLocale: useCustomLocale,
+            customLocaleName: customLocaleName,
+
+            showPriceChangeMarker: showPriceChangeMarker,
+            showTrendingMarker: showTrendingMarker,
+            trendingTimeSpan: trendingTimeSpan,
+
+            flashOnPriceRaise: flashOnPriceRaise,
+            flashOnPriceRaiseColor: flashOnPriceRaiseColor,
+            flashOnPriceDrop: flashOnPriceDrop,
+            flashOnPriceDropColor: flashOnPriceDropColor,
+            markerColorPriceRaise: markerColorPriceRaise,
+            markerColorPriceDrop: markerColorPriceDrop,
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------------
+
     onExchangeChanged: updateModels()
     onCryptoChanged: updateModels()
     onFiatChanged: updateModels()
@@ -53,12 +103,11 @@ ColumnLayout {
         if (typeof exchange === 'undefined' || exchange === '') {
             return
         }
-        if (typeof crypto === 'undefined' || crypto === '') {
+        if (typeof crypto === 'undefined' || crypto === '' || !Crypto.isCryptoSupported(exchange, crypto)) {
             var cryptos = Crypto.getAllExchangeCryptos(exchange);
             crypto = cryptos[0].value
-
         }
-        if (typeof fiat === 'undefined' || fiat === '') {
+        if (typeof fiat === 'undefined' || fiat === '' || !Crypto.isFiatSupported(exchange, crypto, fiat)) {
             var fiats = Crypto.getFiatsForCrypto(exchange, crypto)
             fiat = fiats[0].value
         }
@@ -70,21 +119,18 @@ ColumnLayout {
 
     // ------------------------------------------------------------------------------------------------------------------------
 
-    CheckBox {
-        text: i18n("Exchange enabled")
-        checked: running
-        onCheckedChanged: running = checked
-    }
-
-    // ------------------------------------------------------------------------------------------------------------------------
-
     Kirigami.FormLayout {
-        enabled: running
-
         Layout.fillWidth: true
+        CheckBox {
+            id: exchangeEnabled
+            Kirigami.FormData.label: i18n('Enabled')
+            checked: true
+        }
 
         PlasmaComponents.ComboBox {
             id: exchangeComboBox
+
+            enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Exchange')
             textRole: "text"
             // Component.onCompleted: populateExchageModel()
@@ -112,6 +158,7 @@ ColumnLayout {
         }
 
         PlasmaComponents.SpinBox {
+            enabled: exchangeEnabled.checked
             editable: true
             from: 1
             to: 600
@@ -125,6 +172,7 @@ ColumnLayout {
 
         RowLayout {
             Kirigami.FormData.label: i18n('Crypto')
+            enabled: exchangeEnabled.checked
 
             PlasmaComponents.ComboBox {
                 id: cryptoComboBox
@@ -160,6 +208,7 @@ ColumnLayout {
 
         RowLayout {
             Kirigami.FormData.label: i18n('Fiat')
+            enabled: exchangeEnabled.checked
 
             PlasmaComponents.ComboBox {
                 id: fiatComboBox
@@ -197,16 +246,18 @@ ColumnLayout {
             text: i18n("Show price change markers")
             checked: showPriceChangeMarker
             onCheckedChanged: showPriceChangeMarker = checked
+            enabled: exchangeEnabled.checked
         }
 
         CheckBox {
             text: i18n("Show trending markers")
             checked: showTrendingMarker
             onCheckedChanged: showTrendingMarker = checked
+            enabled: exchangeEnabled.checked
         }
 
         PlasmaComponents.SpinBox {
-            enabled: showTrendingMarker
+            enabled: showTrendingMarker && exchangeEnabled.checked
             editable: true
             from: 1
             to: 600
@@ -217,7 +268,7 @@ ColumnLayout {
         }
 
         KQControls.ColorButton {
-            enabled: showPriceChangeMarker | showTrendingMarker
+            enabled: (showPriceChangeMarker | showTrendingMarker) && exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Price raise markers')
             dialogTitle: i18n('Price raise marker color')
             color: markerColorPriceRaise
@@ -225,7 +276,7 @@ ColumnLayout {
         }
 
         KQControls.ColorButton {
-            enabled: showPriceChangeMarker | showTrendingMarker
+            enabled: (showPriceChangeMarker | showTrendingMarker) && exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Price drop markers')
             dialogTitle: i18n('Price drop marker color')
             color: markerColorPriceDrop
@@ -235,6 +286,7 @@ ColumnLayout {
         // ------------------------------------------------------------------------------------------------------------------------
 
         RowLayout {
+            enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Use custom locale')
             CheckBox {
                 checked: useCustomLocale
@@ -252,6 +304,7 @@ ColumnLayout {
         // ------------------------------------------------------------------------------------------------------------------------
 
         RowLayout {
+            enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n("Flash on price raise")
             CheckBox {
                 checked: flashOnPriceRaise
@@ -266,6 +319,7 @@ ColumnLayout {
         }
 
         RowLayout {
+            enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n("Flash on price drop")
 
             CheckBox {

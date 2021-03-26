@@ -11,8 +11,6 @@ import QtQuick 2.1
 import QtQuick.Layouts 1.1
 import org.kde.plasma.components 3.0 as PlasmaComponents
 import org.kde.plasma.core 2.0 as PlasmaCore
-// import org.kde.plasma.plasmoid 2.0
-// import "../js/meta.js" as Meta
 import "../js/crypto.js" as Crypto
 
 GridLayout {
@@ -24,14 +22,16 @@ GridLayout {
     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
     Layout.fillWidth: true
 
-    property bool running: false
+    property var json: undefined
+
     property string exchange: ''
     property string crypto: ''
     property bool hideCryptoLogo: false
     property string fiat: ''
-    property string localeToUse: ''     // plasmoid.configuration.useCustomLocale ? plasmoid.configuration.localeName : ''
+    property bool useCustomLocale: false
+    property string customLocaleName: ''
     property int refreshRate: 5
-    property bool noDecimals: false
+    property bool hidePriceDecimals: false
 
     property bool showPriceChangeMarker: true
     property bool showTrendingMarker: true
@@ -47,18 +47,41 @@ GridLayout {
 
     // --------------------------------------------------------------------------------------------
 
+    Component.onCompleted: {
+        if (json !== undefined) {
+            exchange = json.exchange
+            crypto = json.crypto
+            hideCryptoLogo = json.hideCryptoLogo
+            fiat = json.fiat
+            refreshRate = json.refreshRate
+            hidePriceDecimals = json.hidePriceDecimals
+            useCustomLocale = json.useCustomLocale
+            customLocaleName = json.customLocaleName
+
+            showPriceChangeMarker = json.showPriceChangeMarker
+            showTrendingMarker = json.showTrendingMarker
+            trendingTimeSpan = json.trendingTimeSpan
+
+            flashOnPriceRaise = json.flashOnPriceRaise
+            flashOnPriceRaiseColor = json.flashOnPriceRaiseColor
+            flashOnPriceDrop = json.flashOnPriceDrop
+            flashOnPriceDropColor = json.flashOnPriceDropColor
+            markerColorPriceRaise = json.markerColorPriceRaise
+            markerColorPriceDrop = json.markerColorPriceDrop
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------
+
     onExchangeChanged: {
-        console.debug('1')
         invalidateExchangeData();
         fetchRate(exchange, crypto, fiat)
     }
     onCryptoChanged: {
-        console.debug('2')
         invalidateExchangeData();
         fetchRate(exchange, crypto, fiat)
     }
     onFiatChanged: {
-        console.debug('3')
         invalidateExchangeData();
         fetchRate(exchange, crypto, fiat)
     }
@@ -177,11 +200,12 @@ GridLayout {
         var color = '#0000ff'
 
         var rate = currentRate
-        if(noDecimals) rate = Math.round(rate)
+        if(hidePriceDecimals) rate = Math.round(rate)
 
         var rateText = ''
-        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeToUse), Crypto.getCurrencySymbol(fiat))
-        if(noDecimals) tmp = tmp.replace(Qt.locale(localeToUse).decimalPoint + '00', '')
+        var localeName = useCustomLocale ? customLocaleName : ''
+        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeName), Crypto.getCurrencySymbol(fiat))
+        if(hidePriceDecimals) tmp = tmp.replace(Qt.locale(localeName).decimalPoint + '00', '')
         rateText += '<span>' + tmp + '</span>'
 
         return rateText
@@ -305,7 +329,7 @@ GridLayout {
 
 	Timer {
 		interval: refreshRate * 60 * 1000
-		running: parent.running
+		running: true
 		repeat: true
 		triggeredOnStart: true
 		onTriggered: fetchRate(exchange, crypto, fiat)
@@ -318,14 +342,15 @@ GridLayout {
         if (dataDownloadInProgress) return
 
         if (!Crypto.exchangeExists(exchange)) {
-            console.debug("fetchRate(): unknown exchange: '" + exchange + "'")
+            if (exchange !== '') console.debug("fetchRate(): unknown exchange: '" + exchange + "'")
             return
         }
         if (!Crypto.isCryptoSupported(exchange, crypto)) {
-            console.debug("fetchRate(): unsupported crypto: '" + crypto + "' on exchange: '" + exchange + "'")
+            if (crypto !== '') console.debug("fetchRate(): unsupported crypto: '" + crypto + "' on exchange: '" + exchange + "'")
             return
         }
         if (!Crypto.isFiatSupported(exchange, crypto, fiat)) {
+            if (fiat !== '') 
             console.debug("fetchRate(): unsupported fiat: '" + fiat + "' for crypto: '" + crypto + "' on exchange: '" + exchange + "'")
             return
         }

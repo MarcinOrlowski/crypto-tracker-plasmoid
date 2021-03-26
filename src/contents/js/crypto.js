@@ -23,7 +23,7 @@ var currencySymbols = {
 	'CZK': 'Kč',				// Czech Krown
 }
 function getCurrencyName(code) {
-	return code + ' ' + currencySymbols[code]
+	return code + ' (' + currencySymbols[code] + ')'
 }
 function getCurrencySymbol(code) {
 	return currencySymbols[code]
@@ -200,6 +200,12 @@ var exchanges = {
 
 function exchangeExists(exchange) {
 	return exchange in exchanges
+}
+
+function getExchange(exchange) {
+	var result = exchangeExists(exchange) ? exchanges[exchange] : undefined
+	if (typeof result === 'undefined') console.error("Invalid exchange id: '" + exchange + "'")
+	return result
 }
 
 function getExchangeName(exchange) {

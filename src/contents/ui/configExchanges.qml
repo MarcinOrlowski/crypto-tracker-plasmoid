@@ -48,6 +48,8 @@ Item {
 			model: exchangesModel
 			Layout.fillWidth: true
 
+			sortIndicatorVisible: true
+
 			anchors.top: parent.top
 			anchors.right: tableActionButtons.left
 			anchors.bottom: parent.bottom
@@ -57,13 +59,14 @@ Item {
 			itemDelegate: Item {
 				PlasmaComponents.Label {
 					text: {
-						switch (styleData.column) {
-							case 0: return Crypto.getExchangeName(styleData.value)
-							case 1: return Crypto.getCryptoName(styleData.value)
-							case 2: return Crypto.getCurrencyName(styleData.value)
+						if (styleData.value !== '') {
+							switch (styleData.column) {
+								case 0: return Crypto.getExchangeName(styleData.value)
+								case 1: return Crypto.getCryptoName(styleData.value)
+								case 2: return Crypto.getCurrencyName(styleData.value)
+							}
 						}
-
-						return '??? col: ' + column + ' val: ' + value
+						return '??? col: ' + styleData.column + ' val: ' + styleData.value
 					}
 				}
 			}
@@ -103,9 +106,10 @@ Item {
 					// even if there's no data in model and table view is empty. So we need
 					// to check for that case here.
 					var idx = exchangesTable.currentRow
-					return (idx !== -1) && ((idx+1) <= exchangesModel.count)
+					return (idx !== -1) && (idx < exchangesModel.count)
 				}
 			}
+
 			PlasmaComponents.Button {
 				text: i18n("Remove")
 				icon.name: "list-remove"
@@ -115,9 +119,51 @@ Item {
 					// even if there's no data in model and table view is empty. So we need
 					// to check for that case here.
 					var idx = exchangesTable.currentRow
-					return (idx !== -1) && ((idx+1) <= exchangesModel.count)
+					return (idx !== -1) && (idx < exchangesModel.count)
 				}
 			}
+
+			PlasmaComponents.Button {
+				text: i18n("Move Up")
+				icon.name: "arrow-up"
+				onClicked: {
+					var from = exchangesTable.currentRow
+					var to = from -1
+					exchangesTable.selection.clear()
+					exchangesModel.move(from, to, 1)
+					exchangesTable.selection.select(to)
+					saveExchanges()
+				}
+				enabled: {
+					// TableView seem to have a bug that makes it think row 0 is selected
+					// even if there's no data in model and table view is empty. So we need
+					// to check for that case here.
+					var idx = exchangesTable.currentRow
+					return (idx > 0) && (idx < exchangesModel.count)
+				}
+			}
+
+			PlasmaComponents.Button {
+				text: i18n("Move Down")
+				icon.name: "arrow-down"
+				onClicked: {
+					var from = exchangesTable.currentRow
+					var to = from+1
+					exchangesTable.selection.clear()
+					exchangesModel.move(from, to, 1)
+					exchangesTable.selection.select(to)
+					saveExchanges()
+				}
+				enabled: {
+					// TableView seem to have a bug that makes it think row 0 is selected
+					// even if there's no data in model and table view is empty. So we need
+					// to check for that case here.
+					var idx = exchangesTable.currentRow
+					return (idx !== -1) && ((idx+1) < exchangesModel.count)
+				}
+			}
+
+
 		} // ColumnLayout
 	} // RowLayout
 

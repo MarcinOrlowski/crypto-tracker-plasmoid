@@ -58,9 +58,9 @@ ColumnLayout {
 		trendingTimeSpan = json.trendingTimeSpan
 
 		flashOnPriceRaise = json.flashOnPriceRaise
+		flashOnPriceRaiseColor = json.flashOnPriceRaiseColor
 		flashOnPriceDrop = json.flashOnPriceDrop
 		flashOnPriceDropColor = json.flashOnPriceDropColor
-		flashOnPriceRaiseColor = json.flashOnPriceRaiseColor
 		markerColorPriceRaise = json.markerColorPriceRaise
 		markerColorPriceDrop = json.markerColorPriceDrop
     }
@@ -81,9 +81,9 @@ ColumnLayout {
             trendingTimeSpan: trendingTimeSpan,
 
             flashOnPriceRaise: flashOnPriceRaise,
+            flashOnPriceRaiseColor: flashOnPriceRaiseColor,
             flashOnPriceDrop: flashOnPriceDrop,
             flashOnPriceDropColor: flashOnPriceDropColor,
-            flashOnPriceRaiseColor: flashOnPriceRaiseColor,
             markerColorPriceRaise: markerColorPriceRaise,
             markerColorPriceDrop: markerColorPriceDrop,
         }
@@ -111,6 +111,7 @@ ColumnLayout {
         exchangeComboBox.updateModel(exchange)
         cryptoComboBox.updateModel(exchange, crypto)
         fiatComboBox.updateModel(exchange, crypto, fiat)
+    }
 
     // ------------------------------------------------------------------------------------------------------------------------
 

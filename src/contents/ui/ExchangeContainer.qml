@@ -17,11 +17,16 @@ import "../js/layouts.js" as Layouts
 GridLayout {
 	readonly property bool vericalOrientation: plasmoid.formFactor == PlasmaCore.Types.Vertical
 	readonly property string defaultLocale: ''
-	property var exchanges: {
-		console.debug('exchanges set: ' + plasmoid.configuration.exchanges)
-		return JSON.parse(plasmoid.configuration.exchanges)
+	property var exchanges: JSON.parse(plasmoid.configuration.exchanges)
+
+	// Lame trick to force re-evaluation. It's needed because if we reorder exchanges, then
+	// exchange count is unchanged, so (unless there's better way?) Repeater will not be 
+	// triggered and exchanges will not be redrawn in new order.
+	onExchangesChanged: {
+		maxExchangeCount = 0
+		maxExchangeCount = exchanges.length
 	}
-	readonly property int maxExchangeCount: exchanges.length
+	property int maxExchangeCount: 0
 
 	property string containerLayoutId: plasmoid.configuration.containerLayoutGridLayout
 

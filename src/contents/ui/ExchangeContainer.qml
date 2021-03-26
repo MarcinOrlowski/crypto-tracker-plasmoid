@@ -59,10 +59,7 @@ GridLayout {
 	Repeater {
 		model: maxExchangeCount
 		Exchange {
-			json: {
-				console.debug('IDX ' + index + ': ' + JSON.stringify(exchanges[index]))
-				return exchanges[index]
-			}
+			json: exchanges[index]
 		}
 	}
 

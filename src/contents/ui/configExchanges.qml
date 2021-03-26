@@ -181,8 +181,6 @@ Item {
 			exchanges.push(exchangesModel.get(i))
 		}
 		serializedExchanges.text = JSON.stringify(exchanges)
-
-		console.debug('SAVE: ' + serializedExchanges.text)
 	}
 
 	function addExchange() {
@@ -231,7 +229,6 @@ Item {
 			} else {
 				exchangesModel.set(selectedRow, ex)
 			}
-
 			saveExchanges();	
 		}
 
@@ -239,6 +236,5 @@ Item {
 			id: exchange
 		}
 	}
-
 
 } // Item

@@ -12,7 +12,6 @@ import QtQuick.Layouts 1.1
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents
 import "../js/crypto.js" as Crypto
-import "../js/layouts.js" as Layouts
 
 GridLayout {
 	readonly property bool vericalOrientation: plasmoid.formFactor == PlasmaCore.Types.Vertical
@@ -22,36 +21,21 @@ GridLayout {
 	// Lame trick to force re-evaluation. It's needed because if we reorder exchanges, then
 	// exchange count is unchanged, so (unless there's better way?) Repeater will not be 
 	// triggered and exchanges will not be redrawn in new order.
+	property int maxExchangeCount: 0
 	onExchangesChanged: {
 		maxExchangeCount = 0
 		maxExchangeCount = exchanges.length
 	}
-	property int maxExchangeCount: 0
-
-	property string containerLayoutId: plasmoid.configuration.containerLayoutGridLayout
-
-	rows: {
-		var rows = vericalOrientation ? maxExchangeCount : 1
-		if (containerLayoutId !== Layouts.DEFAULT) {
-			var layout = Layouts.getLayout(containerLayoutId)
-			rows = layout.rows
-		}
-		return rows
-	}
-
-	columns: {
-		var columns = vericalOrientation ? 1 : maxExchangeCount
-		if (containerLayoutId !== Layouts.DEFAULT) {
-			var layout = Layouts.getLayout(containerLayoutId)
-			columns = layout.columns
-		}
-		return columns
-	}
-
-	readonly property bool anythingVisible: exchanges.length > 0
+	
+	rows: (!plasmoid.configuration.customContainerLayoutEnabled) 
+			? (vericalOrientation ? maxExchangeCount : 1) 
+			: plasmoid.configuration.containerLayoutRows
+	columns: (!plasmoid.configuration.customContainerLayoutEnabled)
+			? (vericalOrientation ? 1 : maxExchangeCount)
+			: plasmoid.configuration.containerLayoutColumns
 
 	PlasmaComponents.Label {
-		visible: !anythingVisible
+		visible: exchanges.length === 0
 		Layout.alignment: Qt.AlignHCenter
 		text: i18n("Edit me!")
 	}

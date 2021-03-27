@@ -183,6 +183,7 @@ Item {
 	}
 
 	function addExchange() {
+		exchange.init()
 		selectedRow = -1
 		exchangeEditDialog.visible = true
 	}

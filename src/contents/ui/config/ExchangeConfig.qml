@@ -25,6 +25,32 @@ ColumnLayout {
 
     // ------------------------------------------------------------------------------------------------------------------------
 
+    function init() {
+        fromJson({
+            'enabled': true,
+
+            'exchange': Crypto.getExchageIds()[0],
+            'crypto': Crypto.BTC,   // FIXME we should fetch first crypto supported by exchange!
+            'hideCryptoLogo': false,
+            'fiat': Crypto.USD,   // FIXME we should fetch first fiat supported by exchange!
+            'refreshRate': 15,
+            'hidePriceDecimals': false,
+            'useCustomLocale': false,
+            'customLocaleName': '',
+
+            'showPriceChangeMarker': true,
+            'showTrendingMarker': true,
+            'trendingTimeSpan': 60,
+
+            'flashOnPriceRaise': true,
+            'flashOnPriceRaiseColor': '#78c625',
+            'flashOnPriceDrop': true,
+            'flashOnPriceDropColor': '#ff006e',
+            'markerColorPriceRaise': '#78c625',
+            'markerColorPriceDrop': '#ff006e',
+        })
+    }
+
     function fromJson(json) {
         exchangeEnabled.checked = json.enabled
 

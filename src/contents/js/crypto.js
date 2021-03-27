@@ -14,13 +14,20 @@ const BTC='BTC'
 const ETH='ETH'
 const LTC='LTC'
 
+const USD='USD'
+const PLN='PLN'
+const GBP='GBP'
+const EUR='EUR'
+const JPY='JPY'
+const CZK='CZK'
+
 var currencySymbols = {
-	'EUR': '€',					// Euro
-	'GBP': '£',					// British Pound Sterling
-	'PLN': 'zł',				// Polish Zloty
-	'USD': '$',					// US Dollar
-	'JPY': '¥',					// Japanese Yen
-	'CZK': 'Kč',				// Czech Krown
+	EUR: '€',					// Euro
+	GBP: '£',					// British Pound Sterling
+	PLN: 'zł',				// Polish Zloty
+	USD: '$',					// US Dollar
+	JPY: '¥',					// Japanese Yen
+	CZK: 'Kč',				// Czech Krown
 }
 function getCurrencyName(code) {
 	return code + ' (' + currencySymbols[code] + ')'
@@ -200,6 +207,10 @@ var exchanges = {
 
 function exchangeExists(exchange) {
 	return exchange in exchanges
+}
+
+function getExchageIds() {
+	return Object.keys(exchanges)
 }
 
 function getExchange(exchange) {

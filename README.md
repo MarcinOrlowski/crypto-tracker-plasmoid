@@ -53,7 +53,9 @@ Widget will display separate ticker for each configured exchange:
 Here you can add, remove, edit and change order of your exchanges.
 
 #### Exchange ####
-The following settings are available for each exchange added to your ticker:
+The following settings are available for each exchange added to your ticker.
+
+![Exchange config](img/config-exchange.png)
 
 * **Enabled**: When checked, exchange will be shown on your widget.
 * **Exchange**: Select exchange you want to use.

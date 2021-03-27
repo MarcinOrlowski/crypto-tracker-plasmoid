@@ -60,6 +60,8 @@ Here you can add, remove, edit and change order of your exchanges.
 * **Move up**: Reorders exchange list by moving select one up the list.
 * **Move down**: Reorders exchange list by moving selected one down the list.
 
+---
+
 #### Exchange ####
 The following settings are available for each exchange added to your ticker.
 
@@ -86,6 +88,8 @@ The following settings are available for each exchange added to your ticker.
 
 ![Widget bg flash](img/widget03.gif)
 
+---
+
 ### Layout ###
 This pane controls how the widgets places exchange details in its internal layout grid.
 
@@ -100,6 +104,8 @@ This pane controls how the widgets places exchange details in its internal layou
   derrived background is used. **NOTE** this option is not available (hidden) if you use Plasma 5.19
   or newer, as it offers own, built-in mechanism to set plasmoid transparent background which is 
   preferred if available.
+
+---
 
 ## Installation ##
 

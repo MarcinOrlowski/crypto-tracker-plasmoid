@@ -52,6 +52,14 @@ Widget will display separate ticker for each configured exchange:
 ### Exchanges ###
 Here you can add, remove, edit and change order of your exchanges.
 
+![Exchanges](img/config-exchanges.png)
+
+* **Add**: Adds new exchange to your ticker.
+* **Edit**: Edits selected exchange (you can also double click on the list).
+* **Remove**: Removes selected exchange from your ticker.
+* **Move up**: Reorders exchange list by moving select one up the list.
+* **Move down**: Reorders exchange list by moving selected one down the list.
+
 #### Exchange ####
 The following settings are available for each exchange added to your ticker.
 

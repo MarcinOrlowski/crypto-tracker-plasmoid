@@ -89,6 +89,8 @@ The following settings are available for each exchange added to your ticker.
 ### Layout ###
 This pane controls how the widgets places exchange details in its internal layout grid.
 
+![Layout](img/config-layout.png)
+
 * **Use custom grid layout**: By default Crypto Trackers puts all enabled exchanges either in single
   row (or single column) depending on your Panel orientation. This option lets you override this behavior
   and manually specify how many rows and columns your desired layout should be using.

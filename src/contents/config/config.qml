@@ -26,5 +26,4 @@ ConfigModel {
 		icon: "view-visible"
 		source: "config/About.qml"
 	}
-
 }

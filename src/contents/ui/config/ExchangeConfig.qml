@@ -21,26 +21,7 @@ ColumnLayout {
 
     property string exchange: undefined
     property string crypto: undefined
-    property bool hideCryptoLogo: false
     property string fiat: undefined
-    property int refreshRate: 5                 // minutes
-    property bool hidePriceDecimals: false
-
-    property bool useCustomLocale: false
-    property string customLocaleName: ''
-
-    property bool showPriceChangeMarker: true
-
-    property bool showTrendingMarker: true
-    property int trendingTimeSpan: 60          // minutes
-
-    property bool flashOnPriceRaise: true
-    property string flashOnPriceRaiseColor: '#00ff00'
-    property bool flashOnPriceDrop: true
-    property string flashOnPriceDropColor: '#ff0000'
-
-    property string markerColorPriceRaise: '#00ff00'
-    property string markerColorPriceDrop: '#ff0000'
 
     // ------------------------------------------------------------------------------------------------------------------------
 
@@ -49,23 +30,23 @@ ColumnLayout {
 
 		exchange = json.exchange
 		crypto = json.crypto
-		hideCryptoLogo = json.hideCryptoLogo
+		hideCryptoLogo.checked = json.hideCryptoLogo
 		fiat = json.fiat
-		refreshRate = json.refreshRate
-		hidePriceDecimals = json.hidePriceDecimals
-		useCustomLocale = json.useCustomLocale
-		customLocaleName = json.customLocaleName
+		refreshRate.value = json.refreshRate
+		hidePriceDecimals.checked = json.hidePriceDecimals
+		useCustomLocale.checked = json.useCustomLocale
+		customLocaleName.text = json.customLocaleName
 
-		showPriceChangeMarker = json.showPriceChangeMarker
-		showTrendingMarker = json.showTrendingMarker
-		trendingTimeSpan = json.trendingTimeSpan
+		showPriceChangeMarker.checked = json.showPriceChangeMarker
+		showTrendingMarker.checked = json.showTrendingMarker
+		trendingTimeSpan.value = json.trendingTimeSpan
 
-		flashOnPriceRaise = json.flashOnPriceRaise
-		flashOnPriceRaiseColor = json.flashOnPriceRaiseColor
-		flashOnPriceDrop = json.flashOnPriceDrop
-		flashOnPriceDropColor = json.flashOnPriceDropColor
-		markerColorPriceRaise = json.markerColorPriceRaise
-		markerColorPriceDrop = json.markerColorPriceDrop
+		flashOnPriceRaise.checked = json.flashOnPriceRaise
+		flashOnPriceRaiseColor.color = json.flashOnPriceRaiseColor
+		flashOnPriceDrop.checked = json.flashOnPriceDrop
+		flashOnPriceDropColor.color = json.flashOnPriceDropColor
+		markerColorPriceRaise.color = json.markerColorPriceRaise
+		markerColorPriceDrop.color = json.markerColorPriceDrop
     }
 
     function toJson() {
@@ -74,23 +55,23 @@ ColumnLayout {
 
             'exchange': exchange,
             'crypto': crypto,
-            'hideCryptoLogo': hideCryptoLogo,
+            'hideCryptoLogo': hideCryptoLogo.checked,
             'fiat': fiat,
-            'refreshRate': refreshRate,
-            'hidePriceDecimals': hidePriceDecimals,
-            'useCustomLocale': useCustomLocale,
-            'customLocaleName': customLocaleName,
+            'refreshRate': refreshRate.value,
+            'hidePriceDecimals': hidePriceDecimals.checked,
+            'useCustomLocale': useCustomLocale.checked,
+            'customLocaleName': customLocaleName.text,
 
-            'showPriceChangeMarker': showPriceChangeMarker,
-            'showTrendingMarker': showTrendingMarker,
-            'trendingTimeSpan': trendingTimeSpan,
+            'showPriceChangeMarker': showPriceChangeMarker.checked,
+            'showTrendingMarker': showTrendingMarker.checked,
+            'trendingTimeSpan': trendingTimeSpan.value,
 
-            'flashOnPriceRaise': flashOnPriceRaise,
-            'flashOnPriceRaiseColor': flashOnPriceRaiseColor,
-            'flashOnPriceDrop': flashOnPriceDrop,
-            'flashOnPriceDropColor': flashOnPriceDropColor,
-            'markerColorPriceRaise': markerColorPriceRaise,
-            'markerColorPriceDrop': markerColorPriceDrop,
+            'flashOnPriceRaise': flashOnPriceRaise.checked,
+            'flashOnPriceRaiseColor': flashOnPriceRaiseColor.color.toString(),
+            'flashOnPriceDrop': flashOnPriceDrop.checked,
+            'flashOnPriceDropColor': flashOnPriceDropColor.color.toString(),
+            'markerColorPriceRaise': markerColorPriceRaise.color.toString(),
+            'markerColorPriceDrop': markerColorPriceDrop.color.toString(),
         }
     }
 
@@ -159,14 +140,13 @@ ColumnLayout {
         }
 
         PlasmaComponents.SpinBox {
+            id: refreshRate
             enabled: exchangeEnabled.checked
             editable: true
             from: 1
             to: 600
             stepSize: 15
             Kirigami.FormData.label: i18n("Update interval (minutes)")
-            value: refreshRate
-            onValueChanged: refreshRate = value
         }
 
         // ------------------------------------------------------------------------------------------------------------------------
@@ -199,9 +179,8 @@ ColumnLayout {
             }
 
             CheckBox {
-                text: i18n("Hide icon")
-                checked: hideCryptoLogo
-                onCheckedChanged: hideCryptoLogo = checked
+                id: hideCryptoLogo
+                text: i18n("Hide currency icon")
             }
         }
 
@@ -237,51 +216,45 @@ ColumnLayout {
             // FIXME should be per Pair as we may have i.e. LTCBTC pair soon
             // and this would make no sense then.
             PlasmaComponents.CheckBox {
+                id: hidePriceDecimals
                 text: i18n("Hide decimals")
-                checked: hidePriceDecimals
-                onCheckedChanged: hidePriceDecimals = checked
             }
         }
 
         CheckBox {
+            id: showPriceChangeMarker
             text: i18n("Show price change markers")
-            checked: showPriceChangeMarker
-            onCheckedChanged: showPriceChangeMarker = checked
             enabled: exchangeEnabled.checked
         }
 
         CheckBox {
+            id: showTrendingMarker
             text: i18n("Show trending markers")
-            checked: showTrendingMarker
-            onCheckedChanged: showTrendingMarker = checked
             enabled: exchangeEnabled.checked
         }
 
         PlasmaComponents.SpinBox {
-            enabled: showTrendingMarker && exchangeEnabled.checked
+            id: trendingTimeSpan
+            enabled: showTrendingMarker.checked && exchangeEnabled.checked
             editable: true
             from: 1
             to: 600
             stepSize: 15
             Kirigami.FormData.label: i18n("Trending span (minutes)")
-            value: trendingTimeSpan
-            onValueChanged: trendingTimeSpan = value
         }
 
         KQControls.ColorButton {
-            enabled: (showPriceChangeMarker | showTrendingMarker) && exchangeEnabled.checked
+            id: markerColorPriceRaise
+            enabled: (showPriceChangeMarker.checked | showTrendingMarker.checked) && exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Price raise markers')
             dialogTitle: i18n('Price raise marker color')
-            color: markerColorPriceRaise
-            onColorChanged: markerColorPriceRaise = color.toString()
         }
 
         KQControls.ColorButton {
-            enabled: (showPriceChangeMarker | showTrendingMarker) && exchangeEnabled.checked
+            id: markerColorPriceDrop
+            enabled: (showPriceChangeMarker.checked | showTrendingMarker.checked) && exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Price drop markers')
             dialogTitle: i18n('Price drop marker color')
-            color: markerColorPriceDrop
-            onColorChanged: markerColorPriceDrop = color.toString()
         }
 
         // ------------------------------------------------------------------------------------------------------------------------
@@ -290,15 +263,13 @@ ColumnLayout {
             enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n('Use custom locale')
             CheckBox {
-                checked: useCustomLocale
-                onCheckedChanged: useCustomLocale = checked
+                id: useCustomLocale
             }
 
             TextField {
-                enabled: useCustomLocale
+                id: customLocaleName
+                enabled: useCustomLocale.checked
                 placeholderText: "en_US"
-                text: customLocaleName
-                onTextChanged: customLocaleName = text
             }
         }
 
@@ -308,14 +279,12 @@ ColumnLayout {
             enabled: exchangeEnabled.checked
             Kirigami.FormData.label: i18n("Flash on price raise")
             CheckBox {
-                checked: flashOnPriceRaise
-                onCheckedChanged: flashOnPriceRaise = checked
+                id: flashOnPriceRaise
             }
             KQControls.ColorButton {
-                enabled: flashOnPriceRaise
+                id: flashOnPriceRaiseColor
+                enabled: flashOnPriceRaise.checked
                 dialogTitle: i18n('Price raise flash background color')
-                color: flashOnPriceRaiseColor
-                onColorChanged: flashOnPriceRaiseColor = color.toString()
             }
         }
 
@@ -324,14 +293,12 @@ ColumnLayout {
             Kirigami.FormData.label: i18n("Flash on price drop")
 
             CheckBox {
-                checked: flashOnPriceDrop
-                onCheckedChanged: flashOnPriceDrop = checked
+                id: flashOnPriceDrop
             }
             KQControls.ColorButton {
-                enabled: flashOnPriceDrop
-                dialogTitle: i18n('Price raise flash background color')
-                color: flashOnPriceDropColor
-                onColorChanged: flashOnPriceDropColor = color.toString()
+                id: flashOnPriceDropColor
+                enabled: flashOnPriceDrop.checked
+                dialogTitle: i18n('Price drop flash background color')
             }
         }
 

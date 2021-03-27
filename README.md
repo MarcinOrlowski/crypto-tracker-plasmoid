@@ -21,7 +21,9 @@ lifted once I will have the time to rework configuration UI to properly handle u
 
  * [Exchange ticker](#ticker)
  * [Configuration](#configuration)
-   * [Appearance](#appearance)
+   * [Exchanges](#exchanges)
+     * [Exchange](#exchange)
+   * [Layout](#layout)
  * [Installation](#installation)
    * [Using built-in installer](#using-built-in-installer)
    * [Manual installation](#manual-installation)
@@ -47,17 +49,44 @@ Widget will display separate ticker for each configured exchange:
 
 ## Configuration ##
 
-### Appearance ###
+### Exchanges ###
+Here you can add, remove, edit and change order of your exchanges.
 
+#### Exchange ####
+The following settings are available for each exchange added to your ticker:
+
+* **Enabled**: When checked, exchange will be shown on your widget.
+* **Exchange**: Select exchange you want to use.
+* **Update interval (minutes)**: Specify how often (in minutes) you want the exchange to be queried for new data.
+* **Crypto**: Name of crypto currency you want to track on this exchange.
+* **Hide currency icon**: If checked, no crypto icon will be drawn on ticker.
+* **Fiat**: Select fiat currencty to show the price of selected crypto.
+* **Hide decimals**: Check it, if you do not care about cents or fractional parts of selected fiat.
+* **Show price change markers**: When enabled, you will be shown with visual markers indicating price change (up or down since last data pull).
+* **Show trending markers**: When enabled, you will see price trending markers on your ticker.
+* **Trending span (minutes)**: Trending marker is calculated using specified time span. I.e. if you set it to 60 minutes, then trending marker
+  will show how much the current price differs vs price we seen 60 minutes ago.
+* **Price raise marker color**: Specify color you want to use while drawing marker indicating price raise (default is green).
+* **Price drop marker color**: Specify color you want to use while drawing marker indicating price drop (default is red).
+* **Use custom locale**: When enabled you can specify locale name to be used to i.e. format prices. For example if your system default locale
+  is `en_UK` (English, British) but you wan to see BTC price in PLN (polish zloty) then you way want to enable this option and set your
+  locale to `pl` so the price is formatted using Polish currency formatting rules.
+* **Flash on price raise**: When enabled, exchange entry background will flash using specified color (default green) when asset price went up since last check.
+* **Flash on price drop**: When enabled, exchange entry background will flash using specified color (default red) when asset price dropped since last check.
+
+
+### Layout ###
 This pane controls how the widgets places exchange details in its internal layout grid.
 
-* **Exchange grid layout**: By default it puts all enabled exchanges either in singe row or single
-  column, depending on your Panel orientation, but you can select any predefined grid layout
-  instead. Grid is defined as `COLUMNS x ROWS` and is applied regardless of Panel orientation. 
-  So if you i.e. use thick horizontal Panel and want to have all six exchanges shown in more
-  compact form you can try i.e. `3x2` layout which means 3 columns, 2 rows each.
-* **Transparent background**: When checked, widget background be fully transparent. Otherwise theme
-  derrived background is used.
+* **Use custom grid layout**: By default Crypto Trackers puts all enabled exchanges either in single
+  row (or single column) depending on your Panel orientation. This option lets you override this behavior
+  and manually specify how many rows and columns your desired layout should be using.
+* **Rows**: Number of rows you want the custom layout grid to use.
+* **Columns**: Number of columns you want the custom layout grid to use.
+* **Transparent background**: When checked, widget background be fully transparent, otherwise theme
+  derrived background is used. **NOTE** this option is not available (hidden) if you use Plasma 5.19
+  or newer, as it offers own, built-in mechanism to set plasmoid transparent background which is 
+  preferred if available.
 
 ## Installation ##
 

@@ -76,6 +76,7 @@ The following settings are available for each exchange added to your ticker.
 * **Flash on price raise**: When enabled, exchange entry background will flash using specified color (default green) when asset price went up since last check.
 * **Flash on price drop**: When enabled, exchange entry background will flash using specified color (default red) when asset price dropped since last check.
 
+![Widget bg flash](img/widget03.gif)
 
 ### Layout ###
 This pane controls how the widgets places exchange details in its internal layout grid.

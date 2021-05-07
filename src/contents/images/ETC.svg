@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="svg8" version="1.1" viewBox="0 0 36 59">
+   <defs id="defs2">
+      <clipPath id="clipPath26" clipPathUnits="userSpaceOnUse">
+         <path id="path24" d="M0 0h794v446H0z" clip-rule="evenodd" />
+      </clipPath>
+      <clipPath id="clipPath102" clipPathUnits="userSpaceOnUse">
+         <path id="path100" d="M397 6v434z" />
+      </clipPath>
+   </defs>
+   <g id="layer1" transform="translate(271 -206)">
+      <g id="g394" transform="matrix(.26458 0 0 .26458 -271 206)">
+         <path id="path380" fill="#669073" fill-rule="evenodd" d="M2 99l65-28 63 29L67 0zm1 30l65 38 66-38-66 91z" class="st0" clip-rule="evenodd" />
+         <path id="path382" fill="#669073" fill-rule="evenodd" d="M68 85L0 113l68 38 66-37z" class="st0" clip-rule="evenodd" />
+      </g>
+   </g>
+   <style id="style2" type="text/css">
+    .st0{fill:url(#XMLID_3_)}
+  </style>
+   <style id="style378">
+    .st0{fill-rule:evenodd;clip-rule:evenodd;fill:#669073}
+  </style>
+</svg>

@@ -1,4 +1,4 @@
-* dev
+* v1.3.0 (2021-05-10)
   * Reworked exchange management and added support for unlimited number of exchanges.
   * Exchanges can be now easily reordered.
   * Added support for Plasma 5.19+ widget background controls.

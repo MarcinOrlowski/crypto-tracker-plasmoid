@@ -1,4 +1,6 @@
-* v1.3.0 (2021-05-10)
+* v2.0.0 (2021-05-10)
+  * [IMPORTANT] Your current config will NOT be migrated and you will have to re-set
+    all the exchanges you had before from scrach. Sorry for the inconvenience.
   * Reworked exchange management and added support for unlimited number of exchanges.
   * Exchanges can be now easily reordered.
   * Added support for Plasma 5.19+ widget background controls.

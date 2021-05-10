@@ -1,3 +1,9 @@
+* v1.3.0 (2021-05-10)
+  * Reworked exchange management and added support for unlimited number of exchanges.
+  * Exchanges can be now easily reordered.
+  * Added support for Plasma 5.19+ widget background controls.
+  * Added support for ETH Classic (patch by César Valadez).
+
 * v1.2.0 (2021-03-24)
   * Internal widget layout grid is configurable now. Requested by @Foul [#11]
   * Widget background can now be set transparent.

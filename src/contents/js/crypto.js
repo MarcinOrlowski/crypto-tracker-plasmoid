@@ -12,18 +12,26 @@
 
 const BTC='BTC'
 const ETH='ETH'
-const LTC='LTC'
+const LTC = 'LTC'
+const ETC = 'ETC'
+
+const USD='USD'
+const PLN='PLN'
+const GBP='GBP'
+const EUR='EUR'
+const JPY='JPY'
+const CZK='CZK'
 
 var currencySymbols = {
-	'EUR': '€',					// Euro
-	'GBP': '£',					// British Pound Sterling
-	'PLN': 'zł',				// Polish Zloty
-	'USD': '$',					// US Dollar
-	'JPY': '¥',					// Japanese Yen
-	'CZK': 'Kč',				// Czech Krown
+	EUR: '€',					// Euro
+	GBP: '£',					// British Pound Sterling
+	PLN: 'zł',				// Polish Zloty
+	USD: '$',					// US Dollar
+	JPY: '¥',					// Japanese Yen
+	CZK: 'Kč',				// Czech Krown
 }
 function getCurrencyName(code) {
-	return code + ' ' + currencySymbols[code]
+	return code + ' (' + currencySymbols[code] + ')'
 }
 function getCurrencySymbol(code) {
 	return currencySymbols[code]
@@ -43,6 +51,9 @@ var cryptos = {
 	},
 	XRP: {
 		name: 'Ripple'
+	},
+	ETC: {
+		name: 'Ethereum Classic'
 	}
 }
 function getCryptoName(code) {
@@ -107,6 +118,11 @@ var exchanges = {
 				'GBP',
 			],
 			ETH: [
+				'USD',
+				'EUR',
+				'GBP',
+			],
+			ETC: [
 				'USD',
 				'EUR',
 				'GBP',
@@ -182,6 +198,10 @@ var exchanges = {
 				'GBP',
 				'JPY',
 			],
+			ETC: [
+				'USD',
+				'EUR',
+			],
 			LTC: [
 				'USD',
 				'EUR',
@@ -200,6 +220,16 @@ var exchanges = {
 
 function exchangeExists(exchange) {
 	return exchange in exchanges
+}
+
+function getExchageIds() {
+	return Object.keys(exchanges)
+}
+
+function getExchange(exchange) {
+	var result = exchangeExists(exchange) ? exchanges[exchange] : undefined
+	if (typeof result === 'undefined') console.error("Invalid exchange id: '" + exchange + "'")
+	return result
 }
 
 function getExchangeName(exchange) {

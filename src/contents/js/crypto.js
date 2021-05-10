@@ -122,17 +122,17 @@ var exchanges = {
 				'EUR',
 				'GBP',
 			],
+			ETC: [
+				'USD',
+				'EUR',
+				'GBP',
+			],
 			LTC: [
 				'USD',
 				'EUR',
 				'GBP',
 			],
 			XRP: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			ETC: [
 				'USD',
 				'EUR',
 				'GBP',
@@ -198,6 +198,10 @@ var exchanges = {
 				'GBP',
 				'JPY',
 			],
+			ETC: [
+				'USD',
+				'EUR',
+			],
 			LTC: [
 				'USD',
 				'EUR',
@@ -209,10 +213,6 @@ var exchanges = {
 				'EUR',
 				'GBP',
 				'JPY',
-			],
-			ETC: [
-				'USD',
-				'EUR',
 			],
 		}
 	}

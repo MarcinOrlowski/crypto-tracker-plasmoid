@@ -12,7 +12,8 @@
 
 const BTC='BTC'
 const ETH='ETH'
-const LTC='LTC'
+const LTC = 'LTC'
+const ETC = 'ETC'
 
 const USD='USD'
 const PLN='PLN'
@@ -50,6 +51,9 @@ var cryptos = {
 	},
 	XRP: {
 		name: 'Ripple'
+	},
+	ETC: {
+		name: 'Ethereum Classic'
 	}
 }
 function getCryptoName(code) {
@@ -128,6 +132,11 @@ var exchanges = {
 				'EUR',
 				'GBP',
 			],
+			ETC: [
+				'USD',
+				'EUR',
+				'GBP',
+			],
 		}
 	},
 	'coinmate-io': {
@@ -200,6 +209,10 @@ var exchanges = {
 				'EUR',
 				'GBP',
 				'JPY',
+			],
+			ETC: [
+				'USD',
+				'EUR',
 			],
 		}
 	}

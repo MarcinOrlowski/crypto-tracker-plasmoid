@@ -1,3 +1,6 @@
+* @dev
+  * Added support for Binance
+
 * v2.0.0 (2021-05-10)
   * [IMPORTANT] Your current config will NOT be migrated and you will have to re-set
     all the exchanges you had before from scrach. Sorry for the inconvenience.
@@ -24,3 +27,4 @@
 
 * v1.0.0 (2021-02-13)
   * Initial public release.
+

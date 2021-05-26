@@ -10,17 +10,18 @@
 // https://doc.qt.io/qt-5/qtqml-javascript-resources.html
 .pragma library
 
+const BCC='BCC'
+const BNB='BNB'
 const BTC='BTC'
+const CZK='CZK'
 const ETC='ETC'
 const ETH='ETH'
-const LTC='LTC'
-
-const USD='USD'
-const PLN='PLN'
-const GBP='GBP'
 const EUR='EUR'
+const GBP='GBP'
 const JPY='JPY'
-const CZK='CZK'
+const LTC='LTC'
+const PLN='PLN'
+const USD='USD'
 const USDT='USDT'
 
 var currencySymbols = {
@@ -31,6 +32,7 @@ var currencySymbols = {
 	JPY: '¥',				// Japanese Yen
 	CZK: 'Kč',				// Czech Krown
 	USDT: '$T',				// USDT
+	BNB: 'BNB',				// Binance Coin
 }
 function getCurrencyName(code) {
 	return code + ' (' + currencySymbols[code] + ')'
@@ -42,6 +44,12 @@ function getCurrencySymbol(code) {
 // --------------------------------------------------------------------------------------------
 
 var cryptos = {
+	BCC: {
+		name: 'Bitcoin Cash'
+	},
+	BNB: {
+		name: 'Binance Coin'
+	},
 	BTC: {
 		name: 'Bitcoin'
 	},
@@ -57,6 +65,9 @@ var cryptos = {
 	ETC: {
 		name: 'Ethereum Classic'
 	},
+	USDT: {
+		name: 'USD Tether'
+	}
 }
 function getCryptoName(code) {
 	return cryptos[code]['name'] + ' (' + code + ')'
@@ -67,38 +78,37 @@ function getCryptoIcon(code) {
 
 // --------------------------------------------------------------------------------------------
 
+const binance_fiats = [
+	USDT,
+	EUR,
+	GBP,
+]
 const bitbay_fiats = [
-	'PLN',
-	'USD',
-	'EUR',
-	'GBP',
+	PLN,
+	USD,
+	EUR,
+	GBP,
 ]
 const bitstamp_fiats = [
-	'USD',
-	'EUR',
-	'GBP',
+	USD,
+	EUR,
+	GBP,
 ]
 const coinmate_fiats = [
-	'CZK',
-	'EUR',
+	CZK,
+	EUR,
 ]
 const kraken_fiats = [
-	'USD',
-	'EUR',
-	'GBP',
-	'JPY',
-]
-const binance_fiats = [
-	'USDT',
-	'EUR',
-	'GBP',
-	'JPY',
+	USD,
+	EUR,
+	GBP,
+	JPY,
 ]
 
 var exchanges = {
 	'binance-com': {
 		name: 'Binance',
-		url: 'https://binance.com',
+		url: 'https://binance.com/',
 		getRateFromExchangeData: function(data, crypto, fiat) {
 			return data[0].price
 		},
@@ -106,11 +116,12 @@ var exchanges = {
 			return 'https://api1.binance.com/api/v3/trades?limit=1&symbol=' + crypto + fiat
 		},
 		pairs: {
+			BNB: binance_fiats,
 			BTC: binance_fiats,
 			ETC: binance_fiats,
 			ETH: binance_fiats,
 			XRP: binance_fiats,
-		}
+		},
 	},
 	'bitbay-net': {
 		name: 'BitBay',
@@ -125,8 +136,9 @@ var exchanges = {
 			BTC: bitbay_fiats,
 			ETH: bitbay_fiats,
 			LTC: bitbay_fiats,
+			USDT: bitbay_fiats,
 			XRP: bitbay_fiats,
-		}
+		},
 	},
 	'bitstamp-net': {
 		name: 'BitStamp',
@@ -143,7 +155,7 @@ var exchanges = {
 			ETC: bitstamp_fiats,
 			LTC: bitstamp_fiats,
 			XRP: bitstamp_fiats,
-		}
+		},
 	},
 	'coinmate-io': {
 		name: 'Coinmate',
@@ -159,7 +171,7 @@ var exchanges = {
 			ETH: coinmate_fiats,
 			LTC: coinmate_fiats,
 			XRP: coinmate_fiats,
-		}
+		},
 	},
 	'kraken-com': {
 		name: 'Kraken',
@@ -167,7 +179,7 @@ var exchanges = {
 		getRateFromExchangeData: function(data, crypto, fiat) {
 			// FIXME hardcoded mapping
 			switch (crypto) {
-				case 'BTC':
+				case BTC:
 					crypto = 'XBT'
 					break
 				default:
@@ -183,12 +195,12 @@ var exchanges = {
 			BTC: kraken_fiats,
 			ETH: kraken_fiats,
 			ETC: [
-				'USD',
-				'EUR',
+				USD,
+				EUR,
 			],
 			LTC: kraken_fiats,
 			XRP: kraken_fiats,
-		}
+		},
 	}
 }
 

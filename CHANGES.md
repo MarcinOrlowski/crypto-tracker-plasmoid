@@ -1,5 +1,7 @@
 * @dev
   * Added support for Binance
+  * Binance: added: BNB (Binance Coin)
+  * Bitbay: added: USDT (Tether)
 
 * v2.0.0 (2021-05-10)
   * [IMPORTANT] Your current config will NOT be migrated and you will have to re-set

@@ -11,9 +11,9 @@
 .pragma library
 
 const BTC='BTC'
+const ETC='ETC'
 const ETH='ETH'
-const LTC = 'LTC'
-const ETC = 'ETC'
+const LTC='LTC'
 
 const USD='USD'
 const PLN='PLN'
@@ -23,11 +23,11 @@ const JPY='JPY'
 const CZK='CZK'
 
 var currencySymbols = {
-	EUR: '€',					// Euro
-	GBP: '£',					// British Pound Sterling
+	EUR: '€',				// Euro
+	GBP: '£',				// British Pound Sterling
 	PLN: 'zł',				// Polish Zloty
-	USD: '$',					// US Dollar
-	JPY: '¥',					// Japanese Yen
+	USD: '$',				// US Dollar
+	JPY: '¥',				// Japanese Yen
 	CZK: 'Kč',				// Czech Krown
 }
 function getCurrencyName(code) {
@@ -54,7 +54,7 @@ var cryptos = {
 	},
 	ETC: {
 		name: 'Ethereum Classic'
-	}
+	},
 }
 function getCryptoName(code) {
 	return cryptos[code]['name'] + ' (' + code + ')'
@@ -64,6 +64,28 @@ function getCryptoIcon(code) {
 }
 
 // --------------------------------------------------------------------------------------------
+
+const bitbay_fiats = [
+	'PLN',
+	'USD',
+	'EUR',
+	'GBP',
+]
+const bitstamp_fiats = [
+	'USD',
+	'EUR',
+	'GBP',
+]
+const coinmate_fiats = [
+	'CZK',
+	'EUR',
+]
+const kraken_fiats = [
+	'USD',
+	'EUR',
+	'GBP',
+	'JPY',
+]
 
 var exchanges = {
 	'bitbay-net': {
@@ -76,30 +98,10 @@ var exchanges = {
 			return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'
 		},
 		pairs: {
-			BTC: [
-				'PLN',
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			ETH: [
-				'PLN',
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			LTC: [
-				'PLN',
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			XRP: [
-				'PLN',
-				'USD',
-				'EUR',
-				'GBP',
-			],
+			BTC: bitbay_fiats,
+			ETH: bitbay_fiats,
+			LTC: bitbay_fiats,
+			XRP: bitbay_fiats,
 		}
 	},
 	'bitstamp-net': {
@@ -112,31 +114,11 @@ var exchanges = {
 			return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat
 		},
 		pairs: {
-			BTC: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			ETH: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			ETC: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			LTC: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			XRP: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
+			BTC: bitstamp_fiats,
+			ETH: bitstamp_fiats,
+			ETC: bitstamp_fiats,
+			LTC: bitstamp_fiats,
+			XRP: bitstamp_fiats,
 		}
 	},
 	'coinmate-io': {
@@ -149,22 +131,10 @@ var exchanges = {
 			return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat
 		},
 		pairs: {
-			BTC: [
-				'CZK',
-				'EUR',
-			],
-			ETH: [
-				'CZK',
-				'EUR',
-			],
-			LTC: [
-				'CZK',
-				'EUR',
-			],
-			XRP: [
-				'CZK',
-				'EUR',
-			],
+			BTC: coinmate_fiats,
+			ETH: coinmate_fiats,
+			LTC: coinmate_fiats,
+			XRP: coinmate_fiats,
 		}
 	},
 	'kraken-com': {
@@ -186,34 +156,14 @@ var exchanges = {
 			return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat
 		},
 		pairs: {
-			BTC: [
-				'USD',
-				'EUR',
-				'GBP',
-				'JPY',
-			],
-			ETH: [
-				'USD',
-				'EUR',
-				'GBP',
-				'JPY',
-			],
+			BTC: kraken_fiats,
+			ETH: kraken_fiats,
 			ETC: [
 				'USD',
 				'EUR',
 			],
-			LTC: [
-				'USD',
-				'EUR',
-				'GBP',
-				'JPY',
-			],
-			XRP: [
-				'USD',
-				'EUR',
-				'GBP',
-				'JPY',
-			],
+			LTC: kraken_fiats,
+			XRP: kraken_fiats,
 		}
 	}
 }

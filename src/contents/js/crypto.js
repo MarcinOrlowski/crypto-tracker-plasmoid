@@ -21,6 +21,7 @@ const GBP='GBP'
 const EUR='EUR'
 const JPY='JPY'
 const CZK='CZK'
+const USDT='USDT'
 
 var currencySymbols = {
 	EUR: '€',				// Euro
@@ -29,6 +30,7 @@ var currencySymbols = {
 	USD: '$',				// US Dollar
 	JPY: '¥',				// Japanese Yen
 	CZK: 'Kč',				// Czech Krown
+	USDT: '$T',				// USDT
 }
 function getCurrencyName(code) {
 	return code + ' (' + currencySymbols[code] + ')'
@@ -86,8 +88,30 @@ const kraken_fiats = [
 	'GBP',
 	'JPY',
 ]
+const binance_fiats = [
+	'USDT',
+	'EUR',
+	'GBP',
+	'JPY',
+]
 
 var exchanges = {
+	'binance-com': {
+		name: 'Binance',
+		url: 'https://binance.com',
+		getRateFromExchangeData: function(data, crypto, fiat) {
+			return data[0].price
+		},
+		getUrl: function(crypto, fiat) {
+			return 'https://api1.binance.com/api/v3/trades?limit=1&symbol=' + crypto + fiat
+		},
+		pairs: {
+			BTC: binance_fiats,
+			ETC: binance_fiats,
+			ETH: binance_fiats,
+			XRP: binance_fiats,
+		}
+	},
 	'bitbay-net': {
 		name: 'BitBay',
 		url: 'https://bitbay.net/',

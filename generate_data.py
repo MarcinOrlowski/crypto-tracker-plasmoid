@@ -237,7 +237,8 @@ src_exchanges['kraken-com'] = {
 
     'functions': {
         'getUrl': "return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat",
-        'getRateFromExchangeData': 'if (crypto == "BTC") crypto = "XBT"; return data.result["X" + crypto + "Z" + fiat].a[0]',
+        # some tricker to work around odd asset naming used in returned reponse as main key
+        'getRateFromExchangeData': "return data.result[Object.keys(data['result'])[0]].a[0]",
     },
 }
 

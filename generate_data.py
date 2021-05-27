@@ -315,30 +315,37 @@ def build_exchanges(exchanges):
 
     for exchange, ex_data in exchanges.items():
         if 'pairs' in ex_data:
-            result.append('\t"{}": {{'.format(exchange))
-            result.append('\t\t"name": "{}",'.format(ex_data['name']))
-            result.append('\t\t"url": "{}",'.format(ex_data['url']))
+            result += [
+                '\t"{}": {{'.format(exchange),
+                '\t\t"name": "{}",'.format(ex_data['name']),
+                '\t\t"url": "{}",'.format(ex_data['url']),
+                ]
 
-            result.append('\t\t"getUrl": function(crypto, fiat) {')
-            result.append('\t\t\t{}'.format(ex_data['functions']['getUrl']))
-            result.append('\t\t},')
+            result += [
+                '\t\t"getUrl": function(crypto, fiat) {',
+                '\t\t\t{}'.format(ex_data['functions']['getUrl']),
+                '\t\t},',
+                ]
 
-            result.append('\t\t"getRateFromExchangeData": function(data, crypto, fiat) {')
-            result.append('\t\t\t{}'.format(ex_data['functions']['getRateFromExchangeData']))
-            result.append('\t\t},')
+            result += [
+                '\t\t"getRateFromExchangeData": function(data, crypto, fiat) {',
+                '\t\t\t{}'.format(ex_data['functions']['getRateFromExchangeData']),
+                '\t\t},'
+                ]
 
             result.append('\t\t"pairs": {')
             for crypto, pairs in ex_data['pairs'].items():
                 pairs.sort()
                 row = '\t\t\t"{crypto}": ['.format(crypto=crypto)
-                for pair in pairs:
-                    row += '"{}",'.format(pair)
+                row += ''.join(['"{}",'.format(pair) for pair in pairs])
                 row += '],'
                 result.append(row)
-            result.append('\t\t},')
-            result.append('\t},')
-    result.append('}')
-    result.append('')
+            result += [
+                '\t\t},',
+                '\t},',
+                ]
+
+    result += ['}', '']
 
     return result
 
@@ -478,10 +485,10 @@ def check_icons(result_exchanges):
                 if pair not in all_pairs:
                     all_pairs.append(pair)
 
+    cnt = 0
     for pair in all_pairs:
         icon_file = os.path.join(img_dir, '{}.svg'.format(pair))
         res = os.path.exists(icon_file)
-        cnt = 0
         if not res:
             print('  File not found: {}'.format(icon_file))
             cnt += 1
@@ -525,7 +532,7 @@ result += build_currencies(currencies)
 result += build_exchanges(result_exchanges)
 
 if args.verbose:
-    print('\n'.join([''] + result))
+    print('\n'.join(result))
 
 if args.file is not None:
     try:

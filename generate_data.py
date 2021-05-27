@@ -48,6 +48,7 @@ def bitbay_ticker_validator(response, crypto, pair):
 
 def kraken_ticker_validator(response, crypto, pair):
     if response.status_code != req.codes.ok:
+        print(0)
         return False
 
     resp = json.loads(response.text)
@@ -56,11 +57,7 @@ def kraken_ticker_validator(response, crypto, pair):
     if 'result' not in resp:
         return False
 
-    # some Kraken's oddifidies...
-    replacements = {'BTC': 'XBT'}
-    crypto = replacements.get(crypto, crypto)
-
-    key = 'X{crypto}Z{pair}'.format(crypto=crypto, pair=pair)
+    key = list(resp['result'].keys())[0]
     if key not in resp['result']:
         return False
     for field in ['a','b','c','l',]:
@@ -72,6 +69,7 @@ def kraken_ticker_validator(response, crypto, pair):
 ######################################################################
 
 ada = 'ADA'
+bch = 'BCH'
 bsv = 'BSV'
 btc = 'BTC'
 btg = 'BTG'
@@ -103,26 +101,27 @@ jpy = 'JPY'
 ######################################################################
 
 currencies = {
+    bch:    {'name': 'Bitcoin Cash', 'symbol': '฿', },
     bsv:    {'name': 'BSV', },
-    btc:    {'name': 'Bitcoin', },
+    btc:    {'name': 'Bitcoin', 'symbol': '₿', },
     btg:    {'name': 'Bitcoin Gold', },
     comp:   {'name': 'COMP', },
     dash:   {'name': 'DASH', },
     dot:    {'name': 'PolkaDot', },
     etc:    {'name': 'Ethereum Classic', },
-    eth:    {'name': 'Ethereum', },
+    eth:    {'name': 'Ethereum', 'symbol': 'Ξ', },
     eur:    {'name': 'Euro', 'symbol': '€', },
     game:   {'name': 'GAME', },
     gbp:    {'name': 'British Pound', 'symbol': '£', },
     link:   {'name': 'LINK', },
     lsk:    {'name': 'Lisk', },
-    ltc:    {'name': 'Litecoin', },
+    ltc:    {'name': 'Litecoin', 'symbol': 'Ł', },
     luna:   {'name': 'LUNA', },
     mkr:    {'name': 'MKR', },
     pln:    {'name': 'Polish Zloty', 'symbol': 'zł', },
     usd:    {'name': 'US Dollar', 'symbol': '$', },
     usdt:   {'name': 'USD Tether', },
-    xrp:    {'name': 'Ripple', },
+    xrp:    {'name': 'Ripple', 'symbol': 'Ʀ', },
     zec:    {'name': 'ZCash', },
     ada:    {'name': 'Cardano', },
     bnb:    {'name': 'Binance Coin', },
@@ -218,6 +217,8 @@ src_exchanges['coinmate-io'] = {
     },
 }
 
+
+src_exchanges = collections.OrderedDict()
 src_exchanges['kraken-com'] = {
 #    'disabled': True,
 
@@ -226,12 +227,13 @@ src_exchanges['kraken-com'] = {
     'api_url': 'https://api.kraken.com/0/public/Ticker?pair={crypto}{pair}',
     'validator': kraken_ticker_validator,
 
-    # https://www.bitstamp.net/markets/
+    # https://support.kraken.com/hc/en-us/articles/360001185506
+    # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
     'crypto': [
-        btc, eth, ltc, xrp,
+        btc, eth, ltc, xrp, ada, doge, dot, etc, zec,
     ],
     'fiats': [
-        usd, eur, gbp, jpy,
+        usd, eur, gbp, jpy, usdt,
     ],
 
     'functions': {
@@ -252,14 +254,16 @@ def abort(msg='Aborted'):
 def do_api_call(queue, exchange, ex_data, crypto, pair):
     url = ex_data['api_url'].format(crypto=crypto, pair=pair)
     response = req.get(url)
-#    print('#{}: {}'.format(response.status_code, url))
+#    print('#{}: {}'.format(response.status_code, url), end='')
 #    time.sleep(0.5)
 
     validator = ex_data.get('validator', default_ticker_validator)
+    rc = validator(response, crypto, pair)
+#    print(' {}'.format('++' if rc else 'FAIL'))
+
     queue.put({
-        'rc': validator(response, crypto, pair),
+        'rc': rc, 'stamp': int(round(time.time() * 1000)),
         'name': exchange, 'crypto': crypto, 'pair': pair,
-        'stamp': int(round(time.time() * 1000)),
         })
 
 def do_api_call_error_callback(msg):
@@ -351,9 +355,6 @@ def process_exchanges(src_exchanges, args):
     result = collections.OrderedDict()
 
     print('Processing exchange data')
-
-    # Figuring out valid pairs
-
     for exchange, ex_data in src_exchanges.items():
         if ex_data.get('disabled', False):
             print('  {}: DISABLED'.format(exchange))
@@ -405,6 +406,7 @@ def process_exchanges(src_exchanges, args):
                                     use_cached_data = True
                                     cache_rc = cache['rc']
                                 now = int(round(time.time() * 1000))
+
                     if use_cached_data:
                         queue.put({'rc': cache_rc, 'name': exchange, 'crypto': item, 'pair': pair,'cache': True})
                     else:

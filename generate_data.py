@@ -134,7 +134,7 @@ currencies = {
 
 src_exchanges = collections.OrderedDict()
 src_exchanges['binance-com'] = {
-    'disabled': True,
+#    'disabled': True,
 
     'name': 'Binance',
     'url': 'https://binance.com/',
@@ -156,7 +156,7 @@ src_exchanges['binance-com'] = {
 }
 
 src_exchanges['bitstamp-net'] = {
-    'disabled': True,
+#    'disabled': True,
 
     'name': 'Bitstamp',
     'url': 'https://bitstamp.net/',
@@ -176,7 +176,7 @@ src_exchanges['bitstamp-net'] = {
 }
 
 src_exchanges['bitbay-net'] = {
-    'disabled': True,
+#    'disabled': True,
 
     'name': 'BitBay',
     'url': 'https://bitbay.net/',
@@ -198,7 +198,7 @@ src_exchanges['bitbay-net'] = {
 }
 
 src_exchanges['coinmate-io'] = {
-    'disabled': True,
+#    'disabled': True,
 
     'name': 'Coinmate',
     'url': 'https://coinmate.io/',
@@ -228,8 +228,7 @@ src_exchanges['kraken-com'] = {
 
     # https://www.bitstamp.net/markets/
     'crypto': [
-    btc
-#        btc, eth, ltc, xrp,
+        btc, eth, ltc, xrp,
     ],
     'fiats': [
         usd, eur, gbp, jpy,
@@ -255,11 +254,13 @@ def do_api_call(queue, exchange, ex_data, crypto, pair):
     response = req.get(url)
 #    print('#{}: {}'.format(response.status_code, url))
 #    time.sleep(0.5)
-    result = {'rc': False}
+
     validator = ex_data.get('validator', default_ticker_validator)
-    if validator(response, crypto, pair):
-        result = {'rc': True, 'name': exchange, 'crypto': crypto, 'pair': pair}
-    queue.put(result)
+    queue.put({
+        'rc': validator(response, crypto, pair),
+        'name': exchange, 'crypto': crypto, 'pair': pair,
+        'stamp': int(round(time.time() * 1000)),
+        })
 
 def do_api_call_error_callback(msg):
     print('Error Callback: {}'.format(msg))
@@ -343,91 +344,138 @@ def build_exchanges(exchanges):
 
 # preprocess data first
 
-def process_exchanges(src_exchanges):
+def process_exchanges(src_exchanges, args):
+    cache_threshold = args.threshold
+    no_cache = args.no_cache
+
     result = collections.OrderedDict()
 
-    print('Processign exchange data')
+    print('Processing exchange data')
 
     # Figuring out valid pairs
+
     for exchange, ex_data in src_exchanges.items():
         if ex_data.get('disabled', False):
             print('  {}: DISABLED'.format(exchange))
             continue
 
-    result[exchange] = collections.OrderedDict({
-        'name': ex_data['name'],
-        'url': ex_data['url'],
-        'functions': ex_data['functions'],
-        'pairs': collections.OrderedDict(),
-        })
+        cache_dir = os.path.join('.gen-cache', exchange)
 
-    # total number of tries needed:
-    all_items = ex_data['crypto'] + ex_data['fiats']
-    # remove duplicates
-    all_items = list(dict.fromkeys(all_items))
-    all_items.sort()
+        result[exchange] = collections.OrderedDict({
+            'name': ex_data['name'],
+            'url': ex_data['url'],
+            'functions': ex_data['functions'],
+            'pairs': collections.OrderedDict(),
+            })
 
-    ex_pairs = collections.OrderedDict()
+        # total number of tries needed:
+        all_items = ex_data['crypto'] + ex_data['fiats']
+        # remove duplicates
+        all_items = list(dict.fromkeys(all_items))
+        all_items.sort()
 
-    # we need to use Manager to allow subprocesses to access our queue
-    queue = mp.Manager().Queue()
-    with mp.Pool(processes=6) as pool:
-        total_checks_cnt = 0
-        for item in all_items:
-            # skip pairs FIAT-CRYPTO
-            if item in ex_data['fiats']:
-               continue
+        ex_pairs = collections.OrderedDict()
 
-            for pair in all_items:
-                # just in case of any dupes in source data
-                if item == pair or (item in result[exchange]['pairs']
-                    and pair in result[exchange]['pairs'][item]):
-                    continue
+        # we need to use Manager to allow subprocesses to access our queue
+        queue = mp.Manager().Queue()
+        with mp.Pool(processes=6) as pool:
+            total_checks_cnt = 0
+            for item in all_items:
+                # skip pairs FIAT-CRYPTO
+                if item in ex_data['fiats']:
+                   continue
 
-                pool.apply_async(func=do_api_call, args=(queue, exchange, ex_data, item, pair),
-#                    callback=do_api_call_success_callback,
-                    error_callback=do_api_call_error_callback)
-                total_checks_cnt += 1
+                for pair in all_items:
+                    # just in case of any dupes in source data
+                    if item == pair or (item in result[exchange]['pairs']
+                        and pair in result[exchange]['pairs'][item]):
+                        continue
 
-        # No more pool submissions
-        pool.close()
+                    # see if we have old cache file already
+                    use_cached_data = False
+                    cache_rc = False
 
-        # Waiting for processes to complete...
-        pair_success_cnt = pair_fail_cnt = 0
-        cnt = 0
-        while cnt < total_checks_cnt:
-            response = queue.get()
-            if response['rc']:
+                    if no_cache == False:
+                        cache_file = os.path.join(cache_dir, '{}-{}'.format(item, pair))
+                        if os.path.exists(cache_file):
+                            with open(cache_file, 'r') as fh:
+                                cache = json.load(fh)
+                                now = int(round(time.time() * 1000))
+                                if (now < (cache['stamp'] + (cache_threshold * 60 * 1000))):
+                                    use_cached_data = True
+                                    cache_rc = cache['rc']
+                                now = int(round(time.time() * 1000))
+                    if use_cached_data:
+                        queue.put({'rc': cache_rc, 'name': exchange, 'crypto': item, 'pair': pair,'cache': True})
+                    else:
+                        pool.apply_async(func=do_api_call, args=(queue, exchange, ex_data, item, pair),
+#                            callback=do_api_call_success_callback,
+                            error_callback=do_api_call_error_callback)
+                    total_checks_cnt += 1
+
+            # No more pool submissions
+            pool.close()
+
+            # Waiting for processes to complete...
+            pair_success_cnt = pair_fail_cnt = pair_from_cache = 0
+            cnt = 0
+            while cnt < total_checks_cnt:
+                response = queue.get()
                 resp_exchange = result[response['name']]
                 resp_crypto = response['crypto']
-                if resp_crypto not in resp_exchange['pairs']:
-                    resp_exchange['pairs'][resp_crypto] = []
+                resp_pair = response['pair']
 
-                resp_exchange['pairs'][resp_crypto].append(response['pair'])
+                cache_file = os.path.join(cache_dir, '{}-{}'.format(resp_crypto, resp_pair))
+                if not os.path.exists(cache_dir):
+                    os.makedirs(cache_dir)
+ 
+                if response['rc']:
+                    if resp_crypto not in resp_exchange['pairs']:
+                        resp_exchange['pairs'][resp_crypto] = []
+                    resp_exchange['pairs'][resp_crypto].append(resp_pair)
+                    pair_success_cnt += 1
+                else:
+                    pair_fail_cnt += 1
 
-                pair_success_cnt += 1
-            else:
-                pair_fail_cnt += 1
+                if response.get('cache', False):
+                    pair_from_cache += 1
+                else:
+                    # create fresh cache entry
+                    with open(cache_file, 'w') as fh:
+                        cache = {
+                            'rc': response['rc'],
+                            'stamp': response['stamp'],
+                            }
+                        fh.write(json.dumps(cache))
 
-            cnt += 1
-            print('  {}: {} of {}...'.format(exchange, cnt, total_checks_cnt), end='\r')
+                cnt += 1
+                print('  {}: {} of {}...'.format(exchange, cnt, total_checks_cnt), end='\r')
 
-        # to ensure we do not leave too early (shoud not happen though)
-        pool.join()
+            # to ensure we do not leave too early (shoud not happen though)
+            pool.join()
 
-        # Summary
-        print('  {}: paired: {}, skipped: {}'.format(exchange, pair_success_cnt, pair_fail_cnt))
+            # Summary
+            print('  {}: paired: {}, skipped: {}, cache hits: {}'.format(exchange, pair_success_cnt, pair_fail_cnt, pair_from_cache))
 
     return result
 
 
 ######################################################################
 
+CACHE_THRESHOLD = 1440
+
 parser = argparse.ArgumentParser()
 ag = parser.add_argument_group('Flags')
-ag.add_argument('-o', '--out', action='store', dest='file', type=str)
-ag.add_argument('-f', '--force', action='store_true', dest='force')
-ag.add_argument('-v', '--verbose', action='store_true', dest='verbose')
+ag.add_argument('-t', '--threshold', action='store', dest='threshold', type=int,
+    help='Cache threshold, in minutes. Default {} mins'.format(CACHE_THRESHOLD),
+    default=CACHE_THRESHOLD)
+ag.add_argument('-n', '--nocache', action='store_true', dest='no_cache', default=False,
+    help='Ignore validation result cache and always do the full API check.')
+ag.add_argument('-o', '--out', action='store', dest='file', type=str,
+    help='Optional. Name of JS file to be generated.')
+ag.add_argument('-f', '--force', action='store_true', dest='force',
+    help='Enforce certain operations. Mainly file overwrite.')
+ag.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False)
 args = parser.parse_args()
 
 if args.file is None:
@@ -436,13 +484,13 @@ elif not args.force and os.path.exists(args.file):
     abort('File already exists: {}'.format(args.file))
 
 # preprocess data first
-result_exchanges = process_exchanges(src_exchanges)
+result_exchanges = process_exchanges(src_exchanges, args)
 
 result = build_header()
 result += build_currencies(currencies)
 result += build_exchanges(result_exchanges)
 
-if args.verbose is not None:
+if args.verbose:
     print('\n'.join([''] + result))
 
 if args.file is not None:

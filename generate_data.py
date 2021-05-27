@@ -15,7 +15,7 @@
 # - Validates data integrity and completenes
 # - Generates exchange data matrix for the widget
 #
-# Usage:
+# Usage (use -h or --help for more info):
 #   generate_data.py -o src/contents/js/crypto_data.js
 #
 ######################################################################
@@ -218,7 +218,6 @@ src_exchanges['coinmate-io'] = {
 }
 
 
-src_exchanges = collections.OrderedDict()
 src_exchanges['kraken-com'] = {
 #    'disabled': True,
 
@@ -457,7 +456,9 @@ def process_exchanges(src_exchanges, args):
             pool.join()
 
             # Summary
-            print('  {}: paired: {}, skipped: {}, cache hits: {}'.format(exchange, pair_success_cnt, pair_fail_cnt, pair_from_cache))
+            print('  {}: total: {}, paired: {}, skipped: {}, cache hits: {} ({:>.0f}%)'.format(
+                exchange, cnt, pair_success_cnt, pair_fail_cnt,
+                pair_from_cache, (pair_from_cache * 100)/cnt))
 
     return result
 

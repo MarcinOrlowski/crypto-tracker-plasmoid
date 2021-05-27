@@ -48,7 +48,6 @@ def bitbay_ticker_validator(response, crypto, pair):
 
 def kraken_ticker_validator(response, crypto, pair):
     if response.status_code != req.codes.ok:
-        print(0)
         return False
 
     resp = json.loads(response.text)
@@ -64,6 +63,22 @@ def kraken_ticker_validator(response, crypto, pair):
         if field not in resp['result'][key]:
             return False
     return True
+
+def coinmate_ticker_validator(response, crypto, pair):
+    if response.status_code != req.codes.ok:
+        return False
+
+    resp = json.loads(response.text)
+    if resp.get('error', False):
+        return False
+    if 'data' not in resp:
+        return False
+    for field in ['ask','bid','change','last',]:
+        if field not in resp['data']:
+            return False
+
+    return True
+ 
 
 
 ######################################################################
@@ -96,6 +111,9 @@ bnb = 'BNB'
 fil = 'FIL'
 czk = 'CZK'
 jpy = 'JPY'
+busd = 'BUSD'
+usdc = 'USDC'
+uni = 'UNI'
 
 
 ######################################################################
@@ -113,7 +131,7 @@ currencies = {
     eur:    {'name': 'Euro', 'symbol': '€', },
     game:   {'name': 'GAME', },
     gbp:    {'name': 'British Pound', 'symbol': '£', },
-    link:   {'name': 'LINK', },
+    link:   {'name': 'Chainlink', },
     lsk:    {'name': 'Lisk', },
     ltc:    {'name': 'Litecoin', 'symbol': 'Ł', },
     luna:   {'name': 'LUNA', },
@@ -129,6 +147,9 @@ currencies = {
     fil:    {'name': 'Filecoin', },
     czk:    {'name': 'Czech Krown', 'symbol': 'Kč', },
     jpy:    {'name': 'Japanese Yen', 'symbol': '¥', },
+    busd:   {'name': 'BUSD', },
+    usdc:   {'name': 'USDC', },
+    uni:    {'name': 'Uniswap', },
 }
 
 src_exchanges = collections.OrderedDict()
@@ -139,13 +160,13 @@ src_exchanges['binance-com'] = {
     'url': 'https://binance.com/',
     'api_url': 'https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
 
+    # https://www.binance.com/en/markets
     'crypto': [
-        btc, etc, eth, xrp,
-        ada, bnb, doge, fil,
+        btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc,
         # FIXME we need a BNB/USDT pair for example
     ],
     'fiats': [
-        usdt, eur, gbp, bnb
+        usdt, eur, gbp, bnb, busd, 
     ],
 
     'functions': {
@@ -161,11 +182,12 @@ src_exchanges['bitstamp-net'] = {
     'url': 'https://bitstamp.net/',
     'api_url': 'https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
 
+    # https://www.bitstamp.net/markets/
     'crypto': [
-        btc, etc, etc, ltc, xrp,
+        btc, etc, ltc, xrp, uni, eth,
     ],
     'fiats': [
-        usd, eur, gbp,
+        usd, eur, gbp, usdc
     ],
 
     'functions': {
@@ -182,7 +204,6 @@ src_exchanges['bitbay-net'] = {
     'api_url': 'https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
     'validator': bitbay_ticker_validator,
 
-    # https://www.bitstamp.net/markets/
     'crypto': [
         btc, bsv, btg, comp, dash, dot, etc, eth, game, link, lsk, ltc, luna, mkr, xrp, zec,
     ],
@@ -202,10 +223,11 @@ src_exchanges['coinmate-io'] = {
     'name': 'Coinmate',
     'url': 'https://coinmate.io/',
     'api_url': 'https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
+    'validator': coinmate_ticker_validator,
 
-    # https://www.bitstamp.net/markets/
+    # https://coinmate.io/trade
     'crypto': [
-        btc, eth, ltc, xrp,
+        btc, eth, ltc, xrp, dash, bch,
     ],
     'fiats': [
         czk, eur,
@@ -259,8 +281,6 @@ def do_api_call(queue, exchange, ex_data, crypto, pair):
 
     validator = ex_data.get('validator', default_ticker_validator)
     rc = validator(response, crypto, pair)
-#    print(' {}'.format('++' if rc else 'FAIL'))
-
     queue.put({
         'rc': rc, 'stamp': int(round(time.time() * 1000)),
         'name': exchange, 'crypto': crypto, 'pair': pair,

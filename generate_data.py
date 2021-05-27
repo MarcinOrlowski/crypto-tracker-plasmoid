@@ -466,6 +466,33 @@ def process_exchanges(src_exchanges, args):
 
 ######################################################################
 
+def check_icons(result_exchanges):
+    img_dir = 'src/contents/images/'
+
+    print('Checking SVG icons...')
+
+    all_pairs = []
+    for ex, ex_data in result_exchanges.items():
+        for crypto, pairs in ex_data['pairs'].items():
+            for pair in pairs:
+                if pair not in all_pairs:
+                    all_pairs.append(pair)
+
+    for pair in all_pairs:
+        icon_file = os.path.join(img_dir, '{}.svg'.format(pair))
+        res = os.path.exists(icon_file)
+        cnt = 0
+        if not res:
+            print('  File not found: {}'.format(icon_file))
+            cnt += 1
+
+    print('Total {} coins in use, {} icons missing'.format(len(all_pairs), cnt))
+
+    return cnt == 0
+
+
+######################################################################
+
 CACHE_THRESHOLD = 1440
 
 parser = argparse.ArgumentParser()
@@ -482,13 +509,16 @@ ag.add_argument('-f', '--force', action='store_true', dest='force',
 ag.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False)
 args = parser.parse_args()
 
-if args.file is None:
-    args.verbose = True
-elif not args.force and os.path.exists(args.file):
+if args.file is not None and not args.force and os.path.exists(args.file):
     abort('File already exists: {}'.format(args.file))
 
 # preprocess data first
 result_exchanges = process_exchanges(src_exchanges, args)
+
+# check for icons of used coins
+check_result = check_icons(result_exchanges)
+if not check_result and not args.force:
+    abort('Some icon files are missing.')
 
 result = build_header()
 result += build_currencies(currencies)

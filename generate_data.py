@@ -26,6 +26,7 @@ import json
 import math
 import multiprocessing as mp
 import os
+import re
 import requests as req
 import sys
 import time
@@ -515,24 +516,59 @@ def check_icons(result_exchanges):
 
     print('Total {} coins in use, {} icons missing'.format(len(all_pairs), cnt))
 
-    return cnt == 0
+    return cnt
 
 
 ######################################################################
 
-CACHE_THRESHOLD = 1440
+def threshold(arg_value):
+    pat = re.compile(r"^([0-9]{1,3})([dwmy]?)$")
+    match = pat.match(arg_value)
+    if not match:
+        raise argparse.ArgumentTypeError(msg='Invalid format: XXXu')
+
+    val = int(match.group(1))
+    if val == 0:
+        raise argparse.ArgumentError(msg='Value must be in range 0-999')
+
+    unit = match.group(2)
+    
+    # in millis
+    MIN = 60 * 1000
+    HOUR = MIN * 60
+    DAY = 24 * HOUR
+
+    multiplier = MIN
+    if unit != '':
+        mm = {
+            'h': HOUR,          # hour
+            'd': DAY,           # day
+            'w': 7 * DAY,       # week
+            'm': 30 * DAY,      # month
+            'y': 365 * DAY,     # year
+        }
+        multiplier = mm[unit]
+
+    return val * multiplier
+
+
+######################################################################
+
+CACHE_THRESHOLD = '1m'
 
 parser = argparse.ArgumentParser()
-ag = parser.add_argument_group('Flags')
-ag.add_argument('-t', '--threshold', action='store', dest='threshold', type=int,
-    help='Cache threshold, in minutes. Default {} mins'.format(CACHE_THRESHOLD),
+ag = parser.add_argument_group('Options')
+ag.add_argument('-t', '--threshold', action='store', dest='threshold', type=threshold,
+    help='Cache validity threshold in format XXXZ where XXX is number in range 1-999, '
+        'Z is (optional) units specifier: "h", "d", "w", "m", "y". If unit is not specified, '
+        'value is considered specified in minutes. Default value: {}'.format(CACHE_THRESHOLD),
     default=CACHE_THRESHOLD)
 ag.add_argument('-n', '--nocache', action='store_true', dest='no_cache', default=False,
     help='Ignore validation result cache and always do the full API check.')
 ag.add_argument('-o', '--out', action='store', dest='file', type=str,
     help='Optional. Name of JS file to be generated.')
 ag.add_argument('-f', '--force', action='store_true', dest='force',
-    help='Enforce certain operations. Mainly file overwrite.')
+    help='Enforces ignoring certain issues (missing icons, existing target file).')
 ag.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False)
 args = parser.parse_args()
 
@@ -543,9 +579,9 @@ if args.file is not None and not args.force and os.path.exists(args.file):
 result_exchanges = process_exchanges(src_exchanges, args)
 
 # check for icons of used coins
-check_result = check_icons(result_exchanges)
-if not check_result and not args.force:
-    abort('Some icon files are missing.')
+missing_icons_cnt = check_icons(result_exchanges)
+if missing_icons_cnt != 0 and not args.force:
+    abort('Missing {} currency icons.'.format(missing_icons_cnt))
 
 result = build_header()
 result += build_currencies(currencies)
@@ -560,4 +596,3 @@ if args.file is not None:
             fh.writelines('\n'.join(result))
     except IOError:
         abort('Failed writing to: {}'.format(args.file))
-

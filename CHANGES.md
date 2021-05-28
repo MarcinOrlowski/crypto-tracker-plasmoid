@@ -1,4 +1,4 @@
-* @dev
+* v2.1.0 (2021-05-28)
   * Added support for Binance.
   * Added multiple coints and tokens to existing exchanges.
   * Added ability to cross pair currencies with bigger flexibility.

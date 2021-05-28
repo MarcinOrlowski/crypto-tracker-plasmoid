@@ -7,3 +7,4 @@
 *.plasmoid
 /tmp/
 /release/
+/.gen-cache

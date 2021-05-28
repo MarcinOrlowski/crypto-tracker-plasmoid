@@ -10,54 +10,45 @@
 // https://doc.qt.io/qt-5/qtqml-javascript-resources.html
 .pragma library
 
+.import 'crypto_data.js' as Data
+
+// OBSOLETE: Remove config panes that using this
 const BTC='BTC'
-const ETH='ETH'
-const LTC = 'LTC'
-const ETC = 'ETC'
-
 const USD='USD'
-const PLN='PLN'
-const GBP='GBP'
-const EUR='EUR'
-const JPY='JPY'
-const CZK='CZK'
 
-var currencySymbols = {
-	EUR: '€',					// Euro
-	GBP: '£',					// British Pound Sterling
-	PLN: 'zł',				// Polish Zloty
-	USD: '$',					// US Dollar
-	JPY: '¥',					// Japanese Yen
-	CZK: 'Kč',				// Czech Krown
-}
+const currencies = Data.currencies
+
 function getCurrencyName(code) {
-	return code + ' (' + currencySymbols[code] + ')'
+	if (code in currencies) {
+		var c = currencies[code]
+		var name = (c['name'] != code) ? c['name'] : ''
+		var symbol = ('symbol' in c ) ? c['symbol'] : ''
+		var full_name = code
+		if (name + symbol != '') {
+			var extra = ''
+			if (symbol != '') extra += symbol
+			if (extra != '') extra += ' '
+			if (name != '') extra += name
+			full_name += ' (' + extra + ')'
+		}
+		return full_name
+	} else {
+		return 'UNKNOWN! ' + code
+	}
 }
 function getCurrencySymbol(code) {
-	return currencySymbols[code]
+	return ('symbol' in currencies[code])
+		? currencies[code]['symbol']
+		: code
 }
 
 // --------------------------------------------------------------------------------------------
 
-var cryptos = {
-	BTC: {
-		name: 'Bitcoin'
-	},
-	ETH: {
-		name: 'Ethereum'
-	},
-	LTC: {
-		name: 'Litecoin'
-	},
-	XRP: {
-		name: 'Ripple'
-	},
-	ETC: {
-		name: 'Ethereum Classic'
-	}
-}
 function getCryptoName(code) {
-	return cryptos[code]['name'] + ' (' + code + ')'
+	var name = ('name' in currencies[code])
+		? currencies[code]['name']
+		: code
+	return name + ' (' + code + ')'
 }
 function getCryptoIcon(code) {
 	return code + '.svg'
@@ -65,158 +56,7 @@ function getCryptoIcon(code) {
 
 // --------------------------------------------------------------------------------------------
 
-var exchanges = {
-	'bitbay-net': {
-		name: 'BitBay',
-		url: 'https://bitbay.net/',
-		getRateFromExchangeData: function(data, crypto, fiat) {
-			return data.ask
-		},
-		getUrl: function(crypto, fiat) {
-			return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'
-		},
-		pairs: {
-			BTC: [
-				'PLN',
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			ETH: [
-				'PLN',
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			LTC: [
-				'PLN',
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			XRP: [
-				'PLN',
-				'USD',
-				'EUR',
-				'GBP',
-			],
-		}
-	},
-	'bitstamp-net': {
-		name: 'BitStamp',
-		url: 'https://www.bitstamp.net/',
-		getRateFromExchangeData: function(data, crypto, fiat) {
-			return data.ask
-		},
-		getUrl: function(crypto, fiat) {
-			return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat
-		},
-		pairs: {
-			BTC: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			ETH: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			ETC: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			LTC: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-			XRP: [
-				'USD',
-				'EUR',
-				'GBP',
-			],
-		}
-	},
-	'coinmate-io': {
-		name: 'Coinmate',
-		url: 'https://coinmate.io/',
-		getRateFromExchangeData: function(data, crypto, fiat) {
-			return data.data.ask
-		},
-		getUrl: function(crypto, fiat) {
-			return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat
-		},
-		pairs: {
-			BTC: [
-				'CZK',
-				'EUR',
-			],
-			ETH: [
-				'CZK',
-				'EUR',
-			],
-			LTC: [
-				'CZK',
-				'EUR',
-			],
-			XRP: [
-				'CZK',
-				'EUR',
-			],
-		}
-	},
-	'kraken-com': {
-		name: 'Kraken',
-		url: 'https://www.kraken.com/',
-		getRateFromExchangeData: function(data, crypto, fiat) {
-			// FIXME hardcoded mapping
-			switch (crypto) {
-				case 'BTC':
-					crypto = 'XBT'
-					break
-				default:
-					// do nothing
-					break
-			}
-			return data.result['X' + crypto + 'Z' + fiat].a[0]
-		},
-		getUrl: function(crypto, fiat) {
-			return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat
-		},
-		pairs: {
-			BTC: [
-				'USD',
-				'EUR',
-				'GBP',
-				'JPY',
-			],
-			ETH: [
-				'USD',
-				'EUR',
-				'GBP',
-				'JPY',
-			],
-			ETC: [
-				'USD',
-				'EUR',
-			],
-			LTC: [
-				'USD',
-				'EUR',
-				'GBP',
-				'JPY',
-			],
-			XRP: [
-				'USD',
-				'EUR',
-				'GBP',
-				'JPY',
-			],
-		}
-	}
-}
+const exchanges = Data.exchanges
 
 function exchangeExists(exchange) {
 	return exchange in exchanges

@@ -1,7 +1,7 @@
 * @dev
   * Added support for Binance.
   * Added multiple coints and tokens to existing exchanges.
-  * Added ability to pair with not only with fiats.
+  * Added ability to cross pair currencies with bigger flexibility.
   * Improved Kraken's API response handling.
 
 * v2.0.0 (2021-05-10)

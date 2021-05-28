@@ -199,44 +199,6 @@ class Exchanges:
         for ex in exs:
             self.add_clone_if_enabled(ex)
 
-    def check_icons(self, currencies: List[str]) -> int:
-        img_dir = 'src/contents/images/'
-
-        cnt = 0
-        header_shown = False
-        for pair in currencies:
-            icon_file = os.path.join(img_dir, '{}.svg'.format(pair))
-            res = os.path.exists(icon_file)
-            if not res:
-                if not header_shown:
-                    print('  Missing icons:')
-                    header_shown = True
-                print('    {}'.format(icon_file))
-                cnt += 1
-        print('  Total {} coins in use, {} icons missing'.format(len(currencies), cnt))
-        return cnt
-
-    def check_used_icons(self) -> int:
-        print('Checking SVG icons...')
-
-        all_pairs = []
-        for ex in self:
-            uniq_items = 0
-            merged = []
-            for k, v in ex.pairs.items():
-                merged.append(k)
-                merged += v
-            # dedup
-            merged = list(dict.fromkeys(merged))
-            merged.sort()
-            for pair in merged:
-                if pair not in all_pairs:
-                    all_pairs.append(pair)
-                    uniq_items += 1
-            print('  {}: unique currencies: {}'.format(ex.code, uniq_items))
-
-        return self.check_icons(all_pairs)
-
 
 ######################################################################
 
@@ -381,8 +343,7 @@ exchange_definitions.add(
 
         # https://www.binance.com/en/markets
         currencies=[
-            btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc, xmr, atom,
-            xlm,
+            btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc, xmr, atom, xlm,
             usdt, eur, gbp, bnb, busd,
         ],
 
@@ -628,7 +589,7 @@ def process_exchanges(exchanges: Exchanges, config: Config) -> None:
         pool.close()
 
         # Waiting for processes to complete...
-        pair_success_cnt = pair_fail_cnt = pair_from_cache = 0
+        pair_success_cnt = pair_skipped_cnt = pair_from_cache = 0
         cnt = 0
         while cnt < total_number_of_checks:
             response: TestResult = queue.get()
@@ -637,7 +598,7 @@ def process_exchanges(exchanges: Exchanges, config: Config) -> None:
                 ex.add_pair(response.crypto, response.pair)
                 pair_success_cnt += 1
             else:
-                pair_fail_cnt += 1
+                pair_skipped_cnt += 1
 
             if not response.cached:
                 if not config.dry_run:
@@ -646,14 +607,35 @@ def process_exchanges(exchanges: Exchanges, config: Config) -> None:
                 pair_from_cache += 1
 
             cnt += 1
-            print('  {}: {} of {}...'.format(ex.code, cnt, total_number_of_checks), end='\r')
+            print('  {} of {}...'.format(cnt, total_number_of_checks), end='\r')
 
         # to ensure we do not leave too early (should not happen though)
         pool.join()
 
         # Summary
-        print('Total: {}, paired: {}, skipped: {}, cache hits: {} ({:>.0f}%)'.format(
-            cnt, pair_success_cnt, pair_fail_cnt, pair_from_cache, (pair_from_cache * 100) / cnt))
+        print('Total: {total}, cache hits: {cache_cnt} ({cache_percent:>.0f}%), paired: {paired}, skipped: {skipped}'.format(
+            total=cnt, paired=pair_success_cnt, skipped=pair_skipped_cnt,
+            cache_cnt=pair_from_cache, cache_percent=(pair_from_cache * 100) / cnt))
+
+
+######################################################################
+
+def check_icons(self, currencies: List[str]) -> int:
+    img_dir = 'src/contents/images/'
+
+    cnt = 0
+    header_shown = False
+    for pair in currencies:
+        icon_file = os.path.join(img_dir, '{}.svg'.format(pair))
+        res = os.path.exists(icon_file)
+        if not res:
+            if not header_shown:
+                print('  Missing icons:')
+                header_shown = True
+            print('    {}'.format(icon_file))
+            cnt += 1
+    print('  Total {} coins in use, {} icons missing'.format(len(currencies), cnt))
+    return cnt
 
 
 ######################################################################
@@ -705,8 +687,6 @@ ag.add_argument('-o', '--out', action='store', dest='file', type=str,
                 help='Optional. Name of JS file to be generated.')
 ag.add_argument('-s', '--show', action='store_true', dest='show', default=False,
                 help='Output generated JS code to stdout.')
-ag.add_argument('-a', '--allicons', action='store_true', dest='check_all_icons', default=False,
-                help='Check all currencies for SVG icons or only used ones.')
 ag.add_argument('-f', '--force', action='store_true', dest='force',
                 help='Enforces ignoring certain issues (missing icons, existing target file).')
 ag.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False)
@@ -721,12 +701,9 @@ exs.import_all_enabled(exchange_definitions)
 process_exchanges(exs, config)
 
 # check for icons of used coins
-if config.check_all_icons:
-    curr = list(currencies.keys())
-    curr.sort()
-    missing_icons_cnt = exs.check_icons(curr)
-else:
-    missing_icons_cnt = exs.check_used_icons()
+curr = list(currencies.keys())
+curr.sort()
+missing_icons_cnt = check_icons(curr)
 if missing_icons_cnt != 0 and not config.force:
     abort('Missing {} currency icons.'.format(missing_icons_cnt))
 

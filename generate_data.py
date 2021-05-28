@@ -328,6 +328,7 @@ busd = 'BUSD'
 usdc = 'USDC'
 uni = 'UNI'
 xmr = 'XMR'
+atom = 'ATOM'
 
 ######################################################################
 
@@ -364,6 +365,7 @@ currencies = {
     usdc: {'name': 'USD Coin', },
     uni:  {'name': 'Uniswap', },
     xmr:  {'name': 'Monero', },
+    atom: {'name': 'Cosmos', },
 }
 
 exchange_definitions = Exchanges(cache_dir=os.path.expanduser(CACHE_DIR_NAME))
@@ -377,7 +379,7 @@ exchange_definitions.add(
 
         # https://www.binance.com/en/markets
         currencies=[
-            btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc, xmr,
+            btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc, xmr, atom,
             usdt, eur, gbp, bnb, busd,
         ],
 
@@ -458,7 +460,7 @@ exchange_definitions.add(
         # https://support.kraken.com/hc/en-us/articles/360001185506
         # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
         currencies=[
-            btc, eth, ltc, xrp, ada, doge, dot, etc, zec,
+            btc, eth, ltc, xrp, ada, doge, dot, etc, zec, atom,
             usd, eur, gbp, jpy, usdt,
         ],
 

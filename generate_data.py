@@ -199,9 +199,24 @@ class Exchanges:
         for ex in exs:
             self.add_clone_if_enabled(ex)
 
-    def check_icons(self) -> int:
+    def check_icons(self, currencies: List[str]) -> int:
         img_dir = 'src/contents/images/'
 
+        cnt = 0
+        header_shown = False
+        for pair in currencies:
+            icon_file = os.path.join(img_dir, '{}.svg'.format(pair))
+            res = os.path.exists(icon_file)
+            if not res:
+                if not header_shown:
+                    print('  Missing icons:')
+                    header_shown = True
+                print('    {}'.format(icon_file))
+                cnt += 1
+        print('  Total {} coins in use, {} icons missing'.format(len(currencies), cnt))
+        return cnt
+
+    def check_used_icons(self) -> int:
         print('Checking SVG icons...')
 
         all_pairs = []
@@ -220,21 +235,7 @@ class Exchanges:
                     uniq_items += 1
             print('  {}: unique currencies: {}'.format(ex.code, uniq_items))
 
-        cnt = 0
-        header_shown = False
-        for pair in all_pairs:
-            icon_file = os.path.join(img_dir, '{}.svg'.format(pair))
-            res = os.path.exists(icon_file)
-            if not res:
-                if not header_shown:
-                    print('  Missing icons:')
-                    header_shown = True
-                print('    {}'.format(icon_file))
-                cnt += 1
-
-        print('  Total {} coins in use, {} icons missing'.format(len(all_pairs), cnt))
-
-        return cnt
+        return self.check_icons(all_pairs)
 
 
 ######################################################################
@@ -290,6 +291,7 @@ class Config:
         self.force = args.force
         self.dry_run = args.dry_run
         self.show = args.show
+        self.check_all_icons = args.check_all_icons
 
 
 ######################################################################
@@ -330,12 +332,12 @@ uni = 'UNI'
 
 currencies = {
     bch:  {'name': 'Bitcoin Cash', 'symbol': '฿', },
-    bsv:  {'name': 'BSV', },
+    bsv:  {'name': 'Bitcoin SV', },
     btc:  {'name': 'Bitcoin', 'symbol': '₿', },
     btg:  {'name': 'Bitcoin Gold', },
-    comp: {'name': 'COMP', },
+    comp: {'name': 'Compound', },
     dash: {'name': 'DASH', },
-    dot:  {'name': 'PolkaDot', },
+    dot:  {'name': 'Polkadot', },
     etc:  {'name': 'Ethereum Classic', },
     eth:  {'name': 'Ethereum', 'symbol': 'Ξ', },
     eur:  {'name': 'Euro', 'symbol': '€', },
@@ -345,7 +347,7 @@ currencies = {
     lsk:  {'name': 'Lisk', },
     ltc:  {'name': 'Litecoin', 'symbol': 'Ł', },
     luna: {'name': 'LUNA', },
-    mkr:  {'name': 'MKR', },
+    mkr:  {'name': 'Maker', },
     pln:  {'name': 'Polish Zloty', 'symbol': 'zł', },
     usd:  {'name': 'US Dollar', 'symbol': '$', },
     usdt: {'name': 'USD Tether', },
@@ -353,12 +355,12 @@ currencies = {
     zec:  {'name': 'ZCash', },
     ada:  {'name': 'Cardano', },
     bnb:  {'name': 'Binance Coin', },
-    doge: {'name': 'Doge Coin', },
+    doge: {'name': 'Dogecoin', },
     fil:  {'name': 'Filecoin', },
     czk:  {'name': 'Czech Krown', 'symbol': 'Kč', },
     jpy:  {'name': 'Japanese Yen', 'symbol': '¥', },
-    busd: {'name': 'BUSD', },
-    usdc: {'name': 'USDC', },
+    busd: {'name': 'Binance USD', },
+    usdc: {'name': 'USD Coin', },
     uni:  {'name': 'Uniswap', },
 }
 
@@ -696,6 +698,8 @@ ag.add_argument('-o', '--out', action='store', dest='file', type=str,
                 help='Optional. Name of JS file to be generated.')
 ag.add_argument('-s', '--show', action='store_true', dest='show', default=False,
                 help='Output generated JS code to stdout.')
+ag.add_argument('-a', '--allicons', action='store_true', dest='check_all_icons', default=False,
+                help='Check all currencies for SVG icons or only used ones.')
 ag.add_argument('-f', '--force', action='store_true', dest='force',
                 help='Enforces ignoring certain issues (missing icons, existing target file).')
 ag.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False)
@@ -710,7 +714,12 @@ exs.import_all_enabled(exchange_definitions)
 process_exchanges(exs, config)
 
 # check for icons of used coins
-missing_icons_cnt = exs.check_icons()
+if config.check_all_icons:
+    curr = list(currencies.keys())
+    curr.sort()
+    missing_icons_cnt = exs.check_icons(curr)
+else:
+    missing_icons_cnt = exs.check_used_icons()
 if missing_icons_cnt != 0 and not config.force:
     abort('Missing {} currency icons.'.format(missing_icons_cnt))
 

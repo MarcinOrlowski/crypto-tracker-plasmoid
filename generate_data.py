@@ -82,11 +82,11 @@ class Exchange():
             self.pairs[crypto].append(pair)
 
     def download_ticker(self, crypto, pair):
-        url = self.api_url.format(crypto=crypto, pair=pair)
+        url = self.api_url.format(crypto = crypto, pair = pair)
         return req.get(url)
 
     def get_test_result(self, crypto: str, pair: str, use_cache: bool, cache_threshold: int) -> "TestResult":
-        tr = TestResult(ex_code=self.code, crypto=crypto, pair=pair, use_cache=use_cache, cache_dir=self.cache_dir)
+        tr = TestResult(ex_code = self.code, crypto = crypto, pair = pair, use_cache = use_cache, cache_dir = self.cache_dir)
         tr.cache_load(cache_threshold)
         return tr
 
@@ -332,22 +332,22 @@ currencies = {
     xlm:  {'name': 'Stellar', },
 }
 
-exchange_definitions = Exchanges(cache_dir=os.path.expanduser(CACHE_DIR_NAME))
+exchange_definitions = Exchanges(cache_dir = os.path.expanduser(CACHE_DIR_NAME))
 exchange_definitions.add(
     Exchange(
         # disabled = True,
-        code='binance-com',
-        name='Binance',
-        url='https://binance.com/',
-        api_url='https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
+        code = 'binance-com',
+        name = 'Binance',
+        url = 'https://binance.com/',
+        api_url = 'https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
 
         # https://www.binance.com/en/markets
-        currencies=[
+        currencies = [
             btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc, xmr, atom, xlm,
             usdt, eur, gbp, bnb, busd,
         ],
 
-        functions={
+        functions = {
             'getUrl':                  "return 'https://api1.binance.com/api/v3/trades?limit=1&symbol=' + crypto + fiat",
             'getRateFromExchangeData': 'return data[0].price',
         },
@@ -356,18 +356,18 @@ exchange_definitions.add(
 exchange_definitions.add(
     Exchange(
         # disabled = True,
-        code='bitstamp-net',
-        name='Bitstamp',
-        url='https://bitstamp.net/',
-        api_url='https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
+        code = 'bitstamp-net',
+        name = 'Bitstamp',
+        url = 'https://bitstamp.net/',
+        api_url = 'https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
 
         # https://www.bitstamp.net/markets/
-        currencies=[
+        currencies = [
             btc, etc, ltc, xrp, uni, eth,
             usd, eur, gbp, usdc
         ],
 
-        functions={
+        functions = {
             'getUrl':                  "return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat",
             'getRateFromExchangeData': 'return data.ask',
         },
@@ -376,17 +376,17 @@ exchange_definitions.add(
 exchange_definitions.add(
     Bitbay(
         # disabled = True,
-        code='bitbay-net',
-        name='BitBay',
-        url='https://bitbay.net/',
-        api_url='https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
+        code = 'bitbay-net',
+        name = 'BitBay',
+        url = 'https://bitbay.net/',
+        api_url = 'https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
 
-        currencies=[
+        currencies = [
             btc, bsv, btg, comp, dash, dot, etc, eth, game, link, lsk, ltc, luna, mkr, xrp, zec, xlm,
             eur, gbp, pln, usd,
         ],
 
-        functions={
+        functions = {
             'getUrl':                  "return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'",
             'getRateFromExchangeData': 'return data.ask',
         },
@@ -395,18 +395,18 @@ exchange_definitions.add(
 exchange_definitions.add(
     Coinmate(
         # disabled = True,
-        code='coinmate-io',
-        name='Coinmate',
-        url='https://coinmate.io/',
-        api_url='https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
+        code = 'coinmate-io',
+        name = 'Coinmate',
+        url = 'https://coinmate.io/',
+        api_url = 'https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
 
         # https://coinmate.io/trade
-        currencies=[
+        currencies = [
             btc, eth, ltc, xrp, dash, bch,
             czk, eur,
         ],
 
-        functions={
+        functions = {
             'getUrl':                  "return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat",
             'getRateFromExchangeData': 'return data.data.ask',
         },
@@ -416,19 +416,19 @@ exchange_definitions.add(
     Kraken(
         # disabled = True,
 
-        code='kraken-com',
-        name='Kraken',
-        url='https://kraken.com/',
-        api_url='https://api.kraken.com/0/public/Ticker?pair={crypto}{pair}',
+        code = 'kraken-com',
+        name = 'Kraken',
+        url = 'https://kraken.com/',
+        api_url = 'https://api.kraken.com/0/public/Ticker?pair={crypto}{pair}',
 
         # https://support.kraken.com/hc/en-us/articles/360001185506
         # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
-        currencies=[
+        currencies = [
             btc, eth, ltc, xrp, ada, doge, dot, etc, zec, atom, xlm,
             usd, eur, gbp, jpy, usdt,
         ],
 
-        functions={
+        functions = {
             'getUrl':                  "return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat",
             # some tricker to work around odd asset naming used in returned reponse as main key
             'getRateFromExchangeData': "return data.result[Object.keys(data['result'])[0]].a[0]",
@@ -529,7 +529,7 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
         result.append('\t\t"pairs": {')
         for crypto, pairs in ex.pairs.items():
             pairs.sort()
-            row = '\t\t\t"{crypto}": ['.format(crypto=crypto)
+            row = '\t\t\t"{crypto}": ['.format(crypto = crypto)
             row += ''.join(['"{}",'.format(pair) for pair in pairs])
             row += '],'
             result.append(row)
@@ -569,7 +569,7 @@ def process_exchange(pool, queue, ex: Exchange, config: Config) -> int:
             if tr.cached:
                 queue.put(tr)
             else:
-                pool.apply_async(func=do_api_call, args=(queue, tr,), error_callback=do_api_call_error_callback)
+                pool.apply_async(func = do_api_call, args = (queue, tr,), error_callback = do_api_call_error_callback)
             total_number_of_checks += 1
 
     return total_number_of_checks
@@ -578,7 +578,7 @@ def process_exchange(pool, queue, ex: Exchange, config: Config) -> int:
 def process_exchanges(exchanges: Exchanges, config: Config) -> None:
     print('Processing exchange data')
 
-    with mp.Pool(processes=6) as pool:
+    with mp.Pool(processes = 6) as pool:
         queue = mp.Manager().Queue()
 
         total_number_of_checks = 0
@@ -607,15 +607,15 @@ def process_exchanges(exchanges: Exchanges, config: Config) -> None:
                 pair_from_cache += 1
 
             cnt += 1
-            print('  {} of {}...'.format(cnt, total_number_of_checks), end='\r')
+            print('  {} of {}...'.format(cnt, total_number_of_checks), end = '\r')
 
         # to ensure we do not leave too early (should not happen though)
         pool.join()
 
         # Summary
         print('Total: {total}, cache hits: {cache_cnt} ({cache_percent:>.0f}%), paired: {paired}, skipped: {skipped}'.format(
-            total=cnt, paired=pair_success_cnt, skipped=pair_skipped_cnt,
-            cache_cnt=pair_from_cache, cache_percent=(pair_from_cache * 100) / cnt))
+            total = cnt, paired = pair_success_cnt, skipped = pair_skipped_cnt,
+            cache_cnt = pair_from_cache, cache_percent = (pair_from_cache * 100) / cnt))
 
 
 ######################################################################
@@ -677,20 +677,20 @@ def threshold(arg_value: str) -> int:
 parser = argparse.ArgumentParser()
 ag = parser.add_argument_group('Options')
 ag.add_argument(
-    '-t', '--threshold', action='store', dest='cache_threshold', type=threshold, default=CACHE_THRESHOLD,
-    help='Cache validity threshold in format XXXZ where XXX is number in range 1-999, '
-         'Z is (optional) units specifier: "h", "d", "w", "m", "y". If unit is not specified, '
-         'minutes are used. Default value: {}'.format(CACHE_THRESHOLD))
-ag.add_argument('-n', '--nocache', action='store_true', dest='no_cache', default=False,
-                help='Ignore validation result cache and always do the full API check.')
-ag.add_argument('-o', '--out', action='store', dest='file', type=str,
-                help='Optional. Name of JS file to be generated.')
-ag.add_argument('-s', '--show', action='store_true', dest='show', default=False,
-                help='Output generated JS code to stdout.')
-ag.add_argument('-f', '--force', action='store_true', dest='force',
-                help='Enforces ignoring certain issues (missing icons, existing target file).')
-ag.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False)
-ag.add_argument('-d', '--dry-run', action='store_true', dest='dry_run', default=False)
+    '-t', '--threshold', action = 'store', dest = 'cache_threshold', type = threshold, default = CACHE_THRESHOLD,
+    help = 'Cache validity threshold in format XXXZ where XXX is number in range 1-999, '
+           'Z is (optional) units specifier: "h", "d", "w", "m", "y". If unit is not specified, '
+           'minutes are used. Default value: {}'.format(CACHE_THRESHOLD))
+ag.add_argument('-n', '--nocache', action = 'store_true', dest = 'no_cache', default = False,
+                help = 'Ignore validation result cache and always do the full API check.')
+ag.add_argument('-o', '--out', action = 'store', dest = 'file', type = str,
+                help = 'Optional. Name of JS file to be generated.')
+ag.add_argument('-s', '--show', action = 'store_true', dest = 'show', default = False,
+                help = 'Output generated JS code to stdout.')
+ag.add_argument('-f', '--force', action = 'store_true', dest = 'force',
+                help = 'Enforces ignoring certain issues (missing icons, existing target file).')
+ag.add_argument('-v', '--verbose', action = 'store_true', dest = 'verbose', default = False)
+ag.add_argument('-d', '--dry-run', action = 'store_true', dest = 'dry_run', default = False)
 config = Config(parser.parse_args())
 
 if config.file is not None and not config.force and os.path.exists(config.file):

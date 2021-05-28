@@ -41,14 +41,13 @@ CACHE_DIR_NAME = '~/.cryto-tracker-plasmoid-gen-cache'
 ######################################################################
 
 class ExchangeBase:
-    def __init__(self, code: str, name: str, url: str, api_url: str, crypto: List, fiats: List, functions: Dict[str, str],
+    def __init__(self, code: str, name: str, url: str, api_url: str, currencies: List[str], functions: Dict[str, str],
                  disabled: bool = False, cache_dir: str = None):
         self.code = code
         self.name = name
         self.url = url
         self.api_url = api_url
-        self.crypto = crypto
-        self.fiats = fiats
+        self.currencies = currencies
         self.functions = functions
         self.disabled = disabled
 
@@ -57,13 +56,16 @@ class ExchangeBase:
 
     @property
     def currencies(self) -> List[str]:
-        all_items = self.crypto + self.fiats
-        # remove duplicates
-        all_items = list(dict.fromkeys(all_items))
-        all_items.sort()
-        return all_items
+        return self._currencies
 
-    def _validate(response: req.Response, crypto: str, pair: str) -> bool:
+    @currencies.setter
+    def currencies(self, val: List[str]) -> None:
+        # cheap trick to remove list duplicates
+        items = list(dict.fromkeys(val))
+        items.sort()
+        self._currencies = items
+
+    def _validate(self, response: req.Response, crypto: str, pair: str) -> bool:
         return response.status_code == req.codes.ok
 
     def is_ticker_valid(self, response, crypto: str, pair: str) -> bool:
@@ -370,10 +372,8 @@ exchange_definitions.add(Exchange(
     api_url='https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
 
     # https://www.binance.com/en/markets
-    crypto=[
+    currencies=[
         btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc,
-    ],
-    fiats=[
         usdt, eur, gbp, bnb, busd,
     ],
 
@@ -391,10 +391,8 @@ exchange_definitions.add(Exchange(
     api_url='https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
 
     # https://www.bitstamp.net/markets/
-    crypto=[
+    currencies=[
         btc, etc, ltc, xrp, uni, eth,
-    ],
-    fiats=[
         usd, eur, gbp, usdc
     ],
 
@@ -411,10 +409,8 @@ exchange_definitions.add(Bitbay(
     url='https://bitbay.net/',
     api_url='https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
 
-    crypto=[
+    currencies=[
         btc, bsv, btg, comp, dash, dot, etc, eth, game, link, lsk, ltc, luna, mkr, xrp, zec,
-    ],
-    fiats=[
         eur, gbp, pln, usd,
     ],
 
@@ -432,10 +428,8 @@ exchange_definitions.add(Coinmate(
     api_url='https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
 
     # https://coinmate.io/trade
-    crypto=[
+    currencies=[
         btc, eth, ltc, xrp, dash, bch,
-    ],
-    fiats=[
         czk, eur,
     ],
 
@@ -455,10 +449,8 @@ exchange_definitions.add(Kraken(
 
     # https://support.kraken.com/hc/en-us/articles/360001185506
     # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
-    crypto=[
+    currencies=[
         btc, eth, ltc, xrp, ada, doge, dot, etc, zec,
-    ],
-    fiats=[
         usd, eur, gbp, jpy, usdt,
     ],
 
@@ -481,7 +473,6 @@ def abort(msg: str = 'Aborted') -> None:
 # Returns current timestamp in millis
 def now() -> int:
     return int(round(time.time() * 1000))
-
 
 ######################################################################
 

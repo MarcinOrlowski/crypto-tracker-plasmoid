@@ -23,21 +23,21 @@
 import argparse
 import collections
 import json
-import math
 import multiprocessing as mp
 import os
 import re
+from typing import Callable, Dict, List
 import requests as req
 import sys
 import time
 
 ######################################################################
 
-def default_ticker_validator(response, crypto, pair):
+def default_ticker_validator(response: req.Response, crypto: str, pair: str) -> bool:
     return response.status_code == req.codes.ok
 
 # validates if provided HTTP response contains valid ticker
-def bitbay_ticker_validator(response, crypto, pair):
+def bitbay_ticker_validator(response: req.Response, crypto: str, pair: str) -> bool:
     if response.status_code != req.codes.ok:
         return False
 
@@ -47,7 +47,7 @@ def bitbay_ticker_validator(response, crypto, pair):
             return False
     return True
 
-def kraken_ticker_validator(response, crypto, pair):
+def kraken_ticker_validator(response: req.Response, crypto: str, pair: str) -> bool:
     if response.status_code != req.codes.ok:
         return False
 
@@ -65,7 +65,7 @@ def kraken_ticker_validator(response, crypto, pair):
             return False
     return True
 
-def coinmate_ticker_validator(response, crypto, pair):
+def coinmate_ticker_validator(response: req.Response, crypto: str, pair: str) -> bool:
     if response.status_code != req.codes.ok:
         return False
 
@@ -79,7 +79,6 @@ def coinmate_ticker_validator(response, crypto, pair):
             return False
 
     return True
- 
 
 
 ######################################################################
@@ -167,7 +166,7 @@ src_exchanges['binance-com'] = {
         # FIXME we need a BNB/USDT pair for example
     ],
     'fiats': [
-        usdt, eur, gbp, bnb, busd, 
+        usdt, eur, gbp, bnb, busd,
     ],
 
     'functions': {
@@ -240,7 +239,6 @@ src_exchanges['coinmate-io'] = {
     },
 }
 
-
 src_exchanges['kraken-com'] = {
 #    'disabled': True,
 
@@ -267,33 +265,33 @@ src_exchanges['kraken-com'] = {
 
 ######################################################################
 
-def abort(msg='Aborted'):
+def abort(msg: str = 'Aborted') -> None:
     print('*** {}'.format(msg))
     sys.exit(1)
 
 
 ######################################################################
 
-def do_api_call(queue, exchange, ex_data, crypto, pair):
-    url = ex_data['api_url'].format(crypto=crypto, pair=pair)
+def do_api_call(queue, exchange: Dict[str, Dict], ex_data: Dict, crypto: str, pair: str) -> None:
+    url: str = ex_data['api_url'].format(crypto=crypto, pair=pair)
     response = req.get(url)
 #    print('#{}: {}'.format(response.status_code, url), end='')
 #    time.sleep(0.5)
 
     validator = ex_data.get('validator', default_ticker_validator)
-    rc = validator(response, crypto, pair)
+    rc: bool = validator(response, crypto, pair)
     queue.put({
         'rc': rc, 'stamp': int(round(time.time() * 1000)),
         'name': exchange, 'crypto': crypto, 'pair': pair,
         })
 
-def do_api_call_error_callback(msg):
+def do_api_call_error_callback(msg: str) -> None:
     print('Error Callback: {}'.format(msg))
 
 
 ######################################################################
 
-def build_header():
+def build_header() -> List[str]:
     return [
         '// This file is auto-generated. DO NOT EDIT BY HAND',
         '// Use generate_data.py to rebuild this file if needed',
@@ -303,7 +301,7 @@ def build_header():
         '',
         ]
 
-def build_currencies(currencies):
+def build_currencies(currencies: Dict[str, Dict]) -> List[str]:
     # currency and token info
     result = [
         'var currencies = {',
@@ -312,7 +310,7 @@ def build_currencies(currencies):
     keys = list(currencies.keys())
     keys.sort()
     for key in keys:
-        data = currencies[key]
+        data: Dict = currencies[key]
         symbol = None if 'symbol' not in data else '"{}"'.format(data['symbol'])
 
         row = '\t"{}": {{'.format(key)
@@ -329,7 +327,7 @@ def build_currencies(currencies):
 
     return result
 
-def build_exchanges(exchanges):
+def build_exchanges(exchanges: Dict[str, Dict]) -> List[str]:
     result = [
         'var exchanges = {',
         ]
@@ -374,11 +372,9 @@ def build_exchanges(exchanges):
 
 #############################G#########################################
 
-# preprocess data first
-
-def process_exchanges(src_exchanges, args):
-    cache_threshold = args.threshold
-    no_cache = args.no_cache
+def process_exchanges(src_exchanges: Dict[str, Dict], args) -> Dict:
+    cache_threshold: int = args.threshold
+    no_cache: bool = args.no_cache
 
     result = collections.OrderedDict()
 
@@ -402,8 +398,6 @@ def process_exchanges(src_exchanges, args):
         # remove duplicates
         all_items = list(dict.fromkeys(all_items))
         all_items.sort()
-
-        ex_pairs = collections.OrderedDict()
 
         # we need to use Manager to allow subprocesses to access our queue
         queue = mp.Manager().Queue()
@@ -433,13 +427,11 @@ def process_exchanges(src_exchanges, args):
                                 if (now < (cache['stamp'] + (cache_threshold * 60 * 1000))):
                                     use_cached_data = True
                                     cache_rc = cache['rc']
-                                now = int(round(time.time() * 1000))
 
                     if use_cached_data:
                         queue.put({'rc': cache_rc, 'name': exchange, 'crypto': item, 'pair': pair,'cache': True})
                     else:
                         pool.apply_async(func=do_api_call, args=(queue, exchange, ex_data, item, pair),
-#                            callback=do_api_call_success_callback,
                             error_callback=do_api_call_error_callback)
                     total_checks_cnt += 1
 
@@ -458,7 +450,7 @@ def process_exchanges(src_exchanges, args):
                 cache_file = os.path.join(cache_dir, '{}-{}'.format(resp_crypto, resp_pair))
                 if not os.path.exists(cache_dir):
                     os.makedirs(cache_dir)
- 
+
                 if response['rc']:
                     if resp_crypto not in resp_exchange['pairs']:
                         resp_exchange['pairs'][resp_crypto] = []
@@ -494,7 +486,7 @@ def process_exchanges(src_exchanges, args):
 
 ######################################################################
 
-def check_icons(result_exchanges):
+def check_icons(result_exchanges: Dict) -> int:
     img_dir = 'src/contents/images/'
 
     print('Checking SVG icons...')
@@ -521,18 +513,18 @@ def check_icons(result_exchanges):
 
 ######################################################################
 
-def threshold(arg_value):
+def threshold(arg_value: str) -> int:
     pat = re.compile(r"^([0-9]{1,3})([dwmy]?)$")
     match = pat.match(arg_value)
     if not match:
-        raise argparse.ArgumentTypeError(msg='Invalid format: XXXu')
+        raise argparse.ArgumentTypeError
 
     val = int(match.group(1))
     if val == 0:
-        raise argparse.ArgumentError(msg='Value must be in range 0-999')
+        raise argparse.ArgumentTypeError
 
     unit = match.group(2)
-    
+
     # in millis
     MIN = 60 * 1000
     HOUR = MIN * 60

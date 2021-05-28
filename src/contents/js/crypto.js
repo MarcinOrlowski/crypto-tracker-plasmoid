@@ -94,10 +94,10 @@ function isCryptoSupported(exchange, crypto) {
 	return result
 }
 
-function isFiatSupported(exchange, crypto, fiat) {
+function isPairSupported(exchange, crypto, pair) {
 	var result = false
 	if (isCryptoSupported(exchange, crypto)) {
-		result = (exchanges[exchange]['pairs'][crypto].indexOf(fiat) !== -1)
+		result = (exchanges[exchange]['pairs'][crypto].indexOf(pair) !== -1)
 	} else {
 		console.error("Invalid crypto '" + crypto + "' on '" + exchange + "'")
 	}
@@ -118,18 +118,18 @@ function getAllExchangeCryptos(exchange) {
 	}
 	return cryptoModel
 }
-function getFiatsForCrypto(exchange, crypto) {
+function getPairsForCrypto(exchange, crypto) {
 	var currencyModel = null
 	if (isCryptoSupported(exchange, crypto)) {
 		currencyModel = []
-		var fiats = exchanges[exchange]['pairs'][crypto]
-		for(var i = 0; i < fiats.length; i++) {
-			var key = fiats[i]
+		var pairs = exchanges[exchange]['pairs'][crypto]
+		for(var i = 0; i < pairs.length; i++) {
+			var key = pairs[i]
 			currencyModel.push({'value': key, 'text': getCurrencyName(key)})
 		}
 	} else {
 		var exName = getExchangeName(exchange)
-		console.error("Can't get fiat pairs for '" + crypto + "' on '" + exchange + "' (" + exName + ")")
+		console.error("Can't get pair for '" + crypto + "' on '" + exchange + "' (" + exName + ")")
 	}
 	return currencyModel
 }

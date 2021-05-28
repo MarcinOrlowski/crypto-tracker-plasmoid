@@ -1,5 +1,8 @@
 * @dev
-  * Added support for Binance
+  * Added support for Binance.
+  * Added multiple coints and tokens to existing exchanges.
+  * Added ability to cross pair currencies with bigger flexibility.
+  * Improved Kraken's API response handling.
 
 * v2.0.0 (2021-05-10)
   * [IMPORTANT] Your current config will NOT be migrated and you will have to re-set

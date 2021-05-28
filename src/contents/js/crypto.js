@@ -10,56 +10,45 @@
 // https://doc.qt.io/qt-5/qtqml-javascript-resources.html
 .pragma library
 
+.import 'crypto_data.js' as Data
+
+// OBSOLETE: Remove config panes that using this
 const BTC='BTC'
-const ETC='ETC'
-const ETH='ETH'
-const LTC='LTC'
-
 const USD='USD'
-const PLN='PLN'
-const GBP='GBP'
-const EUR='EUR'
-const JPY='JPY'
-const CZK='CZK'
-const USDT='USDT'
 
-var currencySymbols = {
-	EUR: '€',				// Euro
-	GBP: '£',				// British Pound Sterling
-	PLN: 'zł',				// Polish Zloty
-	USD: '$',				// US Dollar
-	JPY: '¥',				// Japanese Yen
-	CZK: 'Kč',				// Czech Krown
-	USDT: '$T',				// USDT
-}
+const currencies = Data.currencies
+
 function getCurrencyName(code) {
-	return code + ' (' + currencySymbols[code] + ')'
+	if (code in currencies) {
+		var c = currencies[code]
+		var name = (c['name'] != code) ? c['name'] : ''
+		var symbol = ('symbol' in c ) ? c['symbol'] : ''
+		var full_name = code
+		if (name + symbol != '') {
+			var extra = ''
+			if (symbol != '') extra += symbol
+			if (extra != '') extra += ' '
+			if (name != '') extra += name
+			full_name += ' (' + extra + ')'
+		}
+		return full_name
+	} else {
+		return 'UNKNOWN! ' + code
+	}
 }
 function getCurrencySymbol(code) {
-	return currencySymbols[code]
+	return ('symbol' in currencies[code])
+		? currencies[code]['symbol']
+		: code
 }
 
 // --------------------------------------------------------------------------------------------
 
-var cryptos = {
-	BTC: {
-		name: 'Bitcoin'
-	},
-	ETH: {
-		name: 'Ethereum'
-	},
-	LTC: {
-		name: 'Litecoin'
-	},
-	XRP: {
-		name: 'Ripple'
-	},
-	ETC: {
-		name: 'Ethereum Classic'
-	},
-}
 function getCryptoName(code) {
-	return cryptos[code]['name'] + ' (' + code + ')'
+	var name = ('name' in currencies[code])
+		? currencies[code]['name']
+		: code
+	return name + ' (' + code + ')'
 }
 function getCryptoIcon(code) {
 	return code + '.svg'
@@ -67,130 +56,7 @@ function getCryptoIcon(code) {
 
 // --------------------------------------------------------------------------------------------
 
-const bitbay_fiats = [
-	'PLN',
-	'USD',
-	'EUR',
-	'GBP',
-]
-const bitstamp_fiats = [
-	'USD',
-	'EUR',
-	'GBP',
-]
-const coinmate_fiats = [
-	'CZK',
-	'EUR',
-]
-const kraken_fiats = [
-	'USD',
-	'EUR',
-	'GBP',
-	'JPY',
-]
-const binance_fiats = [
-	'USDT',
-	'EUR',
-	'GBP',
-	'JPY',
-]
-
-var exchanges = {
-	'binance-com': {
-		name: 'Binance',
-		url: 'https://binance.com',
-		getRateFromExchangeData: function(data, crypto, fiat) {
-			return data[0].price
-		},
-		getUrl: function(crypto, fiat) {
-			return 'https://api1.binance.com/api/v3/trades?limit=1&symbol=' + crypto + fiat
-		},
-		pairs: {
-			BTC: binance_fiats,
-			ETC: binance_fiats,
-			ETH: binance_fiats,
-			XRP: binance_fiats,
-		}
-	},
-	'bitbay-net': {
-		name: 'BitBay',
-		url: 'https://bitbay.net/',
-		getRateFromExchangeData: function(data, crypto, fiat) {
-			return data.ask
-		},
-		getUrl: function(crypto, fiat) {
-			return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'
-		},
-		pairs: {
-			BTC: bitbay_fiats,
-			ETH: bitbay_fiats,
-			LTC: bitbay_fiats,
-			XRP: bitbay_fiats,
-		}
-	},
-	'bitstamp-net': {
-		name: 'BitStamp',
-		url: 'https://www.bitstamp.net/',
-		getRateFromExchangeData: function(data, crypto, fiat) {
-			return data.ask
-		},
-		getUrl: function(crypto, fiat) {
-			return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat
-		},
-		pairs: {
-			BTC: bitstamp_fiats,
-			ETH: bitstamp_fiats,
-			ETC: bitstamp_fiats,
-			LTC: bitstamp_fiats,
-			XRP: bitstamp_fiats,
-		}
-	},
-	'coinmate-io': {
-		name: 'Coinmate',
-		url: 'https://coinmate.io/',
-		getRateFromExchangeData: function(data, crypto, fiat) {
-			return data.data.ask
-		},
-		getUrl: function(crypto, fiat) {
-			return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat
-		},
-		pairs: {
-			BTC: coinmate_fiats,
-			ETH: coinmate_fiats,
-			LTC: coinmate_fiats,
-			XRP: coinmate_fiats,
-		}
-	},
-	'kraken-com': {
-		name: 'Kraken',
-		url: 'https://www.kraken.com/',
-		getRateFromExchangeData: function(data, crypto, fiat) {
-			// FIXME hardcoded mapping
-			switch (crypto) {
-				case 'BTC':
-					crypto = 'XBT'
-					break
-				default:
-					// do nothing
-					break
-			}
-			return data.result['X' + crypto + 'Z' + fiat].a[0]
-		},
-		getUrl: function(crypto, fiat) {
-			return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat
-		},
-		pairs: {
-			BTC: kraken_fiats,
-			ETH: kraken_fiats,
-			ETC: [
-				'USD',
-				'EUR',
-			],
-			LTC: kraken_fiats,
-			XRP: kraken_fiats,
-		}
-	}
-}
+const exchanges = Data.exchanges
 
 function exchangeExists(exchange) {
 	return exchange in exchanges

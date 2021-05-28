@@ -253,7 +253,6 @@ class Config:
         self.force = args.force
         self.dry_run = args.dry_run
         self.show = args.show
-        self.check_all_icons = args.check_all_icons
 
 
 ######################################################################
@@ -348,7 +347,6 @@ exchange_definitions.add(
         ],
 
         functions = {
-            'getUrl':                  "return 'https://api1.binance.com/api/v3/trades?limit=1&symbol=' + crypto + fiat",
             'getRateFromExchangeData': 'return data[0].price',
         },
     ))
@@ -368,7 +366,6 @@ exchange_definitions.add(
         ],
 
         functions = {
-            'getUrl':                  "return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat",
             'getRateFromExchangeData': 'return data.ask',
         },
     ))
@@ -387,7 +384,6 @@ exchange_definitions.add(
         ],
 
         functions = {
-            'getUrl':                  "return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'",
             'getRateFromExchangeData': 'return data.ask',
         },
     ))
@@ -407,7 +403,6 @@ exchange_definitions.add(
         ],
 
         functions = {
-            'getUrl':                  "return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat",
             'getRateFromExchangeData': 'return data.data.ask',
         },
     ))
@@ -429,8 +424,7 @@ exchange_definitions.add(
         ],
 
         functions = {
-            'getUrl':                  "return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat",
-            # some tricker to work around odd asset naming used in returned reponse as main key
+            # some tricks to work around odd asset naming used in returned response as main key
             'getRateFromExchangeData': "return data.result[Object.keys(data['result'])[0]].a[0]",
         },
     ))
@@ -512,18 +506,13 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
             '\t"{}": {{'.format(ex.code),
             '\t\t"name": "{}",'.format(ex.name),
             '\t\t"url": "{}",'.format(ex.url),
+            '\t\t"api_url": "{}",'.format(ex.api_url),
         ]
 
         result += [
-            '\t\t"getUrl": function(crypto, fiat) {',
-            '\t\t\t{}'.format(ex.functions['getUrl']),
-            '\t\t},',
-        ]
-
-        result += [
-            '\t\t"getRateFromExchangeData": function(data, crypto, fiat) {',
+            '\t\t"getRateFromExchangeData": function(data, crypto, pair) {',
             '\t\t\t{}'.format(ex.functions['getRateFromExchangeData']),
-            '\t\t},'
+            '\t\t},',
         ]
 
         result.append('\t\t"pairs": {')
@@ -620,12 +609,18 @@ def process_exchanges(exchanges: Exchanges, config: Config) -> None:
 
 ######################################################################
 
-def check_icons(self, currencies: List[str]) -> int:
+def check_icons(currencies: List[str]) -> int:
     img_dir = 'src/contents/images/'
 
-    cnt = 0
+    ignored = [czk, eur, gbp, jpy, pln, usd, ]
+
+    cnt = skipped = 0
     header_shown = False
     for pair in currencies:
+        if pair in ignored:
+            skipped += 1
+            continue
+
         icon_file = os.path.join(img_dir, '{}.svg'.format(pair))
         res = os.path.exists(icon_file)
         if not res:
@@ -634,7 +629,7 @@ def check_icons(self, currencies: List[str]) -> int:
                 header_shown = True
             print('    {}'.format(icon_file))
             cnt += 1
-    print('  Total {} coins in use, {} icons missing'.format(len(currencies), cnt))
+    print('  Total {} coins in use, {} icons skipped, {} missing'.format(len(currencies), skipped, cnt))
     return cnt
 
 

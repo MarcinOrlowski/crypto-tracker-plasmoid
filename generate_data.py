@@ -164,26 +164,17 @@ class Exchanges:
     def count(self) -> int:
         return len(self._container)
 
-    def add(self, exs) -> None:
+    def add(self, ex: Exchange) -> None:
         """
         Adds new Exchange to Exchanges container. Also populates its cache_dir root folder
 
-        :param exs: subclass of ExchangeBase to be added or list of such objects
+        :param ex: subclass of Exchange to be added
         :return: None
         """
-        if isinstance(exs, List):
-            pass
-        elif isinstance(exs, object) and issubclass(exs, ExchangeBase):
-            exs = [exs]
-        else:
-            print('%r' % exs)
-            raise TypeError
-
-        for ex in exs:
-            if ex.code in self._container:
-                raise ValueError('Exchange with key "{}" already exists.'.format(ex.code))
-            ex.cache_dir = os.path.join(self.cache_dir, ex.code)
-            self._container[ex.code] = ex
+        if ex.code in self._container:
+            raise ValueError('Exchange with key "{}" already exists.'.format(ex.code))
+        ex.cache_dir = os.path.join(self.cache_dir, ex.code)
+        self._container[ex.code] = ex
 
     def get(self, idx_or_key) -> Optional[Exchange]:
         if isinstance(idx_or_key, int):

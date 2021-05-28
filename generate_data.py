@@ -207,11 +207,17 @@ class Exchanges:
         all_pairs = []
         for ex in self:
             uniq_items = 0
-            for _, pairs in ex.pairs.items():
-                for pair in pairs:
-                    if pair not in all_pairs:
-                        all_pairs.append(pair)
-                        uniq_items += 1
+            merged = []
+            for k, v in ex.pairs.items():
+                merged.append(k)
+                merged += v
+            # dedup
+            merged = list(dict.fromkeys(merged))
+            merged.sort()
+            for pair in merged:
+                if pair not in all_pairs:
+                    all_pairs.append(pair)
+                    uniq_items += 1
             print('  {}: unique currencies: {}'.format(ex.code, uniq_items))
 
         cnt = 0

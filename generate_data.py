@@ -40,7 +40,7 @@ CACHE_DIR_NAME = '~/.cryto-tracker-plasmoid-gen-cache'
 
 ######################################################################
 
-class ExchangeBase:
+class Exchange():
     def __init__(self, code: str, name: str, url: str, api_url: str, currencies: List[str], functions: Dict[str, str],
                  disabled: bool = False, cache_dir: str = None):
         self.code = code
@@ -91,11 +91,7 @@ class ExchangeBase:
         return tr
 
 
-class Exchange(ExchangeBase):
-    pass
-
-
-class Bitbay(ExchangeBase):
+class Bitbay(Exchange):
     def _validate(self, response: req.Response, crypto: str, pair: str) -> bool:
         if response.status_code != req.codes.ok:
             return False
@@ -107,24 +103,21 @@ class Bitbay(ExchangeBase):
         return True
 
 
-class Coinmate(ExchangeBase):
+class Coinmate(Exchange):
     def _validate(self, response: req.Response, crypto: str, pair: str) -> bool:
         if response.status_code != req.codes.ok:
             return False
 
         resp = json.loads(response.text)
-        if resp.get('error', False):
-            return False
-        if 'data' not in resp:
+        if resp.get('error', False) or 'data' not in resp:
             return False
         for field in ['ask', 'bid', 'change', 'last', ]:
             if field not in resp['data']:
                 return False
-
         return True
 
 
-class Kraken(ExchangeBase):
+class Kraken(Exchange):
     def _validate(self, response: req.Response, crypto: str, pair: str) -> bool:
         if response.status_code != req.codes.ok:
             return False
@@ -171,17 +164,26 @@ class Exchanges:
     def count(self) -> int:
         return len(self._container)
 
-    def add(self, ex: Exchange) -> None:
+    def add(self, exs) -> None:
         """
         Adds new Exchange to Exchanges container. Also populates its cache_dir root folder
 
-        :param ex: Exchange to be added
+        :param exs: subclass of ExchangeBase to be added or list of such objects
         :return: None
         """
-        if ex.code in self._container:
-            raise ValueError('Exchange with key "{}" already exists.'.format(ex.code))
-        ex.cache_dir = os.path.join(self.cache_dir, ex.code)
-        self._container[ex.code] = ex
+        if isinstance(exs, List):
+            pass
+        elif isinstance(exs, object) and issubclass(exs, ExchangeBase):
+            exs = [exs]
+        else:
+            print('%r' % exs)
+            raise TypeError
+
+        for ex in exs:
+            if ex.code in self._container:
+                raise ValueError('Exchange with key "{}" already exists.'.format(ex.code))
+            ex.cache_dir = os.path.join(self.cache_dir, ex.code)
+            self._container[ex.code] = ex
 
     def get(self, idx_or_key) -> Optional[Exchange]:
         if isinstance(idx_or_key, int):
@@ -364,102 +366,107 @@ currencies = {
 }
 
 exchange_definitions = Exchanges(cache_dir=os.path.expanduser(CACHE_DIR_NAME))
-exchange_definitions.add(Exchange(
-    # disabled = True,
-    code='binance-com',
-    name='Binance',
-    url='https://binance.com/',
-    api_url='https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
+exchange_definitions.add(
+    Exchange(
+        # disabled = True,
+        code='binance-com',
+        name='Binance',
+        url='https://binance.com/',
+        api_url='https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
 
-    # https://www.binance.com/en/markets
-    currencies=[
-        btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc,
-        usdt, eur, gbp, bnb, busd,
-    ],
+        # https://www.binance.com/en/markets
+        currencies=[
+            btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc,
+            usdt, eur, gbp, bnb, busd,
+        ],
 
-    functions={
-        'getUrl':                  "return 'https://api1.binance.com/api/v3/trades?limit=1&symbol=' + crypto + fiat",
-        'getRateFromExchangeData': 'return data[0].price',
-    },
-))
+        functions={
+            'getUrl':                  "return 'https://api1.binance.com/api/v3/trades?limit=1&symbol=' + crypto + fiat",
+            'getRateFromExchangeData': 'return data[0].price',
+        },
+    ))
 
-exchange_definitions.add(Exchange(
-    # disabled = True,
-    code='bitstamp-net',
-    name='Bitstamp',
-    url='https://bitstamp.net/',
-    api_url='https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
+exchange_definitions.add(
+    Exchange(
+        # disabled = True,
+        code='bitstamp-net',
+        name='Bitstamp',
+        url='https://bitstamp.net/',
+        api_url='https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
 
-    # https://www.bitstamp.net/markets/
-    currencies=[
-        btc, etc, ltc, xrp, uni, eth,
-        usd, eur, gbp, usdc
-    ],
+        # https://www.bitstamp.net/markets/
+        currencies=[
+            btc, etc, ltc, xrp, uni, eth,
+            usd, eur, gbp, usdc
+        ],
 
-    functions={
-        'getUrl':                  "return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat",
-        'getRateFromExchangeData': 'return data.ask',
-    },
-))
+        functions={
+            'getUrl':                  "return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat",
+            'getRateFromExchangeData': 'return data.ask',
+        },
+    ))
 
-exchange_definitions.add(Bitbay(
-    # disabled = True,
-    code='bitbay-net',
-    name='BitBay',
-    url='https://bitbay.net/',
-    api_url='https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
+exchange_definitions.add(
+    Bitbay(
+        # disabled = True,
+        code='bitbay-net',
+        name='BitBay',
+        url='https://bitbay.net/',
+        api_url='https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
 
-    currencies=[
-        btc, bsv, btg, comp, dash, dot, etc, eth, game, link, lsk, ltc, luna, mkr, xrp, zec,
-        eur, gbp, pln, usd,
-    ],
+        currencies=[
+            btc, bsv, btg, comp, dash, dot, etc, eth, game, link, lsk, ltc, luna, mkr, xrp, zec,
+            eur, gbp, pln, usd,
+        ],
 
-    functions={
-        'getUrl':                  "return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'",
-        'getRateFromExchangeData': 'return data.ask',
-    },
-))
+        functions={
+            'getUrl':                  "return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'",
+            'getRateFromExchangeData': 'return data.ask',
+        },
+    ))
 
-exchange_definitions.add(Coinmate(
-    # disabled = True,
-    code='coinmate-io',
-    name='Coinmate',
-    url='https://coinmate.io/',
-    api_url='https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
+exchange_definitions.add(
+    Coinmate(
+        # disabled = True,
+        code='coinmate-io',
+        name='Coinmate',
+        url='https://coinmate.io/',
+        api_url='https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
 
-    # https://coinmate.io/trade
-    currencies=[
-        btc, eth, ltc, xrp, dash, bch,
-        czk, eur,
-    ],
+        # https://coinmate.io/trade
+        currencies=[
+            btc, eth, ltc, xrp, dash, bch,
+            czk, eur,
+        ],
 
-    functions={
-        'getUrl':                  "return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat",
-        'getRateFromExchangeData': 'return data.data.ask',
-    },
-))
+        functions={
+            'getUrl':                  "return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat",
+            'getRateFromExchangeData': 'return data.data.ask',
+        },
+    ))
 
-exchange_definitions.add(Kraken(
-    # disabled = True,
+exchange_definitions.add(
+    Kraken(
+        # disabled = True,
 
-    code='kraken-com',
-    name='Kraken',
-    url='https://kraken.com/',
-    api_url='https://api.kraken.com/0/public/Ticker?pair={crypto}{pair}',
+        code='kraken-com',
+        name='Kraken',
+        url='https://kraken.com/',
+        api_url='https://api.kraken.com/0/public/Ticker?pair={crypto}{pair}',
 
-    # https://support.kraken.com/hc/en-us/articles/360001185506
-    # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
-    currencies=[
-        btc, eth, ltc, xrp, ada, doge, dot, etc, zec,
-        usd, eur, gbp, jpy, usdt,
-    ],
+        # https://support.kraken.com/hc/en-us/articles/360001185506
+        # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
+        currencies=[
+            btc, eth, ltc, xrp, ada, doge, dot, etc, zec,
+            usd, eur, gbp, jpy, usdt,
+        ],
 
-    functions={
-        'getUrl':                  "return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat",
-        # some tricker to work around odd asset naming used in returned reponse as main key
-        'getRateFromExchangeData': "return data.result[Object.keys(data['result'])[0]].a[0]",
-    },
-))
+        functions={
+            'getUrl':                  "return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat",
+            # some tricker to work around odd asset naming used in returned reponse as main key
+            'getRateFromExchangeData': "return data.result[Object.keys(data['result'])[0]].a[0]",
+        },
+    ))
 
 
 ######################################################################
@@ -473,6 +480,7 @@ def abort(msg: str = 'Aborted') -> None:
 # Returns current timestamp in millis
 def now() -> int:
     return int(round(time.time() * 1000))
+
 
 ######################################################################
 

@@ -327,6 +327,7 @@ jpy = 'JPY'
 busd = 'BUSD'
 usdc = 'USDC'
 uni = 'UNI'
+xmr = 'XMR'
 
 ######################################################################
 
@@ -362,6 +363,7 @@ currencies = {
     busd: {'name': 'Binance USD', },
     usdc: {'name': 'USD Coin', },
     uni:  {'name': 'Uniswap', },
+    xmr:  {'name': 'Monero', },
 }
 
 exchange_definitions = Exchanges(cache_dir=os.path.expanduser(CACHE_DIR_NAME))
@@ -375,7 +377,7 @@ exchange_definitions.add(
 
         # https://www.binance.com/en/markets
         currencies=[
-            btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc,
+            btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc, xmr,
             usdt, eur, gbp, bnb, busd,
         ],
 

@@ -31,10 +31,12 @@ import requests as req
 import sys
 import time
 
+
 ######################################################################
 
 def default_ticker_validator(response: req.Response, crypto: str, pair: str) -> bool:
     return response.status_code == req.codes.ok
+
 
 # validates if provided HTTP response contains valid ticker
 def bitbay_ticker_validator(response: req.Response, crypto: str, pair: str) -> bool:
@@ -42,10 +44,11 @@ def bitbay_ticker_validator(response: req.Response, crypto: str, pair: str) -> b
         return False
 
     resp = json.loads(response.text)
-    for field in ['min','max','last','bid','ask',]:
+    for field in ['min', 'max', 'last', 'bid', 'ask', ]:
         if field not in resp:
             return False
     return True
+
 
 def kraken_ticker_validator(response: req.Response, crypto: str, pair: str) -> bool:
     if response.status_code != req.codes.ok:
@@ -60,10 +63,11 @@ def kraken_ticker_validator(response: req.Response, crypto: str, pair: str) -> b
     key = list(resp['result'].keys())[0]
     if key not in resp['result']:
         return False
-    for field in ['a','b','c','l',]:
+    for field in ['a', 'b', 'c', 'l', ]:
         if field not in resp['result'][key]:
             return False
     return True
+
 
 def coinmate_ticker_validator(response: req.Response, crypto: str, pair: str) -> bool:
     if response.status_code != req.codes.ok:
@@ -74,7 +78,7 @@ def coinmate_ticker_validator(response: req.Response, crypto: str, pair: str) ->
         return False
     if 'data' not in resp:
         return False
-    for field in ['ask','bid','change','last',]:
+    for field in ['ask', 'bid', 'change', 'last', ]:
         if field not in resp['data']:
             return False
 
@@ -115,153 +119,153 @@ busd = 'BUSD'
 usdc = 'USDC'
 uni = 'UNI'
 
-
 ######################################################################
 
 currencies = {
-    bch:    {'name': 'Bitcoin Cash', 'symbol': '฿', },
-    bsv:    {'name': 'BSV', },
-    btc:    {'name': 'Bitcoin', 'symbol': '₿', },
-    btg:    {'name': 'Bitcoin Gold', },
-    comp:   {'name': 'COMP', },
-    dash:   {'name': 'DASH', },
-    dot:    {'name': 'PolkaDot', },
-    etc:    {'name': 'Ethereum Classic', },
-    eth:    {'name': 'Ethereum', 'symbol': 'Ξ', },
-    eur:    {'name': 'Euro', 'symbol': '€', },
-    game:   {'name': 'GAME', },
-    gbp:    {'name': 'British Pound', 'symbol': '£', },
-    link:   {'name': 'Chainlink', },
-    lsk:    {'name': 'Lisk', },
-    ltc:    {'name': 'Litecoin', 'symbol': 'Ł', },
-    luna:   {'name': 'LUNA', },
-    mkr:    {'name': 'MKR', },
-    pln:    {'name': 'Polish Zloty', 'symbol': 'zł', },
-    usd:    {'name': 'US Dollar', 'symbol': '$', },
-    usdt:   {'name': 'USD Tether', },
-    xrp:    {'name': 'Ripple', 'symbol': 'Ʀ', },
-    zec:    {'name': 'ZCash', },
-    ada:    {'name': 'Cardano', },
-    bnb:    {'name': 'Binance Coin', },
-    doge:   {'name': 'Doge Coin', },
-    fil:    {'name': 'Filecoin', },
-    czk:    {'name': 'Czech Krown', 'symbol': 'Kč', },
-    jpy:    {'name': 'Japanese Yen', 'symbol': '¥', },
-    busd:   {'name': 'BUSD', },
-    usdc:   {'name': 'USDC', },
-    uni:    {'name': 'Uniswap', },
+    bch:  {'name': 'Bitcoin Cash', 'symbol': '฿', },
+    bsv:  {'name': 'BSV', },
+    btc:  {'name': 'Bitcoin', 'symbol': '₿', },
+    btg:  {'name': 'Bitcoin Gold', },
+    comp: {'name': 'COMP', },
+    dash: {'name': 'DASH', },
+    dot:  {'name': 'PolkaDot', },
+    etc:  {'name': 'Ethereum Classic', },
+    eth:  {'name': 'Ethereum', 'symbol': 'Ξ', },
+    eur:  {'name': 'Euro', 'symbol': '€', },
+    game: {'name': 'GAME', },
+    gbp:  {'name': 'British Pound', 'symbol': '£', },
+    link: {'name': 'Chainlink', },
+    lsk:  {'name': 'Lisk', },
+    ltc:  {'name': 'Litecoin', 'symbol': 'Ł', },
+    luna: {'name': 'LUNA', },
+    mkr:  {'name': 'MKR', },
+    pln:  {'name': 'Polish Zloty', 'symbol': 'zł', },
+    usd:  {'name': 'US Dollar', 'symbol': '$', },
+    usdt: {'name': 'USD Tether', },
+    xrp:  {'name': 'Ripple', 'symbol': 'Ʀ', },
+    zec:  {'name': 'ZCash', },
+    ada:  {'name': 'Cardano', },
+    bnb:  {'name': 'Binance Coin', },
+    doge: {'name': 'Doge Coin', },
+    fil:  {'name': 'Filecoin', },
+    czk:  {'name': 'Czech Krown', 'symbol': 'Kč', },
+    jpy:  {'name': 'Japanese Yen', 'symbol': '¥', },
+    busd: {'name': 'BUSD', },
+    usdc: {'name': 'USDC', },
+    uni:  {'name': 'Uniswap', },
 }
 
 src_exchanges = collections.OrderedDict()
 src_exchanges['binance-com'] = {
-#    'disabled': True,
+    #    'disabled': True,
 
-    'name': 'Binance',
-    'url': 'https://binance.com/',
-    'api_url': 'https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
+    'name':      'Binance',
+    'url':       'https://binance.com/',
+    'api_url':   'https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
 
     # https://www.binance.com/en/markets
-    'crypto': [
+    'crypto':    [
         btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc,
         # FIXME we need a BNB/USDT pair for example
     ],
-    'fiats': [
+    'fiats':     [
         usdt, eur, gbp, bnb, busd,
     ],
 
     'functions': {
-        'getUrl': "return 'https://api1.binance.com/api/v3/trades?limit=1&symbol=' + crypto + fiat",
+        'getUrl':                  "return 'https://api1.binance.com/api/v3/trades?limit=1&symbol=' + crypto + fiat",
         'getRateFromExchangeData': 'return data[0].price',
     },
 }
 
 src_exchanges['bitstamp-net'] = {
-#    'disabled': True,
+    #    'disabled': True,
 
-    'name': 'Bitstamp',
-    'url': 'https://bitstamp.net/',
-    'api_url': 'https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
+    'name':      'Bitstamp',
+    'url':       'https://bitstamp.net/',
+    'api_url':   'https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
 
     # https://www.bitstamp.net/markets/
-    'crypto': [
+    'crypto':    [
         btc, etc, ltc, xrp, uni, eth,
     ],
-    'fiats': [
+    'fiats':     [
         usd, eur, gbp, usdc
     ],
 
     'functions': {
-        'getUrl': "return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat",
+        'getUrl':                  "return 'https://www.bitstamp.net/api/v2/ticker/' + crypto + fiat",
         'getRateFromExchangeData': 'return data.ask',
     },
 }
 
 src_exchanges['bitbay-net'] = {
-#    'disabled': True,
+    #    'disabled': True,
 
-    'name': 'BitBay',
-    'url': 'https://bitbay.net/',
-    'api_url': 'https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
+    'name':      'BitBay',
+    'url':       'https://bitbay.net/',
+    'api_url':   'https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
     'validator': bitbay_ticker_validator,
 
-    'crypto': [
+    'crypto':    [
         btc, bsv, btg, comp, dash, dot, etc, eth, game, link, lsk, ltc, luna, mkr, xrp, zec,
     ],
-    'fiats': [
+    'fiats':     [
         eur, gbp, pln, usd,
     ],
 
     'functions': {
-        'getUrl': "return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'",
+        'getUrl':                  "return 'https://bitbay.net/API/Public/' + crypto + fiat + '/ticker.json'",
         'getRateFromExchangeData': 'return data.ask',
     },
 }
 
 src_exchanges['coinmate-io'] = {
-#    'disabled': True,
+    #    'disabled': True,
 
-    'name': 'Coinmate',
-    'url': 'https://coinmate.io/',
-    'api_url': 'https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
+    'name':      'Coinmate',
+    'url':       'https://coinmate.io/',
+    'api_url':   'https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
     'validator': coinmate_ticker_validator,
 
     # https://coinmate.io/trade
-    'crypto': [
+    'crypto':    [
         btc, eth, ltc, xrp, dash, bch,
     ],
-    'fiats': [
+    'fiats':     [
         czk, eur,
     ],
 
     'functions': {
-        'getUrl': "return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat",
+        'getUrl':                  "return 'https://coinmate.io/api/ticker?currencyPair=' + crypto + '_' + fiat",
         'getRateFromExchangeData': 'return data.data.ask',
     },
 }
 
 src_exchanges['kraken-com'] = {
-#    'disabled': True,
+    #    'disabled': True,
 
-    'name': 'Kraken',
-    'url': 'https://kraken.com/',
-    'api_url': 'https://api.kraken.com/0/public/Ticker?pair={crypto}{pair}',
+    'name':      'Kraken',
+    'url':       'https://kraken.com/',
+    'api_url':   'https://api.kraken.com/0/public/Ticker?pair={crypto}{pair}',
     'validator': kraken_ticker_validator,
 
     # https://support.kraken.com/hc/en-us/articles/360001185506
     # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
-    'crypto': [
+    'crypto':    [
         btc, eth, ltc, xrp, ada, doge, dot, etc, zec,
     ],
-    'fiats': [
+    'fiats':     [
         usd, eur, gbp, jpy, usdt,
     ],
 
     'functions': {
-        'getUrl': "return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat",
+        'getUrl':                  "return 'https://api.kraken.com/0/public/Ticker?pair=' + crypto + fiat",
         # some tricker to work around odd asset naming used in returned reponse as main key
         'getRateFromExchangeData': "return data.result[Object.keys(data['result'])[0]].a[0]",
     },
 }
+
 
 ######################################################################
 
@@ -275,15 +279,16 @@ def abort(msg: str = 'Aborted') -> None:
 def do_api_call(queue, exchange: Dict[str, Dict], ex_data: Dict, crypto: str, pair: str) -> None:
     url: str = ex_data['api_url'].format(crypto=crypto, pair=pair)
     response = req.get(url)
-#    print('#{}: {}'.format(response.status_code, url), end='')
-#    time.sleep(0.5)
+    #    print('#{}: {}'.format(response.status_code, url), end='')
+    #    time.sleep(0.5)
 
     validator = ex_data.get('validator', default_ticker_validator)
     rc: bool = validator(response, crypto, pair)
     queue.put({
-        'rc': rc, 'stamp': int(round(time.time() * 1000)),
+        'rc':   rc, 'stamp': int(round(time.time() * 1000)),
         'name': exchange, 'crypto': crypto, 'pair': pair,
-        })
+    })
+
 
 def do_api_call_error_callback(msg: str) -> None:
     print('Error Callback: {}'.format(msg))
@@ -299,13 +304,14 @@ def build_header() -> List[str]:
         '// https://doc.qt.io/qt-5/qtqml-javascript-resources.html',
         '.pragma library',
         '',
-        ]
+    ]
+
 
 def build_currencies(currencies: Dict[str, Dict]) -> List[str]:
     # currency and token info
     result = [
         'var currencies = {',
-        ]
+    ]
 
     keys = list(currencies.keys())
     keys.sort()
@@ -327,10 +333,11 @@ def build_currencies(currencies: Dict[str, Dict]) -> List[str]:
 
     return result
 
+
 def build_exchanges(exchanges: Dict[str, Dict]) -> List[str]:
     result = [
         'var exchanges = {',
-        ]
+    ]
 
     for exchange, ex_data in exchanges.items():
         if 'pairs' in ex_data:
@@ -338,19 +345,19 @@ def build_exchanges(exchanges: Dict[str, Dict]) -> List[str]:
                 '\t"{}": {{'.format(exchange),
                 '\t\t"name": "{}",'.format(ex_data['name']),
                 '\t\t"url": "{}",'.format(ex_data['url']),
-                ]
+            ]
 
             result += [
                 '\t\t"getUrl": function(crypto, fiat) {',
                 '\t\t\t{}'.format(ex_data['functions']['getUrl']),
                 '\t\t},',
-                ]
+            ]
 
             result += [
                 '\t\t"getRateFromExchangeData": function(data, crypto, fiat) {',
                 '\t\t\t{}'.format(ex_data['functions']['getRateFromExchangeData']),
                 '\t\t},'
-                ]
+            ]
 
             result.append('\t\t"pairs": {')
             for crypto, pairs in ex_data['pairs'].items():
@@ -362,12 +369,11 @@ def build_exchanges(exchanges: Dict[str, Dict]) -> List[str]:
             result += [
                 '\t\t},',
                 '\t},',
-                ]
+            ]
 
     result += ['}', '']
 
     return result
-
 
 
 #############################G#########################################
@@ -384,20 +390,19 @@ def process_exchanges(src_exchanges: Dict[str, Dict], args) -> Dict:
             print('  {}: DISABLED'.format(exchange))
             continue
 
-        cache_dir = os.path.join('.gen-cache', exchange)
-
         result[exchange] = collections.OrderedDict({
-            'name': ex_data['name'],
-            'url': ex_data['url'],
+            'name':      ex_data['name'],
+            'url':       ex_data['url'],
             'functions': ex_data['functions'],
-            'pairs': collections.OrderedDict(),
-            })
+            'pairs':     collections.OrderedDict(),
+        })
 
-        # total number of tries needed:
         all_items = ex_data['crypto'] + ex_data['fiats']
         # remove duplicates
         all_items = list(dict.fromkeys(all_items))
         all_items.sort()
+
+        cache_dir = os.path.join('.gen-cache', exchange)
 
         # we need to use Manager to allow subprocesses to access our queue
         queue = mp.Manager().Queue()
@@ -406,12 +411,12 @@ def process_exchanges(src_exchanges: Dict[str, Dict], args) -> Dict:
             for item in all_items:
                 # skip pairs FIAT-CRYPTO
                 if item in ex_data['fiats']:
-                   continue
+                    continue
 
                 for pair in all_items:
                     # just in case of any dupes in source data
                     if item == pair or (item in result[exchange]['pairs']
-                        and pair in result[exchange]['pairs'][item]):
+                                        and pair in result[exchange]['pairs'][item]):
                         continue
 
                     # see if we have old cache file already
@@ -429,10 +434,10 @@ def process_exchanges(src_exchanges: Dict[str, Dict], args) -> Dict:
                                     cache_rc = cache['rc']
 
                     if use_cached_data:
-                        queue.put({'rc': cache_rc, 'name': exchange, 'crypto': item, 'pair': pair,'cache': True})
+                        queue.put({'rc': cache_rc, 'name': exchange, 'crypto': item, 'pair': pair, 'cache': True})
                     else:
                         pool.apply_async(func=do_api_call, args=(queue, exchange, ex_data, item, pair),
-                            error_callback=do_api_call_error_callback)
+                                         error_callback=do_api_call_error_callback)
                     total_checks_cnt += 1
 
             # No more pool submissions
@@ -465,9 +470,9 @@ def process_exchanges(src_exchanges: Dict[str, Dict], args) -> Dict:
                     # create fresh cache entry
                     with open(cache_file, 'w') as fh:
                         cache = {
-                            'rc': response['rc'],
+                            'rc':    response['rc'],
                             'stamp': response['stamp'],
-                            }
+                        }
                         fh.write(json.dumps(cache))
 
                 cnt += 1
@@ -479,7 +484,7 @@ def process_exchanges(src_exchanges: Dict[str, Dict], args) -> Dict:
             # Summary
             print('  {}: total: {}, paired: {}, skipped: {}, cache hits: {} ({:>.0f}%)'.format(
                 exchange, cnt, pair_success_cnt, pair_fail_cnt,
-                pair_from_cache, (pair_from_cache * 100)/cnt))
+                pair_from_cache, (pair_from_cache * 100) / cnt))
 
     return result
 
@@ -533,11 +538,11 @@ def threshold(arg_value: str) -> int:
     multiplier = MIN
     if unit != '':
         mm = {
-            'h': HOUR,          # hour
-            'd': DAY,           # day
-            'w': 7 * DAY,       # week
-            'm': 30 * DAY,      # month
-            'y': 365 * DAY,     # year
+            'h': HOUR,  # hour
+            'd': DAY,  # day
+            'w': 7 * DAY,  # week
+            'm': 30 * DAY,  # month
+            'y': 365 * DAY,  # year
         }
         multiplier = mm[unit]
 
@@ -550,17 +555,17 @@ CACHE_THRESHOLD = '1m'
 
 parser = argparse.ArgumentParser()
 ag = parser.add_argument_group('Options')
-ag.add_argument('-t', '--threshold', action='store', dest='threshold', type=threshold,
+ag.add_argument(
+    '-t', '--threshold', action='store', dest='threshold', type=threshold, default=CACHE_THRESHOLD,
     help='Cache validity threshold in format XXXZ where XXX is number in range 1-999, '
-        'Z is (optional) units specifier: "h", "d", "w", "m", "y". If unit is not specified, '
-        'value is considered specified in minutes. Default value: {}'.format(CACHE_THRESHOLD),
-    default=CACHE_THRESHOLD)
+         'Z is (optional) units specifier: "h", "d", "w", "m", "y". If unit is not specified, '
+         'value is considered specified in minutes. Default value: {}'.format(CACHE_THRESHOLD))
 ag.add_argument('-n', '--nocache', action='store_true', dest='no_cache', default=False,
-    help='Ignore validation result cache and always do the full API check.')
+                help='Ignore validation result cache and always do the full API check.')
 ag.add_argument('-o', '--out', action='store', dest='file', type=str,
-    help='Optional. Name of JS file to be generated.')
+                help='Optional. Name of JS file to be generated.')
 ag.add_argument('-f', '--force', action='store_true', dest='force',
-    help='Enforces ignoring certain issues (missing icons, existing target file).')
+                help='Enforces ignoring certain issues (missing icons, existing target file).')
 ag.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False)
 args = parser.parse_args()
 
@@ -575,16 +580,17 @@ missing_icons_cnt = check_icons(result_exchanges)
 if missing_icons_cnt != 0 and not args.force:
     abort('Missing {} currency icons.'.format(missing_icons_cnt))
 
-result = build_header()
-result += build_currencies(currencies)
-result += build_exchanges(result_exchanges)
+if args.verbose or args.file is not None:
+    buffer = build_header()
+    buffer += build_currencies(currencies)
+    buffer += build_exchanges(result_exchanges)
 
-if args.verbose:
-    print('\n'.join(result))
+    if args.verbose:
+        print('\n'.join(buffer))
 
-if args.file is not None:
-    try:
-        with open(args.file, 'w') as fh:
-            fh.writelines('\n'.join(result))
-    except IOError:
-        abort('Failed writing to: {}'.format(args.file))
+    if args.file is not None:
+        try:
+            with open(args.file, 'w') as fh:
+                fh.writelines('\n'.join(buffer))
+        except IOError:
+            abort('Failed writing to: {}'.format(args.file))

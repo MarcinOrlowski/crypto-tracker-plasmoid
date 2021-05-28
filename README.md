@@ -153,6 +153,7 @@ other apps):
  * [Crypto Tracker widget in KDE store](https://store.kde.org/p/1481524/)
  * [Plasmoid developer helper tools](https://github.com/marcinorlowski/plasmoid-tools)
  * [Logo font: Evil Empire](https://www.dafont.com/evil-empire.font?text=Crypto+Tracker)
+ * [Crypto Currency Logos](https://cryptologos.cc/)
 
 ---
 

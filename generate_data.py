@@ -329,6 +329,7 @@ usdc = 'USDC'
 uni = 'UNI'
 xmr = 'XMR'
 atom = 'ATOM'
+xlm = 'XLM'
 
 ######################################################################
 
@@ -366,6 +367,7 @@ currencies = {
     uni:  {'name': 'Uniswap', },
     xmr:  {'name': 'Monero', },
     atom: {'name': 'Cosmos', },
+    xlm:  {'name': 'Stellar', },
 }
 
 exchange_definitions = Exchanges(cache_dir=os.path.expanduser(CACHE_DIR_NAME))
@@ -380,6 +382,7 @@ exchange_definitions.add(
         # https://www.binance.com/en/markets
         currencies=[
             btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc, xmr, atom,
+            xlm,
             usdt, eur, gbp, bnb, busd,
         ],
 
@@ -418,7 +421,7 @@ exchange_definitions.add(
         api_url='https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
 
         currencies=[
-            btc, bsv, btg, comp, dash, dot, etc, eth, game, link, lsk, ltc, luna, mkr, xrp, zec,
+            btc, bsv, btg, comp, dash, dot, etc, eth, game, link, lsk, ltc, luna, mkr, xrp, zec, xlm,
             eur, gbp, pln, usd,
         ],
 
@@ -460,7 +463,7 @@ exchange_definitions.add(
         # https://support.kraken.com/hc/en-us/articles/360001185506
         # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
         currencies=[
-            btc, eth, ltc, xrp, ada, doge, dot, etc, zec, atom,
+            btc, eth, ltc, xrp, ada, doge, dot, etc, zec, atom, xlm,
             usd, eur, gbp, jpy, usdt,
         ],
 

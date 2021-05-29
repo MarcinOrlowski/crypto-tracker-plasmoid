@@ -548,7 +548,7 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
 def check_icons(currencies: List[str]) -> int:
     img_dir = 'src/contents/images/'
 
-    ignored = ['CZK', 'EUR', 'GBP', 'JPY', 'PLN', 'USD', ]
+    ignored = ['CZK', 'EUR', 'GBP', 'JPY', 'PLN', ]
 
     cnt = skipped = 0
     header_shown = False

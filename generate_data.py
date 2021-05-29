@@ -40,6 +40,61 @@ CACHE_DIR_NAME = '~/.cryto-tracker-plasmoid-gen-cache'
 
 ######################################################################
 
+class TestResult:
+    def __init__(self, ex_code: str, crypto: str, pair: str, rc: bool = False, stamp: int = None, cached: bool = False,
+                 use_cache: bool = True, cache_dir: str = None):
+        self.ex_code = ex_code
+        self.crypto = crypto
+        self.pair = pair
+
+        self.rc = rc
+        self.stamp = stamp if stamp else now()
+        self.cached = cached
+        self.use_cache = use_cache
+
+        # path to target location for cache files for specified exchange that factoried this object
+        self.cache_dir = cache_dir
+
+    def cache_load(self, cache_threshold: int) -> bool:
+        result = False
+        if self.use_cache:
+            cache_file = os.path.join(self.cache_dir, '{}-{}'.format(self.crypto, self.pair))
+            if os.path.exists(cache_file):
+                with open(cache_file, 'r') as fh:
+                    cached_data = json.load(fh)
+                    if now() < (cached_data['stamp'] + cache_threshold):
+                        self.rc = cached_data['rc']
+                        self.stamp = cached_data['stamp']
+                        self.cached = True
+                        result = True
+        return result
+
+    def cache_save(self) -> None:
+        if self.use_cache:
+            cache_file = os.path.join(self.cache_dir, '{}-{}'.format(self.crypto, self.pair))
+            if not os.path.exists(self.cache_dir):
+                os.makedirs(self.cache_dir)
+
+            with open(cache_file, 'w') as fh:
+                cache = {'rc': self.rc, 'stamp': self.stamp, }
+                fh.write(json.dumps(cache))
+
+
+######################################################################
+
+class Config:
+    def __init__(self, args):
+        self.verbose = args.verbose
+        self.use_cache = not args.no_cache
+        self.cache_threshold = args.cache_threshold
+        self.file = args.file
+        self.force = args.force
+        self.dry_run = args.dry_run
+        self.show = args.show
+
+
+######################################################################
+
 class Exchange():
     def __init__(self, code: str, name: str, url: str, api_url: str, currencies: List[str], functions: Dict[str, str],
                  disabled: bool = False, cache_dir: str = None):
@@ -85,7 +140,7 @@ class Exchange():
         url = self.api_url.format(crypto = crypto, pair = pair)
         return req.get(url)
 
-    def get_test_result(self, crypto: str, pair: str, use_cache: bool, cache_threshold: int) -> "TestResult":
+    def build_tr_object(self, crypto: str, pair: str, use_cache: bool, cache_threshold: int) -> "TestResult":
         tr = TestResult(ex_code = self.code, crypto = crypto, pair = pair, use_cache = use_cache, cache_dir = self.cache_dir)
         tr.cache_load(cache_threshold)
         return tr
@@ -157,6 +212,10 @@ class Exchanges:
     def __init__(self, cache_dir: str = None):
         self._container = collections.OrderedDict()
         self.cache_dir = os.path.expanduser(CACHE_DIR_NAME) if cache_dir is None else cache_dir
+        self.config = None
+
+        self._queue = None
+        self._pool = None
 
     def __iter__(self):
         return ExchangesIterator(self)
@@ -191,68 +250,89 @@ class Exchanges:
         keys = list(self._container.keys())
         return self._container.get(keys[idx])
 
-    def add_clone_if_enabled(self, ex: Exchange) -> None:
-        if not ex.disabled:
-            self.add(copy.deepcopy(ex))
+    def init(self, config: Config):
+        self.config = config
 
-    def import_all_enabled(self, exs: "Exchanges") -> None:
-        for ex in exs:
-            self.add_clone_if_enabled(ex)
+        self._pool = mp.Pool(processes = 6)
+        self._queue = mp.Manager().Queue()
 
+    def do_api_call(self, tr: TestResult) -> None:
+        ex = self.get(tr.ex_code)
+        response = ex.download_ticker(tr.crypto, tr.pair)
+        tr.rc = ex.is_ticker_valid(response, tr.crypto, tr.pair)
+        self._queue.put(tr)
 
-######################################################################
+    def do_api_call_error_callback(self, msg: str) -> None:
+        print('Error Callback: {}'.format(msg))
 
-class TestResult:
-    def __init__(self, ex_code: str, crypto: str, pair: str, rc: bool = False, stamp: int = None, cached: bool = False,
-                 use_cache: bool = True, cache_dir: str = None):
-        self.ex_code = ex_code
-        self.crypto = crypto
-        self.pair = pair
+    def process_single_exchange(self, ex: Exchange) -> int:
+        """
+        Pair all currencies of given Exchange (each with each other).
 
-        self.rc = rc
-        self.stamp = stamp if stamp else now()
-        self.cached = cached
-        self.use_cache = use_cache
+        :param ex:
 
-        # path to target location for cache files for specified exchange that factoried this object
-        self.cache_dir = cache_dir
+        :return: Number of elements queued for API checks.
+        """
 
-    def cache_load(self, cache_threshold: int) -> bool:
-        result = False
-        if self.use_cache:
-            cache_file = os.path.join(self.cache_dir, '{}-{}'.format(self.crypto, self.pair))
-            if os.path.exists(cache_file):
-                with open(cache_file, 'r') as fh:
-                    cached_data = json.load(fh)
-                    if now() < (cached_data['stamp'] + cache_threshold):
-                        self.rc = cached_data['rc']
-                        self.stamp = cached_data['stamp']
-                        self.cached = True
-                        result = True
-        return result
+        if self.config.verbose:
+            print('  Processing {}'.format(ex.code))
+        total_number_of_checks = 0
+        for item in ex.currencies:
+            for pair in ex.currencies:
+                if ex.pair_exists(item, pair):
+                    continue
 
-    def cache_save(self) -> None:
-        if self.use_cache:
-            cache_file = os.path.join(self.cache_dir, '{}-{}'.format(self.crypto, self.pair))
-            if not os.path.exists(self.cache_dir):
-                os.makedirs(self.cache_dir)
+                tr = ex.build_tr_object(item, pair, self.config.use_cache, self.config.cache_threshold)
+                if tr.cached:
+                    self._queue.put(tr)
+                else:
+                    self._pool.apply_async(func = self.do_api_call, args = (tr,),
+                                           error_callback = self.do_api_call_error_callback)
+                total_number_of_checks += 1
 
-            with open(cache_file, 'w') as fh:
-                cache = {'rc': self.rc, 'stamp': self.stamp, }
-                fh.write(json.dumps(cache))
+        return total_number_of_checks
 
+    def process_exchanges(self) -> None:
+        # remove non enabled exchanges
+        disabled = [key for key, ex in self._container.items() if ex.disabled]
+        for key in disabled:
+            del self._container[key]
 
-######################################################################
+        total_number_of_checks = 0
+        for _, ex in self._container.items():
+            total_number_of_checks += self.process_single_exchange(ex)
 
-class Config:
-    def __init__(self, args):
-        self.verbose = args.verbose
-        self.use_cache = not args.no_cache
-        self.cache_threshold = args.cache_threshold
-        self.file = args.file
-        self.force = args.force
-        self.dry_run = args.dry_run
-        self.show = args.show
+        # No more pool submissions
+        self._pool.close()
+
+        # Waiting for processes to complete...
+        pair_success_cnt = pair_skipped_cnt = pair_from_cache = 0
+        cnt = 0
+        while cnt < total_number_of_checks:
+            response: TestResult = self._queue.get()
+            if response.rc:
+                ex = self.get(response.ex_code)
+                ex.add_pair(response.crypto, response.pair)
+                pair_success_cnt += 1
+            else:
+                pair_skipped_cnt += 1
+
+            if not response.cached:
+                if not config.dry_run:
+                    response.cache_save()
+            else:
+                pair_from_cache += 1
+
+            cnt += 1
+            print('  {} of {}...'.format(cnt, total_number_of_checks), end = '\r')
+
+        # to ensure we do not leave too early (should not happen though)
+        self._pool.join()
+
+        # Summary
+        print('Total {total} pairs ({cache_percent:>.0f}% cached), invalid: {skipped}, confirmed: {paired}'.format(
+            total = cnt, paired = pair_success_cnt, skipped = pair_skipped_cnt,
+            cache_cnt = pair_from_cache, cache_percent = (pair_from_cache * 100) / cnt))
 
 
 ######################################################################
@@ -298,44 +378,44 @@ name = 'name'
 symbol = 'symbol'
 
 currencies = {
+    ada:  {name: 'Cardano', },
+    atom: {name: 'Cosmos', },
     bch:  {name: 'Bitcoin Cash', symbol: '฿', },
+    bnb:  {name: 'Binance Coin', },
     bsv:  {name: 'Bitcoin SV', },
     btc:  {name: 'Bitcoin', symbol: '₿', },
     btg:  {name: 'Bitcoin Gold', },
+    busd: {name: 'Binance USD', symbol: 'B$', },
     comp: {name: 'Compound', },
-    dash: {name: 'DASH', },
+    czk:  {name: 'Czech Krown', symbol: 'Kč', },
+    dash: {name: 'Dash', },
+    doge: {name: 'Dogecoin', },
     dot:  {name: 'Polkadot', },
     etc:  {name: 'Ethereum Classic', },
     eth:  {name: 'Ethereum', symbol: 'Ξ', },
     eur:  {name: 'Euro', symbol: '€', },
-    game: {name: 'GAME', },
+    fil:  {name: 'Filecoin', },
+    game: {name: 'GameCredits', },
     gbp:  {name: 'British Pound', symbol: '£', },
+    jpy:  {name: 'Japanese Yen', symbol: '¥', },
     link: {name: 'Chainlink', },
     lsk:  {name: 'Lisk', },
     ltc:  {name: 'Litecoin', symbol: 'Ł', },
-    luna: {name: 'LUNA', },
+    luna: {name: 'Terra', },
     mkr:  {name: 'Maker', },
     pln:  {name: 'Polish Zloty', symbol: 'zł', },
+    uni:  {name: 'Uniswap', },
     usd:  {name: 'US Dollar', symbol: '$', },
+    usdc: {name: 'USD Coin', symbol: '$C', },
     usdt: {name: 'USD Tether', symbol: '$T', },
+    xlm:  {name: 'Stellar', },
+    xmr:  {name: 'Monero', },
     xrp:  {name: 'Ripple', symbol: 'Ʀ', },
     zec:  {name: 'ZCash', },
-    ada:  {name: 'Cardano', },
-    bnb:  {name: 'Binance Coin', },
-    doge: {name: 'Dogecoin', },
-    fil:  {name: 'Filecoin', },
-    czk:  {name: 'Czech Krown', symbol: 'Kč', },
-    jpy:  {name: 'Japanese Yen', symbol: '¥', },
-    busd: {name: 'Binance USD', symbol: 'B$', },
-    usdc: {name: 'USD Coin', symbol: '$C', },
-    uni:  {name: 'Uniswap', },
-    xmr:  {name: 'Monero', },
-    atom: {name: 'Cosmos', },
-    xlm:  {name: 'Stellar', },
 }
 
-exchange_definitions = Exchanges(cache_dir = os.path.expanduser(CACHE_DIR_NAME))
-exchange_definitions.add(
+exchanges = Exchanges(cache_dir = os.path.expanduser(CACHE_DIR_NAME))
+exchanges.add(
     Exchange(
         # disabled = True,
         code = 'binance-com',
@@ -354,7 +434,7 @@ exchange_definitions.add(
         },
     ))
 
-exchange_definitions.add(
+exchanges.add(
     Exchange(
         # disabled = True,
         code = 'bitstamp-net',
@@ -373,7 +453,7 @@ exchange_definitions.add(
         },
     ))
 
-exchange_definitions.add(
+exchanges.add(
     Bitbay(
         # disabled = True,
         code = 'bitbay-net',
@@ -391,7 +471,7 @@ exchange_definitions.add(
         },
     ))
 
-exchange_definitions.add(
+exchanges.add(
     Coinmate(
         # disabled = True,
         code = 'coinmate-io',
@@ -410,7 +490,7 @@ exchange_definitions.add(
         },
     ))
 
-exchange_definitions.add(
+exchanges.add(
     Kraken(
         # disabled = True,
 
@@ -444,19 +524,6 @@ def abort(msg: str = 'Aborted') -> None:
 # Returns current timestamp in millis
 def now() -> int:
     return int(round(time.time() * 1000))
-
-
-######################################################################
-
-def do_api_call(queue, tr: TestResult) -> None:
-    ex = exs.get(tr.ex_code)
-    response = ex.download_ticker(tr.crypto, tr.pair)
-    tr.rc = ex.is_ticker_valid(response, tr.crypto, tr.pair)
-    queue.put(tr)
-
-
-def do_api_call_error_callback(msg: str) -> None:
-    print('Error Callback: {}'.format(msg))
 
 
 ######################################################################
@@ -510,14 +577,10 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
             '\t\t"name": "{}",'.format(ex.name),
             '\t\t"url": "{}",'.format(ex.url),
             '\t\t"api_url": "{}",'.format(ex.api_url),
-        ]
-
-        result += [
             '\t\t"getRateFromExchangeData": function(data, crypto, pair) {',
             '\t\t\t{}'.format(ex.functions['getRateFromExchangeData']),
             '\t\t},',
         ]
-
         result.append('\t\t"pairs": {')
         for crypto, pairs in ex.pairs.items():
             pairs.sort()
@@ -533,81 +596,6 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
     result += ['}', '']
 
     return result
-
-
-#############################G#########################################
-
-def process_exchange(pool, queue, ex: Exchange, config: Config) -> int:
-    """
-    Pair all currencies of given Exchange (each with each other).
-
-    :param pool:
-    :param queue:
-    :param ex:
-    :param config:
-
-    :return: Number of elements queued for API checks.
-    """
-
-    if config.verbose:
-        print('  Processing {}'.format(ex.code))
-    total_number_of_checks = 0
-    for item in ex.currencies:
-        for pair in ex.currencies:
-            if ex.pair_exists(item, pair):
-                continue
-
-            tr = ex.get_test_result(item, pair, config.use_cache, config.cache_threshold)
-            if tr.cached:
-                queue.put(tr)
-            else:
-                pool.apply_async(func = do_api_call, args = (queue, tr,), error_callback = do_api_call_error_callback)
-            total_number_of_checks += 1
-
-    return total_number_of_checks
-
-
-def process_exchanges(exchanges: Exchanges, config: Config) -> None:
-    print('Processing exchange data')
-
-    with mp.Pool(processes = 6) as pool:
-        queue = mp.Manager().Queue()
-
-        total_number_of_checks = 0
-        for ex in exchanges:
-            total_number_of_checks += process_exchange(pool, queue, ex, config)
-
-        # No more pool submissions
-        pool.close()
-
-        # Waiting for processes to complete...
-        pair_success_cnt = pair_skipped_cnt = pair_from_cache = 0
-        cnt = 0
-        while cnt < total_number_of_checks:
-            response: TestResult = queue.get()
-            if response.rc:
-                ex = exs.get(response.ex_code)
-                ex.add_pair(response.crypto, response.pair)
-                pair_success_cnt += 1
-            else:
-                pair_skipped_cnt += 1
-
-            if not response.cached:
-                if not config.dry_run:
-                    response.cache_save()
-            else:
-                pair_from_cache += 1
-
-            cnt += 1
-            print('  {} of {}...'.format(cnt, total_number_of_checks), end = '\r')
-
-        # to ensure we do not leave too early (should not happen though)
-        pool.join()
-
-        # Summary
-        print('Total: {total}, cache hits: {cache_cnt} ({cache_percent:>.0f}%), paired: {paired}, skipped: {skipped}'.format(
-            total = cnt, paired = pair_success_cnt, skipped = pair_skipped_cnt,
-            cache_cnt = pair_from_cache, cache_percent = (pair_from_cache * 100) / cnt))
 
 
 ######################################################################
@@ -632,7 +620,7 @@ def check_icons(currencies: List[str]) -> int:
                 header_shown = True
             print('    {}'.format(icon_file))
             cnt += 1
-    print('  Total {} coins in use, {} icons skipped, {} missing'.format(len(currencies), skipped, cnt))
+    print('Total {} coins in use, {} icons skipped, {} missing'.format(len(currencies), skipped, cnt))
     return cnt
 
 
@@ -694,9 +682,8 @@ config = Config(parser.parse_args())
 if config.file is not None and not config.force and os.path.exists(config.file):
     abort('File already exists: {}'.format(config.file))
 
-exs = Exchanges()
-exs.import_all_enabled(exchange_definitions)
-process_exchanges(exs, config)
+exchanges.init(config)
+exchanges.process_exchanges()
 
 # check for icons of used coins
 curr = list(currencies.keys())
@@ -708,7 +695,7 @@ if missing_icons_cnt != 0 and not config.force:
 if config.show or config.file is not None:
     buffer = build_header()
     buffer += build_currencies(currencies)
-    buffer += build_exchanges(exs)
+    buffer += build_exchanges(exchanges)
 
     if config.show:
         print('\n'.join(buffer))

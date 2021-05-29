@@ -28,9 +28,31 @@ import multiprocessing as mp
 import os
 import re
 import requests as req
+import signal
 import sys
 import time
 from typing import Optional, Callable, Dict, List
+
+
+######################################################################
+
+def abort(msg: str = 'Aborted') -> None:
+    print('*** {}'.format(msg))
+    sys.exit(1)
+
+
+# Returns current timestamp in millis
+def now() -> int:
+    return int(round(time.time() * 1000))
+
+
+######################################################################
+
+def signal_handler(signal, frame):
+    sys.exit(1)
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 ######################################################################
 
@@ -265,6 +287,14 @@ class Exchange:
 
 ######################################################################
 
+class Binance(Exchange):
+    def is_ticker_valid(self, response: req.Response) -> bool:
+        if response.status_code != req.codes.ok:
+            return False
+        resp = json.loads(response.text)
+        print('%r' % resp)
+
+
 class Bitstamp(Exchange):
     def do_api_call(self, queue, tr: TestResult) -> None:
         url = self.api_url.format(crypto = tr.crypto.lower(), pair = tr.pair.lower())
@@ -479,7 +509,7 @@ class Exchanges:
 
 exchanges = Exchanges(config, os.path.expanduser(CACHE_DIR_NAME))
 exchanges.add(
-    Exchange(
+    Binance(
         # disabled = True,
         code = 'binance-com',
         name = 'Binance',
@@ -562,19 +592,6 @@ exchanges.add(
             'getRateFromExchangeData': "return data.result[Object.keys(data['result'])[0]].a[0]",
         },
     ))
-
-
-######################################################################
-
-
-def abort(msg: str = 'Aborted') -> None:
-    print('*** {}'.format(msg))
-    sys.exit(1)
-
-
-# Returns current timestamp in millis
-def now() -> int:
-    return int(round(time.time() * 1000))
 
 
 ######################################################################

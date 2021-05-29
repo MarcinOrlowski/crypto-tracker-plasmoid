@@ -292,7 +292,13 @@ class Binance(Exchange):
         if response.status_code != req.codes.ok:
             return False
         resp = json.loads(response.text)
-        print('%r' % resp)
+        if not isinstance(resp, List):
+            return False
+        for field in ['id', 'price', 'qty', 'quoteQty', 'time', ]:
+            if field not in resp:
+                return False
+
+        return True
 
 
 class Bitstamp(Exchange):

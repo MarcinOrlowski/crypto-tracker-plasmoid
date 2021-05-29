@@ -130,13 +130,15 @@ class Config:
         self.force = args.force
         self.dry_run = args.dry_run
         self.show = args.show
+        self.no_gauge = args.no_gauge
 
 
 ######################################################################
 
 class Exchange():
     def __init__(self, code: str, name: str, url: str, api_url: str, currencies: List[str],
-                 functions: Dict[str, str], disabled: bool = False, cache_dir: str = None):
+                 functions: Dict[str, str], disabled: bool = False, cache_dir: str = None,
+                 valid_ticker_pairs: List[str] = None):
         self.code = code
         self.name = name
         self.url = url
@@ -147,6 +149,7 @@ class Exchange():
 
         self.pairs = collections.OrderedDict()
         self.cache_dir = cache_dir
+        self.valid_ticker_pairs = valid_ticker_pairs
 
     @property
     def currencies(self) -> List[str]:
@@ -159,11 +162,14 @@ class Exchange():
         items.sort()
         self._currencies = items
 
-    def _validate(self, response: req.Response, crypto: str, pair: str) -> bool:
+    def is_ticker_valid(self, response) -> bool:
         return response.status_code == req.codes.ok
 
-    def is_ticker_valid(self, response, crypto: str, pair: str) -> bool:
-        return self._validate(response, crypto, pair)
+    def is_ticker_pair_valid(self, crypto: str, pair: str) -> bool:
+        # all pairs allowed unless list is explicitly given
+        if self.valid_ticker_pairs is None:
+            return True
+        return crypto + pair in self.valid_ticker_pairs
 
     def pair_exists(self, item: str, pair: str) -> bool:
         return item == pair or (item in self.pairs and pair in self.pairs[item])
@@ -175,19 +181,26 @@ class Exchange():
         if pair not in self.pairs[crypto]:
             self.pairs[crypto].append(pair)
 
-    def download_ticker(self, crypto, pair):
-        url = self.api_url.format(crypto = crypto, pair = pair)
-        return req.get(url)
-
     def build_tr_object(self, crypto: str, pair: str, config: Config) -> "TestResult":
         tr = TestResult(ex_code = self.code, crypto = crypto, pair = pair,
                         use_cache = config.use_cache, cache_dir = self.cache_dir)
         tr.cache_load(config.cache_threshold)
         return tr
 
+    def do_api_call(self, queue, tr: TestResult) -> None:
+        url = self.api_url.format(crypto = tr.crypto.lower(), pair = tr.pair.lower())
+        response = req.get(url)
+        tr.rc = self.is_ticker_valid(response)
+        queue.put(tr)
+
+    def do_api_call_error_callback(self, msg: str) -> None:
+        print('Error Callback: {}'.format(msg))
+
+
+######################################################################
 
 class Bitbay(Exchange):
-    def _validate(self, response: req.Response, crypto: str, pair: str) -> bool:
+    def is_ticker_valid(self, response: req.Response) -> bool:
         if response.status_code != req.codes.ok:
             return False
 
@@ -199,7 +212,7 @@ class Bitbay(Exchange):
 
 
 class Coinmate(Exchange):
-    def _validate(self, response: req.Response, crypto: str, pair: str) -> bool:
+    def is_ticker_valid(self, response: req.Response) -> bool:
         if response.status_code != req.codes.ok:
             return False
 
@@ -213,7 +226,7 @@ class Coinmate(Exchange):
 
 
 class Kraken(Exchange):
-    def _validate(self, response: req.Response, crypto: str, pair: str) -> bool:
+    def is_ticker_valid(self, response: req.Response) -> bool:
         if response.status_code != req.codes.ok:
             return False
 
@@ -295,15 +308,6 @@ class Exchanges:
 
         self._queue = mp.Manager().Queue()
 
-    def do_api_call(self, tr: TestResult) -> None:
-        ex = self.get(tr.ex_code)
-        response = ex.download_ticker(tr.crypto, tr.pair)
-        tr.rc = ex.is_ticker_valid(response, tr.crypto, tr.pair)
-        self._queue.put(tr)
-
-    def do_api_call_error_callback(self, msg: str) -> None:
-        print('Error Callback: {}'.format(msg))
-
     def process_exchanges(self) -> None:
         # Cycling thru all exchanges we need to check to avoid doing single API endpoint flood
         total_number_of_checks = 0
@@ -312,12 +316,15 @@ class Exchanges:
         for curr_key, curr_data in currencies.items():
             for pair_key, pair_data in currencies.items():
                 for _, ex in self._container.items():
+                    if not ex.is_ticker_pair_valid(curr_key, pair_key):
+                        continue
+
                     tr = ex.build_tr_object(curr_key, pair_key, config)
                     if tr.cached:
                         self._queue.put(tr)
                     else:
-                        pool.apply_async(func = self.do_api_call, args = (tr,),
-                                         error_callback = self.do_api_call_error_callback)
+                        pool.apply_async(func = ex.do_api_call, args = (self._queue, tr,),
+                                         error_callback = ex.do_api_call_error_callback)
                     total_number_of_checks += 1
 
         # No more pool submissions
@@ -341,13 +348,14 @@ class Exchanges:
             elif not config.dry_run:
                 response.cache_save()
 
-            cnt += 1
+            if not config.no_gauge:
+                gauge_max = 60
+                gauge_progress = math.floor(gauge_max * (cnt / total_number_of_checks))
+                msg = '[{}{}]: {} of {}'.format('=' * gauge_progress, ' ' * (gauge_max - gauge_progress),
+                                                cnt, total_number_of_checks)
+                print(msg, end = '\r')
 
-            gauge_max = 60
-            gauge_progress = math.floor(gauge_max * (cnt / total_number_of_checks))
-            msg = '[{}{}]: {} of {}'.format('=' * gauge_progress, ' ' * (gauge_max - gauge_progress),
-                                            cnt, total_number_of_checks)
-            print(msg, end = '\r')
+            cnt += 1
 
         # clear last progress message
         print(' ' * len(msg), end = '\r')
@@ -373,10 +381,6 @@ exchanges.add(
         api_url = 'https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
 
         # https://www.binance.com/en/markets
-        currencies = [
-            'BTC', 'ETC', 'ETH', 'XRP', 'ADA', 'BNB', 'DOGE', 'FIL', 'LINK', 'LTC', 'XMR', 'ATOM', 'XLM',
-            'USDT', 'EUR', 'GBP', 'BNB', 'BUSD',
-        ],
 
         functions = {
             'getRateFromExchangeData': 'return data[0].price',
@@ -391,10 +395,16 @@ exchanges.add(
         url = 'https://bitstamp.net/',
         api_url = 'https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
 
-        # https://www.bitstamp.net/markets/
-        currencies = [
-            'BTC', 'ETC', 'LTC', 'XRP', 'UNI', 'ETH',
-            'USD', 'EUR', 'GBP', 'USDC'
+        # as per GET method docs https://www.bitstamp.net/api/#ticker
+        valid_ticker_pairs = [
+            'BTCUSD', 'BTCEUR', 'BTCGBP', 'BTCPAX', 'BTCUSDC', 'GBPUSD', 'GBPEUR', 'EURUSD', 'ETHUSD', 'ETHEUR', 'ETHBTC', 'ETHGBP',
+            'ETHPAX', 'ETHUSDC', 'XRPUSD', 'XRPEUR', 'XRPBTC', 'XRPGBP', 'XRPPAX', 'UNIUSD', 'UNIEUR', 'UNIBTC', 'LTCUSD', 'LTCEUR',
+            'LTCBTC', 'LTCGBP', 'LINKUSD', 'LINKEUR', 'LINKGBP', 'LINKBTC', 'LINKETH', 'XLMBTC', 'XLMUSD', 'XLMEUR', 'XLMGBP',
+            'BCHUSD', 'BCHEUR', 'BCHBTC', 'BCHGBP', 'AAVEUSD', 'AAVEEUR', 'AAVEBTC', 'ALGOUSD', 'ALGOEUR', 'ALGOBTC', 'SNXUSD',
+            'SNXEUR', 'SNXBTC', 'BATUSD', 'BATEUR', 'BATBTC', 'MKRUSD', 'MKREUR', 'MKRBTC', 'ZRXUSD', 'ZRXEUR', 'ZRXBTC', 'YFIUSD',
+            'YFIEUR', 'YFIBTC', 'UMAUSD', 'UMAEUR', 'UMABTC', 'OMGUSD', 'OMGEUR', 'OMGGBP', 'OMGBTC', 'KNCUSD', 'KNCEUR', 'KNCBTC',
+            'CRVUSD', 'CRVEUR', 'CRVBTC', 'AUDIOUSD', 'AUDIOEUR', 'AUDIOBTC', 'USDCUSD', 'USDCEUR', 'DAIUSD', 'PAXUSD', 'PAXEUR',
+            'PAXGBP', 'ETH2ETH', 'GUSDUSD',
         ],
 
         functions = {
@@ -410,12 +420,6 @@ exchanges.add(
         url = 'https://bitbay.net/',
         api_url = 'https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
 
-        currencies = [
-            'BTC', 'BSV', 'BTG', 'COMP', 'DASH', 'DOT', 'ETC', 'ETH', 'GAME', 'LINK', 'LSK', 'LTC', 'LUNA', 'MKR', 'XRP', 'ZEC',
-            'XLM',
-            'EUR', 'GBP', 'PLN', 'USD',
-        ],
-
         functions = {
             'getRateFromExchangeData': 'return data.ask',
         },
@@ -430,11 +434,6 @@ exchanges.add(
         api_url = 'https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
 
         # https://coinmate.io/trade
-        currencies = [
-            'BTC', 'ETH', 'LTC', 'XRP', 'DASH', 'BCH',
-            'CZK', 'EUR',
-        ],
-
         functions = {
             'getRateFromExchangeData': 'return data.data.ask',
         },
@@ -451,10 +450,6 @@ exchanges.add(
 
         # https://support.kraken.com/hc/en-us/articles/360001185506
         # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
-        currencies = [
-            'BTC', 'ETH', 'LTC', 'XRP', 'ADA', 'DOGE', 'DOT', 'ETC', 'ZEC', 'ATOM', 'XLM',
-            'USD', 'EUR', 'GBP', 'JPY', 'USDT',
-        ],
 
         functions = {
             # some tricks to work around odd asset naming used in returned response as main key
@@ -626,6 +621,7 @@ ag.add_argument('-s', '--show', action = 'store_true', dest = 'show', default = 
 ag.add_argument('-f', '--force', action = 'store_true', dest = 'force',
                 help = 'Enforces ignoring certain issues (missing icons, existing target file).')
 ag.add_argument('-v', '--verbose', action = 'store_true', dest = 'verbose', default = False)
+ag.add_argument('-g', '--nogauge', action = 'store_true', dest = 'no_gauge', default = False)
 ag.add_argument('-d', '--dry-run', action = 'store_true', dest = 'dry_run', default = False)
 config = Config(parser.parse_args())
 

@@ -83,8 +83,8 @@ Item {
 				title: "Crypto"
 			}
 			QtControls.TableViewColumn {
-				role: "fiat"
-				title: "Fiat"
+				role: "pair"
+				title: "Pair"
 			}
 
 			onDoubleClicked: editExchange(exchangesTable.currentRow)
@@ -229,7 +229,7 @@ Item {
 			} else {
 				exchangesModel.set(selectedRow, ex)
 			}
-			saveExchanges();	
+			saveExchanges();
 		}
 
 		ExchangeConfig {

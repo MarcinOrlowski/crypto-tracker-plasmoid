@@ -27,7 +27,7 @@ GridLayout {
     property string exchange: ''
     property string crypto: ''
     property bool hideCryptoLogo: false
-    property string fiat: ''
+    property string pair: ''
     property bool useCustomLocale: false
     property string customLocaleName: ''
     property int refreshRate: 5
@@ -52,7 +52,7 @@ GridLayout {
             exchange = json.exchange
             crypto = json.crypto
             hideCryptoLogo = json.hideCryptoLogo
-            fiat = json.fiat
+            pair = json.pair
             refreshRate = json.refreshRate
             hidePriceDecimals = json.hidePriceDecimals
             useCustomLocale = json.useCustomLocale
@@ -75,15 +75,15 @@ GridLayout {
 
     onExchangeChanged: {
         invalidateExchangeData();
-        fetchRate(exchange, crypto, fiat)
+        fetchRate(exchange, crypto, pair)
     }
     onCryptoChanged: {
         invalidateExchangeData();
-        fetchRate(exchange, crypto, fiat)
+        fetchRate(exchange, crypto, pair)
     }
-    onFiatChanged: {
+    onPairChanged: {
         invalidateExchangeData();
-        fetchRate(exchange, crypto, fiat)
+        fetchRate(exchange, crypto, pair)
     }
 
     // --------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ GridLayout {
     function getDirectionColor(direction, colorUp, colorDown) {
         var color = '#ffffff'
         switch(direction) {
-            case +1: 
+            case +1:
                 color = colorUp
                 break
             case -1:
@@ -170,7 +170,7 @@ GridLayout {
         onClicked: {
             if (!dataDownloadInProgress) {
                 tickerRoot.opacity = 0.5
-                fetchRate(exchange, crypto, fiat)
+                fetchRate(exchange, crypto, pair)
             }
         }
     }
@@ -204,7 +204,7 @@ GridLayout {
 
         var rateText = ''
         var localeName = useCustomLocale ? customLocaleName : ''
-        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeName), Crypto.getCurrencySymbol(fiat))
+        var tmp = Number(rate).toLocaleCurrencyString(Qt.locale(localeName), Crypto.getCurrencySymbol(pair))
         if(hidePriceDecimals) tmp = tmp.replace(Qt.locale(localeName).decimalPoint + '00', '')
         rateText += '<span>' + tmp + '</span>'
 
@@ -261,7 +261,7 @@ GridLayout {
         fontSizeMode: Text.Fit
         // minimumPixelSize: bitcoinIcon.width * 0.7
         minimumPixelSize: 8
-        // font.pixelSize: 12			
+        // font.pixelSize: 12
         text: getTrendingMarkerText()
     }
 
@@ -277,7 +277,7 @@ GridLayout {
         fontSizeMode: Text.Fit
         // minimumPixelSize: bitcoinIcon.width * 0.7
         minimumPixelSize: 8
-        // font.pixelSize: 12			
+        // font.pixelSize: 12
         text: getCurrentRateText()
     }
 
@@ -295,7 +295,7 @@ GridLayout {
         fontSizeMode: Text.Fit
         // minimumPixelSize: bitcoinIcon.width * 0.7
         minimumPixelSize: 8
-        // font.pixelSize: 12			
+        // font.pixelSize: 12
         text: getRateChangeMarkerText()
     }
 
@@ -332,13 +332,13 @@ GridLayout {
 		running: true
 		repeat: true
 		triggeredOnStart: true
-		onTriggered: fetchRate(exchange, crypto, fiat)
+		onTriggered: fetchRate(exchange, crypto, pair)
 	}
 
     // --------------------------------------------------------------------------------------------
 
     property bool dataDownloadInProgress: false
-    function fetchRate(exchange, crypto, fiat) {
+    function fetchRate(exchange, crypto, pair) {
         if (dataDownloadInProgress) return
 
         if (!Crypto.exchangeExists(exchange)) {
@@ -349,16 +349,16 @@ GridLayout {
             if (crypto !== '') console.debug("fetchRate(): unsupported crypto: '" + crypto + "' on exchange: '" + exchange + "'")
             return
         }
-        if (!Crypto.isFiatSupported(exchange, crypto, fiat)) {
-            if (fiat !== '') 
-            console.debug("fetchRate(): unsupported fiat: '" + fiat + "' for crypto: '" + crypto + "' on exchange: '" + exchange + "'")
+        if (!Crypto.isPairSupported(exchange, crypto, pair)) {
+            if (pair !== '')
+            console.debug("fetchRate(): unsupported pair: '" + pair + "' for crypto: '" + crypto + "' on exchange: '" + exchange + "'")
             return
         }
         dataDownloadInProgress = true;
 
-        // console.debug(`fetchRate(): ex: ${exchange}, crypto: ${crypto}, fiat: ${fiat}`)
+        // console.debug(`fetchRate(): ex: ${exchange}, crypto: ${crypto}, pair: ${pair}`)
 
-        downloadExchangeRate(exchange, crypto, fiat, function(rate) {
+        downloadExchangeRate(exchange, crypto, pair, function(rate) {
             var now = new Date()
             lastUpdateMillis = now.getTime()
 
@@ -375,7 +375,7 @@ GridLayout {
                     rateChangeDirection = 1
                 } else if (currentRate < lastRate) {
                     rateChangeDirection = -1
-                } else { 
+                } else {
                     rateChangeDirection = 0
                 }
                 rateDirectionChanged = (lastRateChangeDirection !== rateChangeDirection)
@@ -388,9 +388,9 @@ GridLayout {
 
     // --------------------------------------------------------------------------------------------
 
-    function downloadExchangeRate(exchangeId, crypto, fiat, callback) {
+    function downloadExchangeRate(exchangeId, crypto, pair, callback) {
         var exchange = Crypto.exchanges[exchangeId]
-        var url = exchange.getUrl(crypto, fiat)
+        var url = exchange.api_url.replace('{crypto}', crypto).replace('{pair}', pair)
 
         // console.debug(`Download url: '${url}'`)
 
@@ -398,7 +398,7 @@ GridLayout {
             if(data.length !== 0) {
                 try {
                     var json = JSON.parse(data)
-                    callback(exchange.getRateFromExchangeData(json, crypto, fiat))
+                    callback(exchange.getRateFromExchangeData(json, crypto, pair))
                 } catch (error) {
                     console.error("downloadExchangeRate(): Response parsing failed for '" + url + "'")
                     console.error("downloadExchangeRate(): error: '" + error + "'")

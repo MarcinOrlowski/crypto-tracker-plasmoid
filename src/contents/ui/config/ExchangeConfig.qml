@@ -21,7 +21,7 @@ ColumnLayout {
 
     property string exchange: undefined
     property string crypto: undefined
-    property string fiat: undefined
+    property string pair: undefined
 
     // ------------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ ColumnLayout {
             'exchange': Crypto.getExchageIds()[0],
             'crypto': Crypto.BTC,   // FIXME we should fetch first crypto supported by exchange!
             'hideCryptoLogo': false,
-            'fiat': Crypto.USD,   // FIXME we should fetch first fiat supported by exchange!
+            'pair': Crypto.USD,   // FIXME we should fetch first pair supported by exchange!
             'refreshRate': 15,
             'hidePriceDecimals': false,
             'useCustomLocale': false,
@@ -52,12 +52,13 @@ ColumnLayout {
     }
 
     function fromJson(json) {
-        exchangeEnabled.checked = json.enabled
+        console.debug(json)
 
+        exchangeEnabled.checked = json.enabled
 		exchange = json.exchange
 		crypto = json.crypto
 		hideCryptoLogo.checked = json.hideCryptoLogo
-		fiat = json.fiat
+        pair = json.pair
 		refreshRate.value = json.refreshRate
 		hidePriceDecimals.checked = json.hidePriceDecimals
 		useCustomLocale.checked = json.useCustomLocale
@@ -82,7 +83,7 @@ ColumnLayout {
             'exchange': exchange,
             'crypto': crypto,
             'hideCryptoLogo': hideCryptoLogo.checked,
-            'fiat': fiat,
+            'pair': pair,
             'refreshRate': refreshRate.value,
             'hidePriceDecimals': hidePriceDecimals.checked,
             'useCustomLocale': useCustomLocale.checked,
@@ -105,7 +106,7 @@ ColumnLayout {
 
     onExchangeChanged: updateModels()
     onCryptoChanged: updateModels()
-    onFiatChanged: updateModels()
+    onPairChanged: updateModels()
 
     function updateModels() {
         if (typeof exchange === 'undefined' || exchange === '') {
@@ -115,14 +116,14 @@ ColumnLayout {
             var cryptos = Crypto.getAllExchangeCryptos(exchange);
             crypto = cryptos[0].value
         }
-        if (typeof fiat === 'undefined' || fiat === '' || !Crypto.isFiatSupported(exchange, crypto, fiat)) {
-            var fiats = Crypto.getFiatsForCrypto(exchange, crypto)
-            fiat = fiats[0].value
+        if (typeof pair === 'undefined' || pair === '' || !Crypto.isPairSupported(exchange, crypto, pair)) {
+            var pairs = Crypto.getPairsForCrypto(exchange, crypto)
+            pair = pairs[0].value
         }
 
         exchangeComboBox.updateModel(exchange)
         cryptoComboBox.updateModel(exchange, crypto)
-        fiatComboBox.updateModel(exchange, crypto, fiat)
+        pairComboBox.updateModel(exchange, crypto, pair)
     }
 
     // ------------------------------------------------------------------------------------------------------------------------
@@ -160,7 +161,7 @@ ColumnLayout {
             Component.onCompleted: updateModel(exchange)
         }
 
-        ClickableLabel { 
+        ClickableLabel {
             text: '<u>' + Crypto.getExchangeUrl(exchange) + '</u>'
             url: Crypto.getExchangeUrl(exchange)
         }
@@ -213,29 +214,29 @@ ColumnLayout {
         // ------------------------------------------------------------------------------------------------------------------------
 
         RowLayout {
-            Kirigami.FormData.label: i18n('Fiat')
+            Kirigami.FormData.label: i18n('Pair')
             enabled: exchangeEnabled.checked
 
             PlasmaComponents.ComboBox {
-                id: fiatComboBox
+                id: pairComboBox
                 textRole: "text"
-                onCurrentIndexChanged: fiat = model[currentIndex]['value']
+                onCurrentIndexChanged: pair = model[currentIndex]['value']
 
-                function updateModel(exchange, crypto, fiat) {
+                function updateModel(exchange, crypto, pair) {
                     var tmp = []
                     var currentIdx = 0
                     if ((exchange in Crypto.exchanges) && (crypto in Crypto.exchanges[exchange]['pairs'])) {
-                        tmp = Crypto.getFiatsForCrypto(exchange, crypto)
+                        tmp = Crypto.getPairsForCrypto(exchange, crypto)
                         for (var i=0; i<tmp.length; i++) {
-                            if (tmp[i].value === fiat) currentIdx = i
+                            if (tmp[i].value === pair) currentIdx = i
                         }
                     }
                     model = tmp
                     currentIndex = currentIdx
 
-                    // as the model is swapped, different fiat can be at already set index
+                    // as the model is swapped, different pair can be at already set index
                     // so we need to ensure we do not use old value any more.
-                    fiat = model[currentIndex]['value']
+                    pair = model[currentIndex]['value']
                 }
             }
 

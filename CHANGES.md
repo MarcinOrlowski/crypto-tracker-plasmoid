@@ -1,6 +1,6 @@
-* v2.1.0 (2021-05-28)
+* v2.1.0 (2021-05-29)
   * Added support for Binance.
-  * Added multiple coints and tokens to existing exchanges.
+  * Significantly increased number of supported pairs to 365 total.
   * Added ability to cross pair currencies with bigger flexibility.
   * Improved Kraken's API response handling.
 

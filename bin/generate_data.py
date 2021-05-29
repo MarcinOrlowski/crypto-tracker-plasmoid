@@ -685,7 +685,8 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
 ######################################################################
 
 def check_icons(currencies: List[str]) -> int:
-    img_dir = 'src/contents/images/'
+    my_dir = os.path.dirname(os.path.realpath(__file__))
+    img_dir = os.path.join(my_dir, '../src/contents/images/')
 
     ignored = ['CZK', 'EUR', 'GBP', 'JPY', 'PLN', ]
 
@@ -696,7 +697,7 @@ def check_icons(currencies: List[str]) -> int:
             skipped += 1
             continue
 
-        icon_file = os.path.join(img_dir, '{}.svg'.format(pair))
+        icon_file = os.path.join(img_dir, '{}.svg'.format(pair.lower()))
         res = os.path.exists(icon_file)
         if not res:
             if not header_shown:

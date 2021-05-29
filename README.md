@@ -19,28 +19,13 @@ lifted once I will have the time to rework configuration UI to properly handle u
 
 ## Table of Contents ##
 
- * [Exchange ticker](#ticker)
+ * [Exchange ticker](docs/ticker.md)
  * [Configuration](docs/config.md)
  * [Installation](docs/install.md)
  * [Upgrading](docs/install.md#upgrading)
  * [Additional resources](#additional-resources)
  * [Changelog](CHANGES.md)
  * [License](#license)
-
----
-
-## Ticker ##
-
-Widget will display separate ticker for each configured exchange:
-
-![Ticker](docs/img/ticker.png)
-
- 1. Crypto icon (optional)
- 1. Price trend (calculated in wider time window)
- 1. Current exchange rate
- 1. Exchange rate since last update (so this one may go up/down pretty often)
-
----
 
 ## Additional resources ##
 

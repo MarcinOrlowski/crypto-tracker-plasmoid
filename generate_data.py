@@ -7,7 +7,7 @@
 # @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
 # @copyright 2021 Marcin Orlowski
 # @license   http://www.opensource.org/licenses/mit-license.php MIT
-# @link      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
+# @'LINK'      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
 #
 ######################################################################
 #
@@ -20,7 +20,7 @@
 #
 ######################################################################
 
-import copy
+import math
 import argparse
 import collections
 import json
@@ -41,8 +41,8 @@ CACHE_DIR_NAME = '~/.cryto-tracker-plasmoid-gen-cache'
 ######################################################################
 
 class TestResult:
-    def __init__(self, ex_code: str, crypto: str, pair: str, rc: bool = False, stamp: int = None, cached: bool = False,
-                 use_cache: bool = True, cache_dir: str = None):
+    def __init__(self, ex_code: str, crypto: str, pair: str, rc: bool = False, stamp: int = None,
+                 cached: bool = False, use_cache: bool = True, cache_dir: str = None):
         self.ex_code = ex_code
         self.crypto = crypto
         self.pair = pair
@@ -52,7 +52,7 @@ class TestResult:
         self.cached = cached
         self.use_cache = use_cache
 
-        # path to target location for cache files for specified exchange that factoried this object
+        # path to target location for cache files for specified exchange that produced this object
         self.cache_dir = cache_dir
 
     def cache_load(self, cache_threshold: int) -> bool:
@@ -96,8 +96,8 @@ class Config:
 ######################################################################
 
 class Exchange():
-    def __init__(self, code: str, name: str, url: str, api_url: str, currencies: List[str], functions: Dict[str, str],
-                 disabled: bool = False, cache_dir: str = None):
+    def __init__(self, code: str, name: str, url: str, api_url: str, currencies: List[str],
+                 functions: Dict[str, str], disabled: bool = False, cache_dir: str = None):
         self.code = code
         self.name = name
         self.url = url
@@ -140,9 +140,10 @@ class Exchange():
         url = self.api_url.format(crypto = crypto, pair = pair)
         return req.get(url)
 
-    def build_tr_object(self, crypto: str, pair: str, use_cache: bool, cache_threshold: int) -> "TestResult":
-        tr = TestResult(ex_code = self.code, crypto = crypto, pair = pair, use_cache = use_cache, cache_dir = self.cache_dir)
-        tr.cache_load(cache_threshold)
+    def build_tr_object(self, crypto: str, pair: str, config: Config) -> "TestResult":
+        tr = TestResult(ex_code = self.code, crypto = crypto, pair = pair,
+                        use_cache = config.use_cache, cache_dir = self.cache_dir)
+        tr.cache_load(config.cache_threshold)
         return tr
 
 
@@ -215,7 +216,6 @@ class Exchanges:
         self.config = None
 
         self._queue = None
-        self._pool = None
 
     def __iter__(self):
         return ExchangesIterator(self)
@@ -253,7 +253,6 @@ class Exchanges:
     def init(self, config: Config):
         self.config = config
 
-        self._pool = mp.Pool(processes = 6)
         self._queue = mp.Manager().Queue()
 
     def do_api_call(self, tr: TestResult) -> None:
@@ -265,49 +264,34 @@ class Exchanges:
     def do_api_call_error_callback(self, msg: str) -> None:
         print('Error Callback: {}'.format(msg))
 
-    def process_single_exchange(self, ex: Exchange) -> int:
-        """
-        Pair all currencies of given Exchange (each with each other).
-
-        :param ex:
-
-        :return: Number of elements queued for API checks.
-        """
-
-        if self.config.verbose:
-            print('  Processing {}'.format(ex.code))
-        total_number_of_checks = 0
-        for item in ex.currencies:
-            for pair in ex.currencies:
-                if ex.pair_exists(item, pair):
-                    continue
-
-                tr = ex.build_tr_object(item, pair, self.config.use_cache, self.config.cache_threshold)
-                if tr.cached:
-                    self._queue.put(tr)
-                else:
-                    self._pool.apply_async(func = self.do_api_call, args = (tr,),
-                                           error_callback = self.do_api_call_error_callback)
-                total_number_of_checks += 1
-
-        return total_number_of_checks
-
     def process_exchanges(self) -> None:
         # remove non enabled exchanges
         disabled = [key for key, ex in self._container.items() if ex.disabled]
         for key in disabled:
             del self._container[key]
 
+        # Cycling thru all exchanges we need to check to avoid doing single API endpoint flood
         total_number_of_checks = 0
-        for _, ex in self._container.items():
-            total_number_of_checks += self.process_single_exchange(ex)
+
+        pool = mp.Pool(processes = 6)
+        for curr_key, curr_data in currencies.items():
+            for pair_key, pair_data in currencies.items():
+                for _, ex in self._container.items():
+                    tr = ex.build_tr_object(curr_key, pair_key, config)
+                    if tr.cached:
+                        self._queue.put(tr)
+                    else:
+                        pool.apply_async(func = self.do_api_call, args = (tr,),
+                                         error_callback = self.do_api_call_error_callback)
+                    total_number_of_checks += 1
 
         # No more pool submissions
-        self._pool.close()
+        pool.close()
 
         # Waiting for processes to complete...
         pair_success_cnt = pair_skipped_cnt = pair_from_cache = 0
         cnt = 0
+        msg = ''
         while cnt < total_number_of_checks:
             response: TestResult = self._queue.get()
             if response.rc:
@@ -317,17 +301,24 @@ class Exchanges:
             else:
                 pair_skipped_cnt += 1
 
-            if not response.cached:
-                if not config.dry_run:
-                    response.cache_save()
-            else:
+            if response.cached:
                 pair_from_cache += 1
+            elif not config.dry_run:
+                response.cache_save()
 
             cnt += 1
-            print('  {} of {}...'.format(cnt, total_number_of_checks), end = '\r')
+
+            gauge_max = 60
+            gauge_progress = math.floor(gauge_max * (cnt / total_number_of_checks))
+            msg = '[{}{}]: {} of {}'.format('=' * gauge_progress, ' ' * (gauge_max - gauge_progress),
+                                            cnt, total_number_of_checks)
+            print(msg, end = '\r')
+
+        # clear last progress message
+        print(' ' * len(msg), end = '\r')
 
         # to ensure we do not leave too early (should not happen though)
-        self._pool.join()
+        pool.join()
 
         # Summary
         print('Total {total} pairs ({cache_percent:>.0f}% cached), invalid: {skipped}, confirmed: {paired}'.format(
@@ -337,82 +328,44 @@ class Exchanges:
 
 ######################################################################
 
-ada = 'ADA'
-bch = 'BCH'
-bsv = 'BSV'
-btc = 'BTC'
-btg = 'BTG'
-comp = 'COMP'
-dash = 'DASH'
-dot = 'DOT'
-etc = 'ETC'
-eth = 'ETH'
-eur = 'EUR'
-game = 'GAME'
-gbp = 'GBP'
-link = 'LINK'
-lsk = 'LSK'
-ltc = 'LTC'
-luna = 'LUNA'
-mkr = 'MKR'
-pln = 'PLN'
-usd = 'USD'
-usdt = 'USDT'
-xrp = 'XRP'
-zec = 'ZEC'
-doge = 'DOGE'
-bnb = 'BNB'
-fil = 'FIL'
-czk = 'CZK'
-jpy = 'JPY'
-busd = 'BUSD'
-usdc = 'USDC'
-uni = 'UNI'
-xmr = 'XMR'
-atom = 'ATOM'
-xlm = 'XLM'
+currencies = {
+    'ADA':  {'name': 'Cardano', },
+    'ATOM': {'name': 'Cosmos', },
+    'BCH':  {'name': 'Bitcoin Cash', 'symbol': '฿', },
+    'BNB':  {'name': 'Binance Coin', },
+    'BSV':  {'name': 'Bitcoin SV', },
+    'BTC':  {'name': 'Bitcoin', 'symbol': '₿', },
+    'BTG':  {'name': 'Bitcoin Gold', },
+    'BUSD': {'name': 'Binance USD', 'symbol': 'B$', },
+    'COMP': {'name': 'Compound', },
+    'CZK':  {'name': 'Czech Krown', 'symbol': 'Kč', },
+    'DASH': {'name': 'Dash', },
+    'DOGE': {'name': 'Dogecoin', },
+    'DOT':  {'name': 'Polkadot', },
+    'ETC':  {'name': 'Ethereum Classic', },
+    'ETH':  {'name': 'Ethereum', 'symbol': 'Ξ', },
+    'EUR':  {'name': 'Euro', 'symbol': '€', },
+    'FIL':  {'name': 'Filecoin', },
+    'GAME': {'name': 'GameCredits', },
+    'GBP':  {'name': 'British Pound', 'symbol': '£', },
+    'JPY':  {'name': 'Japanese Yen', 'symbol': '¥', },
+    'LINK': {'name': 'Chainlink', },
+    'LSK':  {'name': 'Lisk', },
+    'LTC':  {'name': 'Litecoin', 'symbol': 'Ł', },
+    'LUNA': {'name': 'Terra', },
+    'MKR':  {'name': 'Maker', },
+    'PLN':  {'name': 'Polish Zloty', 'symbol': 'zł', },
+    'UNI':  {'name': 'Uniswap', },
+    'USD':  {'name': 'US Dollar', 'symbol': '$', },
+    'USDC': {'name': 'USD Coin', 'symbol': '$C', },
+    'USDT': {'name': 'USD Tether', 'symbol': '$T', },
+    'XLM':  {'name': 'Stellar', },
+    'XMR':  {'name': 'Monero', },
+    'XRP':  {'name': 'Ripple', 'symbol': 'Ʀ', },
+    'ZEC':  {'name': 'ZCash', },
+}
 
 ######################################################################
-
-name = 'name'
-symbol = 'symbol'
-
-currencies = {
-    ada:  {name: 'Cardano', },
-    atom: {name: 'Cosmos', },
-    bch:  {name: 'Bitcoin Cash', symbol: '฿', },
-    bnb:  {name: 'Binance Coin', },
-    bsv:  {name: 'Bitcoin SV', },
-    btc:  {name: 'Bitcoin', symbol: '₿', },
-    btg:  {name: 'Bitcoin Gold', },
-    busd: {name: 'Binance USD', symbol: 'B$', },
-    comp: {name: 'Compound', },
-    czk:  {name: 'Czech Krown', symbol: 'Kč', },
-    dash: {name: 'Dash', },
-    doge: {name: 'Dogecoin', },
-    dot:  {name: 'Polkadot', },
-    etc:  {name: 'Ethereum Classic', },
-    eth:  {name: 'Ethereum', symbol: 'Ξ', },
-    eur:  {name: 'Euro', symbol: '€', },
-    fil:  {name: 'Filecoin', },
-    game: {name: 'GameCredits', },
-    gbp:  {name: 'British Pound', symbol: '£', },
-    jpy:  {name: 'Japanese Yen', symbol: '¥', },
-    link: {name: 'Chainlink', },
-    lsk:  {name: 'Lisk', },
-    ltc:  {name: 'Litecoin', symbol: 'Ł', },
-    luna: {name: 'Terra', },
-    mkr:  {name: 'Maker', },
-    pln:  {name: 'Polish Zloty', symbol: 'zł', },
-    uni:  {name: 'Uniswap', },
-    usd:  {name: 'US Dollar', symbol: '$', },
-    usdc: {name: 'USD Coin', symbol: '$C', },
-    usdt: {name: 'USD Tether', symbol: '$T', },
-    xlm:  {name: 'Stellar', },
-    xmr:  {name: 'Monero', },
-    xrp:  {name: 'Ripple', symbol: 'Ʀ', },
-    zec:  {name: 'ZCash', },
-}
 
 exchanges = Exchanges(cache_dir = os.path.expanduser(CACHE_DIR_NAME))
 exchanges.add(
@@ -425,8 +378,8 @@ exchanges.add(
 
         # https://www.binance.com/en/markets
         currencies = [
-            btc, etc, eth, xrp, ada, bnb, doge, fil, link, ltc, xmr, atom, xlm,
-            usdt, eur, gbp, bnb, busd,
+            'BTC', 'ETC', 'ETH', 'XRP', 'ADA', 'BNB', 'DOGE', 'FIL', 'LINK', 'LTC', 'XMR', 'ATOM', 'XLM',
+            'USDT', 'EUR', 'GBP', 'BNB', 'BUSD',
         ],
 
         functions = {
@@ -444,8 +397,8 @@ exchanges.add(
 
         # https://www.bitstamp.net/markets/
         currencies = [
-            btc, etc, ltc, xrp, uni, eth,
-            usd, eur, gbp, usdc
+            'BTC', 'ETC', 'LTC', 'XRP', 'UNI', 'ETH',
+            'USD', 'EUR', 'GBP', 'USDC'
         ],
 
         functions = {
@@ -462,8 +415,9 @@ exchanges.add(
         api_url = 'https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
 
         currencies = [
-            btc, bsv, btg, comp, dash, dot, etc, eth, game, link, lsk, ltc, luna, mkr, xrp, zec, xlm,
-            eur, gbp, pln, usd,
+            'BTC', 'BSV', 'BTG', 'COMP', 'DASH', 'DOT', 'ETC', 'ETH', 'GAME', 'LINK', 'LSK', 'LTC', 'LUNA', 'MKR', 'XRP', 'ZEC',
+            'XLM',
+            'EUR', 'GBP', 'PLN', 'USD',
         ],
 
         functions = {
@@ -481,8 +435,8 @@ exchanges.add(
 
         # https://coinmate.io/trade
         currencies = [
-            btc, eth, ltc, xrp, dash, bch,
-            czk, eur,
+            'BTC', 'ETH', 'LTC', 'XRP', 'DASH', 'BCH',
+            'CZK', 'EUR',
         ],
 
         functions = {
@@ -502,8 +456,8 @@ exchanges.add(
         # https://support.kraken.com/hc/en-us/articles/360001185506
         # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
         currencies = [
-            btc, eth, ltc, xrp, ada, doge, dot, etc, zec, atom, xlm,
-            usd, eur, gbp, jpy, usdt,
+            'BTC', 'ETH', 'LTC', 'XRP', 'ADA', 'DOGE', 'DOT', 'ETC', 'ZEC', 'ATOM', 'XLM',
+            'USD', 'EUR', 'GBP', 'JPY', 'USDT',
         ],
 
         functions = {
@@ -603,7 +557,7 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
 def check_icons(currencies: List[str]) -> int:
     img_dir = 'src/contents/images/'
 
-    ignored = [czk, eur, gbp, jpy, pln, usd, ]
+    ignored = ['CZK', 'EUR', 'GBP', 'JPY', 'PLN', 'USD', ]
 
     cnt = skipped = 0
     header_shown = False

@@ -37,6 +37,45 @@ from typing import Optional, Callable, Dict, List
 CACHE_THRESHOLD = '30d'
 CACHE_DIR_NAME = '~/.cryto-tracker-plasmoid-gen-cache'
 
+######################################################################
+
+currencies = {
+    'ADA':  {'name': 'Cardano', },
+    'ATOM': {'name': 'Cosmos', },
+    'BCH':  {'name': 'Bitcoin Cash', 'symbol': '฿', },
+    'BNB':  {'name': 'Binance Coin', },
+    'BSV':  {'name': 'Bitcoin SV', },
+    'BTC':  {'name': 'Bitcoin', 'symbol': '₿', },
+    'BTG':  {'name': 'Bitcoin Gold', },
+    'BUSD': {'name': 'Binance USD', 'symbol': 'B$', },
+    'COMP': {'name': 'Compound', },
+    'CZK':  {'name': 'Czech Krown', 'symbol': 'Kč', },
+    'DASH': {'name': 'Dash', },
+    'DOGE': {'name': 'Dogecoin', },
+    'DOT':  {'name': 'Polkadot', },
+    'ETC':  {'name': 'Ethereum Classic', },
+    'ETH':  {'name': 'Ethereum', 'symbol': 'Ξ', },
+    'EUR':  {'name': 'Euro', 'symbol': '€', },
+    'FIL':  {'name': 'Filecoin', },
+    'GAME': {'name': 'GameCredits', },
+    'GBP':  {'name': 'British Pound', 'symbol': '£', },
+    'JPY':  {'name': 'Japanese Yen', 'symbol': '¥', },
+    'LINK': {'name': 'Chainlink', },
+    'LSK':  {'name': 'Lisk', },
+    'LTC':  {'name': 'Litecoin', 'symbol': 'Ł', },
+    'LUNA': {'name': 'Terra', },
+    'MKR':  {'name': 'Maker', },
+    'PLN':  {'name': 'Polish Zloty', 'symbol': 'zł', },
+    'UNI':  {'name': 'Uniswap', },
+    'USD':  {'name': 'US Dollar', 'symbol': '$', },
+    'USDC': {'name': 'USD Coin', 'symbol': '$C', },
+    'USDT': {'name': 'USD Tether', 'symbol': '$T', },
+    'XLM':  {'name': 'Stellar', },
+    'XMR':  {'name': 'Monero', },
+    'XRP':  {'name': 'Ripple', 'symbol': 'Ʀ', },
+    'ZEC':  {'name': 'ZCash', },
+}
+
 
 ######################################################################
 
@@ -230,10 +269,11 @@ class Exchanges:
         :param ex: subclass of Exchange to be added
         :return: None
         """
-        if ex.code in self._container:
-            raise ValueError('Exchange with key "{}" already exists.'.format(ex.code))
-        ex.cache_dir = os.path.join(self.cache_dir, ex.code)
-        self._container[ex.code] = ex
+        if not ex.disabled:
+            if ex.code in self._container:
+                raise ValueError('Exchange with key "{}" already exists.'.format(ex.code))
+            ex.cache_dir = os.path.join(self.cache_dir, ex.code)
+            self._container[ex.code] = ex
 
     def get(self, idx_or_key) -> Optional[Exchange]:
         if isinstance(idx_or_key, int):
@@ -265,11 +305,6 @@ class Exchanges:
         print('Error Callback: {}'.format(msg))
 
     def process_exchanges(self) -> None:
-        # remove non enabled exchanges
-        disabled = [key for key, ex in self._container.items() if ex.disabled]
-        for key in disabled:
-            del self._container[key]
-
         # Cycling thru all exchanges we need to check to avoid doing single API endpoint flood
         total_number_of_checks = 0
 
@@ -328,49 +363,10 @@ class Exchanges:
 
 ######################################################################
 
-currencies = {
-    'ADA':  {'name': 'Cardano', },
-    'ATOM': {'name': 'Cosmos', },
-    'BCH':  {'name': 'Bitcoin Cash', 'symbol': '฿', },
-    'BNB':  {'name': 'Binance Coin', },
-    'BSV':  {'name': 'Bitcoin SV', },
-    'BTC':  {'name': 'Bitcoin', 'symbol': '₿', },
-    'BTG':  {'name': 'Bitcoin Gold', },
-    'BUSD': {'name': 'Binance USD', 'symbol': 'B$', },
-    'COMP': {'name': 'Compound', },
-    'CZK':  {'name': 'Czech Krown', 'symbol': 'Kč', },
-    'DASH': {'name': 'Dash', },
-    'DOGE': {'name': 'Dogecoin', },
-    'DOT':  {'name': 'Polkadot', },
-    'ETC':  {'name': 'Ethereum Classic', },
-    'ETH':  {'name': 'Ethereum', 'symbol': 'Ξ', },
-    'EUR':  {'name': 'Euro', 'symbol': '€', },
-    'FIL':  {'name': 'Filecoin', },
-    'GAME': {'name': 'GameCredits', },
-    'GBP':  {'name': 'British Pound', 'symbol': '£', },
-    'JPY':  {'name': 'Japanese Yen', 'symbol': '¥', },
-    'LINK': {'name': 'Chainlink', },
-    'LSK':  {'name': 'Lisk', },
-    'LTC':  {'name': 'Litecoin', 'symbol': 'Ł', },
-    'LUNA': {'name': 'Terra', },
-    'MKR':  {'name': 'Maker', },
-    'PLN':  {'name': 'Polish Zloty', 'symbol': 'zł', },
-    'UNI':  {'name': 'Uniswap', },
-    'USD':  {'name': 'US Dollar', 'symbol': '$', },
-    'USDC': {'name': 'USD Coin', 'symbol': '$C', },
-    'USDT': {'name': 'USD Tether', 'symbol': '$T', },
-    'XLM':  {'name': 'Stellar', },
-    'XMR':  {'name': 'Monero', },
-    'XRP':  {'name': 'Ripple', 'symbol': 'Ʀ', },
-    'ZEC':  {'name': 'ZCash', },
-}
-
-######################################################################
-
 exchanges = Exchanges(cache_dir = os.path.expanduser(CACHE_DIR_NAME))
 exchanges.add(
     Exchange(
-        # disabled = True,
+        disabled = True,
         code = 'binance-com',
         name = 'Binance',
         url = 'https://binance.com/',
@@ -408,7 +404,7 @@ exchanges.add(
 
 exchanges.add(
     Bitbay(
-        # disabled = True,
+        disabled = True,
         code = 'bitbay-net',
         name = 'BitBay',
         url = 'https://bitbay.net/',
@@ -427,7 +423,7 @@ exchanges.add(
 
 exchanges.add(
     Coinmate(
-        # disabled = True,
+        disabled = True,
         code = 'coinmate-io',
         name = 'Coinmate',
         url = 'https://coinmate.io/',
@@ -446,7 +442,7 @@ exchanges.add(
 
 exchanges.add(
     Kraken(
-        # disabled = True,
+        disabled = True,
 
         code = 'kraken-com',
         name = 'Kraken',

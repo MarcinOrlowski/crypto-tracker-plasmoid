@@ -37,6 +37,87 @@ from typing import Optional, Callable, Dict, List
 CACHE_THRESHOLD = '30d'
 CACHE_DIR_NAME = '~/.cryto-tracker-plasmoid-gen-cache'
 
+
+######################################################################
+
+class Config:
+    def __init__(self, args):
+        self.verbose = args.verbose
+        self.use_cache = not args.no_cache
+        self.cache_threshold = args.cache_threshold
+        self.file = args.file
+        self.force = args.force
+        self.dry_run = args.dry_run
+        self.show = args.show
+        self.no_gauge = args.no_gauge
+        self.exchange_filter = args.exchange
+        self.debug = args.debug
+
+        if self.debug:
+            self.no_gauge = True
+
+
+######################################################################
+
+def threshold(arg_value: str) -> int:
+    pat = re.compile(r"^([0-9]{1,3})([hdwmy]?)$")
+    match = pat.match(arg_value)
+    if not match:
+        raise argparse.ArgumentTypeError
+
+    val = int(match.group(1))
+    unit = match.group(2)
+
+    if val == 0:
+        raise argparse.ArgumentTypeError
+
+    # in millis
+    MIN = 60 * 1000
+    HOUR = MIN * 60
+    DAY = 24 * HOUR
+
+    multiplier = MIN
+    if unit != '':
+        mm = {
+            'h': HOUR,
+            'd': DAY,
+            'w': 7 * DAY,
+            'm': 30 * DAY,
+            'y': 365 * DAY,
+        }
+        multiplier = mm[unit]
+
+    # returning value in millis
+    return val * multiplier * 60 * 1000
+
+
+######################################################################
+
+parser = argparse.ArgumentParser()
+ag = parser.add_argument_group('Options')
+ag.add_argument('-t', '--threshold', action = 'store', dest = 'cache_threshold', type = threshold, default = CACHE_THRESHOLD,
+                help = 'Cache validity threshold in format XXXZ where XXX is number in range 1-999, '
+                       'Z is (optional) units specifier: "h", "d", "w", "m", "y". If unit is not specified, '
+                       'minutes are used. Default value: {}'.format(CACHE_THRESHOLD))
+ag.add_argument('-n', '--nocache', action = 'store_true', dest = 'no_cache', default = False,
+                help = 'Ignore validation result cache and always do the full API check.')
+ag.add_argument('-o', '--out', action = 'store', dest = 'file', type = str,
+                help = 'Optional. Name of JS file to be generated.')
+ag.add_argument('-s', '--show', action = 'store_true', dest = 'show', default = False,
+                help = 'Output generated JS code to stdout.')
+ag.add_argument('-f', '--force', action = 'store_true', dest = 'force',
+                help = 'Enforces ignoring certain issues (missing icons, existing target file).')
+ag.add_argument('-e', '--exchange', action = 'store', dest = 'exchange', type = str,
+                help = 'ID of exchange to process. Only this exchange will be used. In such case, "disabled" is ignored.')
+ag.add_argument('-v', '--verbose', action = 'store_true', dest = 'verbose', default = False)
+ag.add_argument('-g', '--nogauge', action = 'store_true', dest = 'no_gauge', default = False)
+ag.add_argument('-r', '--dry-run', action = 'store_true', dest = 'dry_run', default = False)
+ag.add_argument('-d', '--debug', action = 'store_true', dest = 'debug', default = False)
+config = Config(parser.parse_args())
+
+if config.file is not None and not config.force and os.path.exists(config.file):
+    abort('File already exists: {}'.format(config.file))
+
 ######################################################################
 
 currencies = {
@@ -125,24 +206,10 @@ class TestResult:
 
 ######################################################################
 
-class Config:
-    def __init__(self, args):
-        self.verbose = args.verbose
-        self.use_cache = not args.no_cache
-        self.cache_threshold = args.cache_threshold
-        self.file = args.file
-        self.force = args.force
-        self.dry_run = args.dry_run
-        self.show = args.show
-        self.no_gauge = args.no_gauge
-
-
-######################################################################
-
-class Exchange():
+class Exchange:
     def __init__(self, code: str, name: str, url: str, api_url: str,
                  functions: Dict[str, str], disabled: bool = False, cache_dir: str = None,
-                 valid_ticker_pairs: List[str] = None):
+                 valid_ticker_pairs: List[str] = None, config: Config = None):
         self.code = code
         self.name = name
         self.url = url
@@ -153,6 +220,8 @@ class Exchange():
         self.pairs = collections.OrderedDict()
         self.cache_dir = cache_dir
         self.valid_ticker_pairs = valid_ticker_pairs
+
+        self.config = config
 
     def is_ticker_valid(self, response) -> bool:
         return response.status_code == req.codes.ok
@@ -180,16 +249,30 @@ class Exchange():
         return tr
 
     def do_api_call(self, queue, tr: TestResult) -> None:
-        url = self.api_url.format(crypto = tr.crypto.lower(), pair = tr.pair.lower())
+        url = self.api_url.format(crypto = tr.crypto, pair = tr.pair)
         response = req.get(url)
         tr.rc = self.is_ticker_valid(response)
+        self.d('#{sc} isValid:{rc} {url}'.format(url = url, sc = response.status_code, rc = tr.rc))
         queue.put(tr)
 
     def do_api_call_error_callback(self, msg: str) -> None:
         print('Error Callback: {}'.format(msg))
 
+    def d(self, msg):
+        if self.config.debug:
+            print(msg)
+
 
 ######################################################################
+
+class Bitstamp(Exchange):
+    def do_api_call(self, queue, tr: TestResult) -> None:
+        url = self.api_url.format(crypto = tr.crypto.lower(), pair = tr.pair.lower())
+        response = req.get(url)
+        tr.rc = self.is_ticker_valid(response)
+        self.d('#{sc} isValid:{rc} {url}'.format(url = url, sc = response.status_code, rc = tr.rc))
+        queue.put(tr)
+
 
 class Bitbay(Exchange):
     def is_ticker_valid(self, response: req.Response) -> bool:
@@ -254,12 +337,11 @@ class ExchangesIterator:
 
 
 class Exchanges:
-    def __init__(self, cache_dir: str = None):
+    def __init__(self, config: Config, cache_dir: str = None):
         self._container = collections.OrderedDict()
+        self.config = config
         self.cache_dir = os.path.expanduser(CACHE_DIR_NAME) if cache_dir is None else cache_dir
-        self.config = None
-
-        self._queue = None
+        self._queue = mp.Manager().Queue()
 
     def __iter__(self):
         return ExchangesIterator(self)
@@ -274,11 +356,12 @@ class Exchanges:
         :param ex: subclass of Exchange to be added
         :return: None
         """
-        if not ex.disabled:
-            if ex.code in self._container:
-                raise ValueError('Exchange with key "{}" already exists.'.format(ex.code))
-            ex.cache_dir = os.path.join(self.cache_dir, ex.code)
-            self._container[ex.code] = ex
+        if ex.code in self._container:
+            raise ValueError('Exchange with key "{}" already exists.'.format(ex.code))
+
+        ex.cache_dir = os.path.join(self.cache_dir, ex.code)
+        ex.config = self.config
+        self._container[ex.code] = ex
 
     def get(self, idx_or_key) -> Optional[Exchange]:
         if isinstance(idx_or_key, int):
@@ -295,14 +378,36 @@ class Exchanges:
         keys = list(self._container.keys())
         return self._container.get(keys[idx])
 
-    def init(self, config: Config):
-        self.config = config
+    def filter_exchanges(self) -> None:
+        """
+        Cleans up exchange container either removing disabled exchanges, or if config.exchange_filter
+        is set, removing all but matching the filter.
 
-        self._queue = mp.Manager().Queue()
+        :return:
+        """
+        to_be_removed = []
+        if self.config.exchange_filter is None:
+            for _, ex in self._container.items():
+                if ex.disabled:
+                    to_be_removed.append(ex)
+        else:
+            ex_filter = self.config.exchange_filter
+            self.verbose('Filtering exchanges: "{}"'.format(ex_filter))
+            for _, ex in self._container.items():
+                if ex.code.find(ex_filter) >= 0 or ex.name.find(ex_filter) >= 0:
+                    self.verbose('  {} ({}) matches'.format(ex.name, ex.code))
+                    ex.disabled = False
+                else:
+                    to_be_removed.append(ex.code)
 
-    def process_exchanges(self, currencies: Dict) -> None:
+        for code in to_be_removed:
+            del self._container[code]
+
+    def process_exchanges(self, currencies: Dict[str, Dict]) -> None:
         # Cycling thru all exchanges we need to check to avoid doing single API endpoint flood
         total_number_of_checks = 0
+
+        self.filter_exchanges()
 
         pool = mp.Pool(processes = 6)
         for curr_key, curr_data in currencies.items():
@@ -361,10 +466,18 @@ class Exchanges:
             total = cnt, paired = pair_success_cnt, skipped = pair_skipped_cnt,
             cache_cnt = pair_from_cache, cache_percent = (pair_from_cache * 100) / cnt))
 
+    def d(self, msg):
+        if self.config.debug:
+            print(msg)
+
+    def verbose(self, msg):
+        if self.config.verbose:
+            print(msg)
+
 
 ######################################################################
 
-exchanges = Exchanges(cache_dir = os.path.expanduser(CACHE_DIR_NAME))
+exchanges = Exchanges(config, os.path.expanduser(CACHE_DIR_NAME))
 exchanges.add(
     Exchange(
         # disabled = True,
@@ -381,7 +494,7 @@ exchanges.add(
     ))
 
 exchanges.add(
-    Exchange(
+    Bitstamp(
         # disabled = True,
         code = 'bitstamp-net',
         name = 'Bitstamp',
@@ -564,64 +677,7 @@ def check_icons(currencies: List[str]) -> int:
 
 ######################################################################
 
-def threshold(arg_value: str) -> int:
-    pat = re.compile(r"^([0-9]{1,3})([hdwmy]?)$")
-    match = pat.match(arg_value)
-    if not match:
-        raise argparse.ArgumentTypeError
 
-    val = int(match.group(1))
-    unit = match.group(2)
-
-    if val == 0:
-        raise argparse.ArgumentTypeError
-
-    # in millis
-    MIN = 60 * 1000
-    HOUR = MIN * 60
-    DAY = 24 * HOUR
-
-    multiplier = MIN
-    if unit != '':
-        mm = {
-            'h': HOUR,
-            'd': DAY,
-            'w': 7 * DAY,
-            'm': 30 * DAY,
-            'y': 365 * DAY,
-        }
-        multiplier = mm[unit]
-
-    # returning value in millis
-    return val * multiplier * 60 * 1000
-
-
-######################################################################
-
-parser = argparse.ArgumentParser()
-ag = parser.add_argument_group('Options')
-ag.add_argument(
-    '-t', '--threshold', action = 'store', dest = 'cache_threshold', type = threshold, default = CACHE_THRESHOLD,
-    help = 'Cache validity threshold in format XXXZ where XXX is number in range 1-999, '
-           'Z is (optional) units specifier: "h", "d", "w", "m", "y". If unit is not specified, '
-           'minutes are used. Default value: {}'.format(CACHE_THRESHOLD))
-ag.add_argument('-n', '--nocache', action = 'store_true', dest = 'no_cache', default = False,
-                help = 'Ignore validation result cache and always do the full API check.')
-ag.add_argument('-o', '--out', action = 'store', dest = 'file', type = str,
-                help = 'Optional. Name of JS file to be generated.')
-ag.add_argument('-s', '--show', action = 'store_true', dest = 'show', default = False,
-                help = 'Output generated JS code to stdout.')
-ag.add_argument('-f', '--force', action = 'store_true', dest = 'force',
-                help = 'Enforces ignoring certain issues (missing icons, existing target file).')
-ag.add_argument('-v', '--verbose', action = 'store_true', dest = 'verbose', default = False)
-ag.add_argument('-g', '--nogauge', action = 'store_true', dest = 'no_gauge', default = False)
-ag.add_argument('-d', '--dry-run', action = 'store_true', dest = 'dry_run', default = False)
-config = Config(parser.parse_args())
-
-if config.file is not None and not config.force and os.path.exists(config.file):
-    abort('File already exists: {}'.format(config.file))
-
-exchanges.init(config)
 exchanges.process_exchanges(currencies)
 
 # check for icons of used coins

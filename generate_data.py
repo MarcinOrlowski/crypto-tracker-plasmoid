@@ -520,12 +520,12 @@ exchanges.add(
         code = 'binance-com',
         name = 'Binance',
         url = 'https://binance.com/',
-        api_url = 'https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
+        api_url = 'https://api1.binance.com/api/v3/ticker/price?symbol={crypto}{pair}',
 
         # https://www.binance.com/en/markets
 
         functions = {
-            'getRateFromExchangeData': 'return data[0].price',
+            'getRateFromExchangeData': 'return data.price',
         },
     ))
 

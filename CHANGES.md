@@ -1,3 +1,6 @@
+* dev
+  * Changed Binance API url to use `/v3/ticker/price` endpoint.
+
 * v2.1.0 (2021-05-29)
   * Added support for Binance.
   * Significantly increased number of supported pairs to 365 total.

@@ -177,6 +177,16 @@ currencies = {
     'XMR':  {'name': 'Monero', },
     'XRP':  {'name': 'Ripple', 'symbol': 'Ʀ', },
     'ZEC':  {'name': 'ZCash', },
+    'WBTC':  {'name': 'Wrapped Bitcoin', },
+    'THETA': {'name': 'Theta', },
+    'SOL':  {'name': 'Solana', },
+    'EOS':  {'name': 'EOS', },
+    'XTZ':  {'name': 'Tezos', },
+    'BTT':  {'name': 'BitTorrent', },
+    'BNT':  {'name': 'Bancor', },
+    'ZRX':  {'name': '0x', },
+    '1INCH':{'name': '1inch', },
+    'GLM':  {'name': 'Golem', },
 }
 
 

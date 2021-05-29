@@ -100,12 +100,16 @@ class TestResult:
             cache_file = os.path.join(self.cache_dir, '{}-{}'.format(self.crypto, self.pair))
             if os.path.exists(cache_file):
                 with open(cache_file, 'r') as fh:
-                    cached_data = json.load(fh)
-                    if now() < (cached_data['stamp'] + cache_threshold):
-                        self.rc = cached_data['rc']
-                        self.stamp = cached_data['stamp']
-                        self.cached = True
-                        result = True
+                    try:
+                        cached_data = json.load(fh)
+                        if now() < (cached_data['stamp'] + cache_threshold):
+                            self.rc = cached_data['rc']
+                            self.stamp = cached_data['stamp']
+                            self.cached = True
+                            result = True
+                    except json.JSONDecodeError:
+                        # In case cache file is corrupted.
+                        pass
         return result
 
     def cache_save(self) -> None:
@@ -136,31 +140,19 @@ class Config:
 ######################################################################
 
 class Exchange():
-    def __init__(self, code: str, name: str, url: str, api_url: str, currencies: List[str],
+    def __init__(self, code: str, name: str, url: str, api_url: str,
                  functions: Dict[str, str], disabled: bool = False, cache_dir: str = None,
                  valid_ticker_pairs: List[str] = None):
         self.code = code
         self.name = name
         self.url = url
         self.api_url = api_url
-        self.currencies = currencies
         self.functions = functions
         self.disabled = disabled
 
         self.pairs = collections.OrderedDict()
         self.cache_dir = cache_dir
         self.valid_ticker_pairs = valid_ticker_pairs
-
-    @property
-    def currencies(self) -> List[str]:
-        return self._currencies
-
-    @currencies.setter
-    def currencies(self, val: List[str]) -> None:
-        # cheap trick to remove list duplicates
-        items = list(dict.fromkeys(val))
-        items.sort()
-        self._currencies = items
 
     def is_ticker_valid(self, response) -> bool:
         return response.status_code == req.codes.ok
@@ -308,7 +300,7 @@ class Exchanges:
 
         self._queue = mp.Manager().Queue()
 
-    def process_exchanges(self) -> None:
+    def process_exchanges(self, currencies: Dict) -> None:
         # Cycling thru all exchanges we need to check to avoid doing single API endpoint flood
         total_number_of_checks = 0
 
@@ -351,8 +343,9 @@ class Exchanges:
             if not config.no_gauge:
                 gauge_max = 60
                 gauge_progress = math.floor(gauge_max * (cnt / total_number_of_checks))
-                msg = '[{}{}]: {} of {}'.format('=' * gauge_progress, ' ' * (gauge_max - gauge_progress),
-                                                cnt, total_number_of_checks)
+                # first char in msg is space so console cursor mimics first block (usually)
+                msg = ' {}{}: {} of {}'.format('█' * gauge_progress, '░' * (gauge_max - gauge_progress),
+                                               cnt, total_number_of_checks)
                 print(msg, end = '\r')
 
             cnt += 1
@@ -374,7 +367,7 @@ class Exchanges:
 exchanges = Exchanges(cache_dir = os.path.expanduser(CACHE_DIR_NAME))
 exchanges.add(
     Exchange(
-        disabled = True,
+        # disabled = True,
         code = 'binance-com',
         name = 'Binance',
         url = 'https://binance.com/',
@@ -414,7 +407,7 @@ exchanges.add(
 
 exchanges.add(
     Bitbay(
-        disabled = True,
+        # disabled = True,
         code = 'bitbay-net',
         name = 'BitBay',
         url = 'https://bitbay.net/',
@@ -427,7 +420,7 @@ exchanges.add(
 
 exchanges.add(
     Coinmate(
-        disabled = True,
+        # disabled = True,
         code = 'coinmate-io',
         name = 'Coinmate',
         url = 'https://coinmate.io/',
@@ -441,7 +434,7 @@ exchanges.add(
 
 exchanges.add(
     Kraken(
-        disabled = True,
+        # disabled = True,
 
         code = 'kraken-com',
         name = 'Kraken',
@@ -629,7 +622,7 @@ if config.file is not None and not config.force and os.path.exists(config.file):
     abort('File already exists: {}'.format(config.file))
 
 exchanges.init(config)
-exchanges.process_exchanges()
+exchanges.process_exchanges(currencies)
 
 # check for icons of used coins
 curr = list(currencies.keys())

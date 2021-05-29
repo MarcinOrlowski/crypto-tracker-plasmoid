@@ -51,7 +51,7 @@ function getCryptoName(code) {
 	return name + ' (' + code + ')'
 }
 function getCryptoIcon(code) {
-	return code + '.svg'
+	return code.toLowerCase() + '.svg'
 }
 
 // --------------------------------------------------------------------------------------------

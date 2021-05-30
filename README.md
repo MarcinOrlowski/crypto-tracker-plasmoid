@@ -6,11 +6,6 @@ Plasma/KDE multi crypto currency price tracker widget, with support for multiple
 
 ![Widget vertical](docs/img/widget01.png) ![Widget horizontal](docs/img/widget02.png) ![Widget bg flash](docs/img/widget03.gif)
 
-> Please note that current version may not support exchange or currency pair you like simply because
-> I did not need them. As long as there's JSON ticker available for the given pair on exchange of your
-> choice it can be easily added to the widget. Please [fill a new ticket](https://github.com/MarcinOrlowski/crypto-tracker-plasmoid/issues)
-> for specific exchange, pair to be added.
-
 ---
 
 ## Table of Contents ##

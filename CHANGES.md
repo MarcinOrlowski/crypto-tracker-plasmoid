@@ -2,6 +2,7 @@
   * Changed Binance API url to use `/v3/ticker/price` endpoint.
   * Added 1INCH, BNT, BTT, EOS, GLM, SOL, THETA, WBTC, XTZ, ZRX.
   * Added new 29 pairs among supported exchanges.
+  * Fixed setting not storing number of layout grid column.
 
 * v2.1.0 (2021-05-29)
   * Added support for Binance.

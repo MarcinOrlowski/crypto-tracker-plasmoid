@@ -45,4 +45,7 @@ other apps):
 
     kquitapp5 plasmashell ; kstart5 plasmashell
 
+If you are using LatteDock, then restarting Plasma alone is insufficient and you need to restart dock too:
+
+    setsid latte-dock -r &
 

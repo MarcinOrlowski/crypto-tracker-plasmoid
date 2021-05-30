@@ -18,6 +18,8 @@ Plasma/KDE multi crypto currency price tracker widget, with support for multiple
  * [Changelog](CHANGES.md)
  * [License](#license)
 
+---
+
 ## Additional resources ##
 
  * [Crypto Tracker widget in KDE store](https://store.kde.org/p/1481524/)

@@ -152,6 +152,7 @@ currencies = {
     'USDC': {'name': 'USD Coin', 'symbol': '$C', },
     'USDT': {'name': 'USD Tether', 'symbol': '$T', },
     'XLM':  {'name': 'Stellar', },
+    'SOL':  {'name': 'Solana', },
     'XMR':  {'name': 'Monero', },
     'XRP':  {'name': 'Ripple', 'symbol': 'Ʀ', },
     'ZEC':  {'name': 'ZCash', },

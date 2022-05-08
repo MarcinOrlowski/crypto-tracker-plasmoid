@@ -390,7 +390,8 @@ GridLayout {
 
     function downloadExchangeRate(exchangeId, crypto, pair, callback) {
         var exchange = Crypto.exchanges[exchangeId]
-        var url = exchange.api_url.replace('{crypto}', crypto).replace('{pair}', pair)
+        // var url = exchange.api_url.replace('{crypto}', crypto).replace('{pair}', pair)
+        var url = exchange.getUrl(crypto, pair)
 
         // console.debug(`Download url: '${url}'`)
 

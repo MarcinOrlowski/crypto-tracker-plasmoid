@@ -1,5 +1,6 @@
 * dev
   * Changed Binance API url to use `/v3/ticker/price` endpoint.
+  * Bitstamp ticker queries now lowercase the pairs to make API happy.
   * Added 1INCH, BNT, BTT, EOS, GLM, SOL, THETA, WBTC, XTZ, ZRX.
   * Added new 29 pairs among supported exchanges.
   * Fixed setting not storing number of layout grid column.

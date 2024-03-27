@@ -7,8 +7,11 @@
  * @link      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
  */
 
-import QtQuick 2.0
+import Qt.labs.qmlmodels
 
-ListModel {
+TableModel {
     id: exchangeModel
+    TableModelColumn { display: "exchange" }
+    TableModelColumn { display: "crypto" }
+    TableModelColumn { display: "pair" }
 }

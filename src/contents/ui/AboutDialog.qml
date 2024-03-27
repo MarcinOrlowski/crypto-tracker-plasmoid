@@ -10,17 +10,17 @@
 import QtQuick 2.1
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.3
-import QtQuick.Dialogs 1.3
+import QtQuick.Dialogs
 
 Dialog {
 	visible: false
 	title: i18n('Information')
-	standardButtons: StandardButton.Ok
+	standardButtons: DialogButtonBox.Ok
 
 	width: 600
 	height: 500
-	Layout.minimumWidth: 600
-	Layout.minimumHeight: 500
+	//Layout.minimumWidth: 600
+	//Layout.minimumHeight: 500
 
 	AppInfo { }
 

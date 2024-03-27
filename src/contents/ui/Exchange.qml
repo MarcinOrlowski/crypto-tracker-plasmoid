@@ -16,7 +16,7 @@ import "../js/crypto.js" as Crypto
 GridLayout {
     id: tickerRoot
 
-    columns: 4
+    columns: 6
     rows: 1
 
     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -246,7 +246,7 @@ GridLayout {
         Layout.maximumHeight: 20
         // Layout.alignment: Qt.AlignHCenter
         // fillMode: Image.PreserveAspectFit
-        source: plasmoid.file('', 'images/' + Crypto.getCryptoIcon(crypto))
+        source: '../images/' + Crypto.getCryptoIcon(crypto)
     }
 
     PlasmaComponents.Label {

@@ -25,7 +25,7 @@ ColumnLayout {
 		id: aboutLogo
 		Layout.alignment: Qt.AlignHCenter
 		fillMode: Image.PreserveAspectFit
-		source: plasmoid.file('', 'images/logo.png')
+		source: "../images/logo.png"
 	}
 
 	// metadata access is not available until very recent Plasma

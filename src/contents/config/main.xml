@@ -12,7 +12,7 @@
 		<entry name="containerLayoutRows" type="Int">
 			<default>6</default>
 		</entry>
-		<entry name="containerLayoutColimns" type="Int">
+		<entry name="containerLayoutColumns" type="Int">
 			<default>1</default>
 		</entry>
 

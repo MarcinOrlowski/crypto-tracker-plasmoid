@@ -239,13 +239,12 @@ class TestResult:
 ######################################################################
 
 class Exchange:
-    def __init__(self, code: str, name: str, url: str, api_url: str,
+    def __init__(self, code: str, name: str, url: str, 
                  functions: Dict[str, str], disabled: bool = False, cache_dir: str = None,
                  valid_ticker_pairs: List[str] = None, config: Config = None):
         self.code = code
         self.name = name
         self.url = url
-        self.api_url = api_url
         self.functions = functions
         self.disabled = disabled
 
@@ -310,7 +309,6 @@ class Binance(Exchange):
 
         return True
 
-
 class Bitstamp(Exchange):
     def do_api_call(self, queue, tr: TestResult) -> None:
         url = self.api_url.format(crypto = tr.crypto.lower(), pair = tr.pair.lower())
@@ -319,18 +317,16 @@ class Bitstamp(Exchange):
         self.d('#{sc} isValid:{rc} {url}'.format(url = url, sc = response.status_code, rc = tr.rc))
         queue.put(tr)
 
+# class Bitbay(Exchange):
+#     def is_ticker_valid(self, response: req.Response) -> bool:
+#         if response.status_code != req.codes.ok:
+#             return False
 
-class Bitbay(Exchange):
-    def is_ticker_valid(self, response: req.Response) -> bool:
-        if response.status_code != req.codes.ok:
-            return False
-
-        resp = json.loads(response.text)
-        for field in ['min', 'max', 'last', 'bid', 'ask', ]:
-            if field not in resp:
-                return False
-        return True
-
+#         resp = json.loads(response.text)
+#         for field in ['min', 'max', 'last', 'bid', 'ask', ]:
+#             if field not in resp:
+#                 return False
+#         return True
 
 class Coinmate(Exchange):
     def is_ticker_valid(self, response: req.Response) -> bool:
@@ -530,12 +526,11 @@ exchanges.add(
         code = 'binance-com',
         name = 'Binance',
         url = 'https://binance.com/',
-        api_url = 'https://api1.binance.com/api/v3/ticker/price?symbol={crypto}{pair}',
-
-        # https://www.binance.com/en/markets
 
         functions = {
             'getRateFromExchangeData': 'return data.price',
+            # https://www.binance.com/en/markets
+            'getUrl': 'return `https://api1.binance.com/api/v3/ticker/price?symbol=${crypto}${pair}`',
         },
     ))
 
@@ -545,7 +540,6 @@ exchanges.add(
         code = 'bitstamp-net',
         name = 'Bitstamp',
         url = 'https://bitstamp.net/',
-        api_url = 'https://www.bitstamp.net/api/v2/ticker/{crypto}{pair}',
 
         # as per GET method docs https://www.bitstamp.net/api/#ticker
         valid_ticker_pairs = [
@@ -561,6 +555,7 @@ exchanges.add(
 
         functions = {
             'getRateFromExchangeData': 'return data.ask',
+            'getUrl': 'return `https://www.bitstamp.net/api/v2/ticker/${crypto.toLowerCase()}${pair.toLowerCase()}`'
         },
     ))
 
@@ -570,10 +565,10 @@ exchanges.add(
         code = 'bitbay-net',
         name = 'BitBay',
         url = 'https://bitbay.net/',
-        api_url = 'https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
 
         functions = {
             'getRateFromExchangeData': 'return data.ask',
+            'getUrl': 'return `https://api.zonda.exchange/rest/trading/ticker/${crypto}-${pair}`'
         },
     ))
 
@@ -583,11 +578,11 @@ exchanges.add(
         code = 'coinmate-io',
         name = 'Coinmate',
         url = 'https://coinmate.io/',
-        api_url = 'https://coinmate.io/api/ticker?currencyPair={crypto}_{pair}',
 
         # https://coinmate.io/trade
         functions = {
             'getRateFromExchangeData': 'return data.data.ask',
+            'getUrl': 'return `https://coinmate.io/api/ticker?currencyPair=${crypto}_${pair}`',
         },
     ))
 
@@ -598,7 +593,6 @@ exchanges.add(
         code = 'kraken-com',
         name = 'Kraken',
         url = 'https://kraken.com/',
-        api_url = 'https://api.kraken.com/0/public/Ticker?pair={crypto}{pair}',
 
         # https://support.kraken.com/hc/en-us/articles/360001185506
         # https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken
@@ -606,6 +600,7 @@ exchanges.add(
         functions = {
             # some tricks to work around odd asset naming used in returned response as main key
             'getRateFromExchangeData': "return data.result[Object.keys(data['result'])[0]].a[0]",
+            'getUrl': 'return `https://api.kraken.com/0/public/Ticker?pair=${crypto}${pair}`',
         },
     ))
 
@@ -660,7 +655,9 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
             '\t"{}": {{'.format(ex.code),
             '\t\t"name": "{}",'.format(ex.name),
             '\t\t"url": "{}",'.format(ex.url),
-            '\t\t"api_url": "{}",'.format(ex.api_url),
+            '\t\t"getUrl": function(crypto, pair) {',
+            '\t\t\t{}'.format(ex.functions['getUrl']),
+            '\t\t},',
             '\t\t"getRateFromExchangeData": function(data, crypto, pair) {',
             '\t\t\t{}'.format(ex.functions['getRateFromExchangeData']),
             '\t\t},',

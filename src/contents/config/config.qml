@@ -22,7 +22,7 @@ ConfigModel {
 		source: "config/Layout.qml"
 	}
 	ConfigCategory {
-		name: i18n("About")
+		name: i18n("Credits")
 		icon: "view-visible"
 		source: "config/About.qml"
 	}

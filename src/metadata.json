@@ -1,0 +1,22 @@
+{
+    "KPlugin": {
+        "Id": "com.marcinorlowski.kde.crypto-tracker",
+        "Name": "Crypto Tracker",
+        "Description": "Crypto currency tracker",
+        "Icon": "bitcoin128",
+        "Authors": [
+            {
+                "Name": "Marcin Orlowski",
+                "Email": ""
+            }
+        ],
+        "License": "MIT",
+        "Version": "2.1.0",
+        "Website": "https://github.com/MarcinOrlowski/crypto-tracker-plasmoid"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "KPackageStructure": "Plasma/Applet",
+    "X-KDE-PluginInfo-Author-Url": "http://marcinorlowski.com/",
+    "X-KDE-PluginInfo-UpdateChecker-Url": "https://raw.githubusercontent.com/MarcinOrlowski/crypto-tracker-plasmoid/master/src/metadata.desktop",
+    "X-KDE-PluginInfo-FirstReleaseYear": 2021
+}

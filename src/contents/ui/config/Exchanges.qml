@@ -253,6 +253,9 @@ Item {
 		title: i18n("Exchange")
 		standardButtons: Dialog.Save | Dialog.Cancel
 
+		width: Kirigami.Units.gridUnit * 28
+		height: Kirigami.Units.gridUnit * 36
+
 		onAccepted: {
 			var ex = exchange.toJson()
 			if (selectedRow === -1) {
@@ -263,8 +266,13 @@ Item {
 			saveExchanges();
 		}
 
-		ExchangeConfig {
-			id: exchange
+		contentItem: PlasmaComponents.ScrollView {
+			PlasmaComponents.ScrollBar.horizontal.policy: PlasmaComponents.ScrollBar.AlwaysOff
+
+			ExchangeConfig {
+				id: exchange
+				width: parent.width
+			}
 		}
 	}
 

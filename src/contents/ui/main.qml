@@ -13,7 +13,6 @@ import org.kde.plasma.components as PlasmaComponents
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.plasmoid
 import org.kde.kirigami as Kirigami
-import "../js/meta.js" as Meta
 
 PlasmoidItem {
 	id: root
@@ -21,20 +20,11 @@ PlasmoidItem {
 	// Context menu actions (Plasma 6 declarative style)
 	Plasmoid.contextualActions: [
 		PlasmaCore.Action {
-			text: i18n('About %1…', Meta.title)
-			icon.name: "help-about"
-			onTriggered: aboutDialog.visible = true
-		},
-		PlasmaCore.Action {
 			text: i18n("Check update…")
 			icon.name: "update-none"
 			onTriggered: updateChecker.checkUpdateAvailability(true)
 		}
 	]
-
-	AboutDialog {
-		id: aboutDialog
-	}
 
 	// ------------------------------------------------------------------------------------------------------------------------
 

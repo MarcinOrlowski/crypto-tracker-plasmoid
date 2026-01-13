@@ -144,14 +144,17 @@ Item {
 		ColumnLayout {
 			id: tableActionButtons
 			Layout.alignment: Qt.AlignTop
+			Layout.fillWidth: false
 
 			PlasmaComponents.Button {
+				Layout.preferredWidth: Kirigami.Units.gridUnit * 8
 				text: i18n("Add")
 				icon.name: "list-add"
 				onClicked: addExchange()
 			}
 
 			PlasmaComponents.Button {
+				Layout.preferredWidth: Kirigami.Units.gridUnit * 8
 				text: i18n("Edit")
 				icon.name: "edit-entry"
 				onClicked: editExchange(exchangesList.currentIndex)
@@ -162,6 +165,7 @@ Item {
 			}
 
 			PlasmaComponents.Button {
+				Layout.preferredWidth: Kirigami.Units.gridUnit * 8
 				text: i18n("Remove")
 				icon.name: "list-remove"
 				onClicked: removeExchange(exchangesList.currentIndex)
@@ -172,6 +176,7 @@ Item {
 			}
 
 			PlasmaComponents.Button {
+				Layout.preferredWidth: Kirigami.Units.gridUnit * 8
 				text: i18n("Move Up")
 				icon.name: "arrow-up"
 				onClicked: {
@@ -188,6 +193,7 @@ Item {
 			}
 
 			PlasmaComponents.Button {
+				Layout.preferredWidth: Kirigami.Units.gridUnit * 8
 				text: i18n("Move Down")
 				icon.name: "arrow-down"
 				onClicked: {

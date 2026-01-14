@@ -7,7 +7,7 @@
  * @link      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
  */
 
-import QtQuick 2.1
+import QtQuick
 import "../js/meta.js" as Meta
 
 ClickableLabel {

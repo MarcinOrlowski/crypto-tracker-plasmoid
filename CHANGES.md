@@ -1,4 +1,5 @@
-* dev
+* dev (TBD)
+  * Added support for Plasma 6
   * Changed Binance API url to use `/v3/ticker/price` endpoint.
   * Bitstamp ticker queries now lowercase the pairs to make API happy.
   * Added 1INCH, BNT, BTT, EOS, GLM, SOL, THETA, WBTC, XTZ, ZRX.

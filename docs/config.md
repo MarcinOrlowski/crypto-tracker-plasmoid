@@ -1,8 +1,8 @@
 ![Crypto Tracker Logo](img/logo.png)
 
-Crypto Tracker for KDE
-======================
-Plasma/KDE multi crypto currency price tracker widget, with support for multiple exchanges and currency pairs.
+Crypto Tracker for Plasma 6
+===========================
+Plasma 6/KDE multi crypto currency price tracker widget, with support for multiple exchanges and currency pairs.
 
 ---
 
@@ -69,7 +69,6 @@ This pane controls how the widgets places exchange details in its internal layou
 * **Rows**: Number of rows you want the custom layout grid to use.
 * **Columns**: Number of columns you want the custom layout grid to use.
 * **Transparent background**: When checked, widget background be fully transparent, otherwise theme
-  derrived background is used. **NOTE** this option is not available (hidden) if you use Plasma 5.19
-  or newer, as it offers own, built-in mechanism to set plasmoid transparent background which is 
-  preferred if available.
+  derived background is used. **NOTE** this option is not available (hidden) as Plasma 6 offers its
+  own built-in mechanism to set plasmoid transparent background which is preferred.
 

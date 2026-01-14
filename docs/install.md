@@ -1,14 +1,14 @@
 ![Crypto Tracker Logo](img/logo.png)
 
-Crypto Tracker for KDE
-======================
-Plasma/KDE multi crypto currency price tracker widget, with support for multiple exchanges and currency pairs.
+Crypto Tracker for Plasma 6
+===========================
+Plasma 6/KDE multi crypto currency price tracker widget, with support for multiple exchanges and currency pairs.
 
 ---
 
 ## Installation ##
 
-You should be able to install HTML Clock widget either using built-in Plasma Add-on installer
+You should be able to install Crypto Tracker widget either using built-in Plasma Add-on installer
 or manually, by downloading `*.plasmoid` file either from project
 [Github repository](https://github.com/MarcinOrlowski/crypto-tracker-plasmoid/) or
 from [KDE Store](https://store.kde.org/p/1481524/)
@@ -17,7 +17,7 @@ from [KDE Store](https://store.kde.org/p/1481524/)
 
 To install widget using Plasma built-in mechanism, press right mouse button over your desktop
 or panel and select "Add Widgets..." from the context menu, then "Get new widgets..." eventually
-choosing "Download New Plasma Widgets...". Then search for "HTML Clock" in "Plasma Add-On Installer" window.
+choosing "Download New Plasma Widgets...". Then search for "Crypto Tracker" in "Plasma Add-On Installer" window.
 
 ![Plasma Add-On Installer](img/plasma-installer.png)
 
@@ -28,24 +28,24 @@ Then you can either install it via Plasmashell's GUI, by clicking right mouse bu
 selecting "Add widgets...", then "Get new widgets..." eventually choosing "Install from local file..." and pointing to downloaded
 `*.plasmoid` file.
 
-Alternatively you can install it using your terminal, with help of `kpackagetool5`:
+Alternatively you can install it using your terminal, with help of `kpackagetool6`:
 
-    kpackagetool5 --install /PATH/TO/DOWNLOADED/htmlclock.plasmoid 
+    kpackagetool6 -t Plasma/Applet --install /PATH/TO/DOWNLOADED/crypto-tracker.plasmoid
 
 ## Upgrading ##
 
-If you already have widget running and there's newer release your want to install, use `kpackagetool5`
+If you already have widget running and there's newer release your want to install, use `kpackagetool6`
 with `--upgrade` option. This will update current installation while keeping your settings intact:
 
-    kpackagetool5 --upgrade /PATH/TO/DOWNLOADED/htmlclock.plasmoid
+    kpackagetool6 -t Plasma/Applet --upgrade /PATH/TO/DOWNLOADED/crypto-tracker.plasmoid
 
 **NOTE:** Sometimes, due to Plasma internals, newly installed version may not be instantly seen working,
 so you may want to convince Plasma by doing manual reload (this will **NOT** log you out nor affect
 other apps):
 
-    kquitapp5 plasmashell ; kstart5 plasmashell
+    systemctl --user restart plasma-plasmashell.service
 
-If you are using LatteDock, then restarting Plasma alone is insufficient and you need to restart dock too:
+Alternatively, you can restart the shell manually:
 
-    setsid latte-dock -r &
+    kquitapp6 plasmashell && kstart plasmashell
 

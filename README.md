@@ -32,5 +32,5 @@ Plasma 6/KDE multi crypto currency price tracker widget, with support for multip
 ## License ##
 
  * Written and copyrighted &copy;2021-2026 by Marcin Orlowski <mail (#) marcinorlowski (.) com>
- * Weekday Grid widget is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+ * Crypto Tracker widget is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
 

@@ -1,8 +1,8 @@
-![Crypto Tracker Logo](docs/img/logo.png)
+![Crypto Tracker Logo](img/logo.png)
 
-Crypto Tracker for KDE
-======================
-Plasma/KDE multi crypto currency price tracker widget, with support for multiple exchanges and currency pairs.
+Crypto Tracker for Plasma 6
+===========================
+Plasma 6/KDE multi crypto currency price tracker widget, with support for multiple exchanges and currency pairs.
 
 ---
 
@@ -10,7 +10,7 @@ Plasma/KDE multi crypto currency price tracker widget, with support for multiple
 
 Widget will display separate ticker for each configured exchange:
 
-![Ticker](docs/img/ticker.png)
+![Ticker](img/ticker.png)
 
  1. Crypto icon (optional)
  1. Price trend (calculated in wider time window)

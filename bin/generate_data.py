@@ -5,7 +5,7 @@
 # Crypto Tracker widget for KDE
 #
 # @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
-# @copyright 2021 Marcin Orlowski
+# @copyright 2021-2026 Marcin Orlowski
 # @license   http://www.opensource.org/licenses/mit-license.php MIT
 # @'LINK'      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
 #
@@ -28,9 +28,31 @@ import multiprocessing as mp
 import os
 import re
 import requests as req
+import signal
 import sys
 import time
 from typing import Optional, Callable, Dict, List
+
+
+######################################################################
+
+def abort(msg: str = 'Aborted') -> None:
+    print('*** {}'.format(msg))
+    sys.exit(1)
+
+
+# Returns current timestamp in millis
+def now() -> int:
+    return int(round(time.time() * 1000))
+
+
+######################################################################
+
+def signal_handler(signal, frame):
+    sys.exit(1)
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 ######################################################################
 
@@ -121,40 +143,50 @@ if config.file is not None and not config.force and os.path.exists(config.file):
 ######################################################################
 
 currencies = {
-    'ADA':  {'name': 'Cardano', },
-    'ATOM': {'name': 'Cosmos', },
-    'BCH':  {'name': 'Bitcoin Cash', 'symbol': '฿', },
-    'BNB':  {'name': 'Binance Coin', },
-    'BSV':  {'name': 'Bitcoin SV', },
-    'BTC':  {'name': 'Bitcoin', 'symbol': '₿', },
-    'BTG':  {'name': 'Bitcoin Gold', },
-    'BUSD': {'name': 'Binance USD', 'symbol': 'B$', },
-    'COMP': {'name': 'Compound', },
-    'CZK':  {'name': 'Czech Krown', 'symbol': 'Kč', },
-    'DASH': {'name': 'Dash', },
-    'DOGE': {'name': 'Dogecoin', },
-    'DOT':  {'name': 'Polkadot', },
-    'ETC':  {'name': 'Ethereum Classic', },
-    'ETH':  {'name': 'Ethereum', 'symbol': 'Ξ', },
-    'EUR':  {'name': 'Euro', 'symbol': '€', },
-    'FIL':  {'name': 'Filecoin', },
-    'GAME': {'name': 'GameCredits', },
-    'GBP':  {'name': 'British Pound', 'symbol': '£', },
-    'JPY':  {'name': 'Japanese Yen', 'symbol': '¥', },
-    'LINK': {'name': 'Chainlink', },
-    'LSK':  {'name': 'Lisk', },
-    'LTC':  {'name': 'Litecoin', 'symbol': 'Ł', },
-    'LUNA': {'name': 'Terra', },
-    'MKR':  {'name': 'Maker', },
-    'PLN':  {'name': 'Polish Zloty', 'symbol': 'zł', },
-    'UNI':  {'name': 'Uniswap', },
-    'USD':  {'name': 'US Dollar', 'symbol': '$', },
-    'USDC': {'name': 'USD Coin', 'symbol': '$C', },
-    'USDT': {'name': 'USD Tether', 'symbol': '$T', },
-    'XLM':  {'name': 'Stellar', },
-    'XMR':  {'name': 'Monero', },
-    'XRP':  {'name': 'Ripple', 'symbol': 'Ʀ', },
-    'ZEC':  {'name': 'ZCash', },
+    '1INCH': {'name': '1inch', },
+    'ADA':   {'name': 'Cardano', },
+    'ATOM':  {'name': 'Cosmos', },
+    'BCH':   {'name': 'Bitcoin Cash', 'symbol': '฿', },
+    'BNB':   {'name': 'Binance Coin', },
+    'BNT':   {'name': 'Bancor', },
+    'BSV':   {'name': 'Bitcoin SV', },
+    'BTC':   {'name': 'Bitcoin', 'symbol': '₿', },
+    'BTG':   {'name': 'Bitcoin Gold', },
+    'BTT':   {'name': 'BitTorrent', },
+    'BUSD':  {'name': 'Binance USD', 'symbol': 'B$', },
+    'COMP':  {'name': 'Compound', },
+    'CZK':   {'name': 'Czech Krown', 'symbol': 'Kč', },
+    'DASH':  {'name': 'Dash', },
+    'DOGE':  {'name': 'Dogecoin', },
+    'DOT':   {'name': 'Polkadot', },
+    'EOS':   {'name': 'EOS', },
+    'ETC':   {'name': 'Ethereum Classic', },
+    'ETH':   {'name': 'Ethereum', 'symbol': 'Ξ', },
+    'EUR':   {'name': 'Euro', 'symbol': '€', },
+    'FIL':   {'name': 'Filecoin', },
+    'GAME':  {'name': 'GameCredits', },
+    'GBP':   {'name': 'British Pound', 'symbol': '£', },
+    'GLM':   {'name': 'Golem', },
+    'JPY':   {'name': 'Japanese Yen', 'symbol': '¥', },
+    'LINK':  {'name': 'Chainlink', },
+    'LSK':   {'name': 'Lisk', },
+    'LTC':   {'name': 'Litecoin', 'symbol': 'Ł', },
+    'LUNA':  {'name': 'Terra', },
+    'MKR':   {'name': 'Maker', },
+    'PLN':   {'name': 'Polish Zloty', 'symbol': 'zł', },
+    'SOL':   {'name': 'Solana', },
+    'THETA': {'name': 'Theta', },
+    'UNI':   {'name': 'Uniswap', },
+    'USD':   {'name': 'US Dollar', 'symbol': '$', },
+    'USDC':  {'name': 'USD Coin', 'symbol': '$C', },
+    'USDT':  {'name': 'USD Tether', 'symbol': '$T', },
+    'WBTC':  {'name': 'Wrapped Bitcoin', },
+    'XLM':   {'name': 'Stellar', },
+    'XMR':   {'name': 'Monero', },
+    'XRP':   {'name': 'Ripple', 'symbol': 'Ʀ', },
+    'XTZ':   {'name': 'Tezos', },
+    'ZEC':   {'name': 'ZCash', },
+    'ZRX':   {'name': '0x', },
 }
 
 
@@ -207,14 +239,14 @@ class TestResult:
 ######################################################################
 
 class Exchange:
-    def __init__(self, code: str, name: str, url: str, api_url: str,
-                 functions: Dict[str, str], disabled: bool = False, cache_dir: str = None,
+    def __init__(self, code: str, name: str, url: str, api_url: str = None,
+                 functions: Dict[str, str] = None, disabled: bool = False, cache_dir: str = None,
                  valid_ticker_pairs: List[str] = None, config: Config = None):
         self.code = code
         self.name = name
         self.url = url
         self.api_url = api_url
-        self.functions = functions
+        self.functions = functions if functions else {}
         self.disabled = disabled
 
         self.pairs = collections.OrderedDict()
@@ -265,6 +297,19 @@ class Exchange:
 
 ######################################################################
 
+class Binance(Exchange):
+    def is_ticker_valid(self, response: req.Response) -> bool:
+        if response.status_code != req.codes.ok:
+            return False
+        resp = json.loads(response.text)
+        if not isinstance(resp, List):
+            return False
+        for field in ['id', 'price', 'qty', 'quoteQty', 'time', ]:
+            if field not in resp:
+                return False
+
+        return True
+
 class Bitstamp(Exchange):
     def do_api_call(self, queue, tr: TestResult) -> None:
         url = self.api_url.format(crypto = tr.crypto.lower(), pair = tr.pair.lower())
@@ -272,7 +317,6 @@ class Bitstamp(Exchange):
         tr.rc = self.is_ticker_valid(response)
         self.d('#{sc} isValid:{rc} {url}'.format(url = url, sc = response.status_code, rc = tr.rc))
         queue.put(tr)
-
 
 class Bitbay(Exchange):
     def is_ticker_valid(self, response: req.Response) -> bool:
@@ -284,7 +328,6 @@ class Bitbay(Exchange):
             if field not in resp:
                 return False
         return True
-
 
 class Coinmate(Exchange):
     def is_ticker_valid(self, response: req.Response) -> bool:
@@ -479,17 +522,17 @@ class Exchanges:
 
 exchanges = Exchanges(config, os.path.expanduser(CACHE_DIR_NAME))
 exchanges.add(
-    Exchange(
+    Binance(
         # disabled = True,
         code = 'binance-com',
         name = 'Binance',
         url = 'https://binance.com/',
-        api_url = 'https://api1.binance.com/api/v3/trades?limit=1&symbol={crypto}{pair}',
-
-        # https://www.binance.com/en/markets
+        api_url = 'https://api1.binance.com/api/v3/ticker/price?symbol={crypto}{pair}',
 
         functions = {
-            'getRateFromExchangeData': 'return data[0].price',
+            'getRateFromExchangeData': 'return data.price',
+            # https://www.binance.com/en/markets
+            'getUrl': 'return `https://api1.binance.com/api/v3/ticker/price?symbol=${crypto}${pair}`',
         },
     ))
 
@@ -515,6 +558,7 @@ exchanges.add(
 
         functions = {
             'getRateFromExchangeData': 'return data.ask',
+            'getUrl': 'return `https://www.bitstamp.net/api/v2/ticker/${crypto.toLowerCase()}${pair.toLowerCase()}`'
         },
     ))
 
@@ -524,10 +568,11 @@ exchanges.add(
         code = 'bitbay-net',
         name = 'BitBay',
         url = 'https://bitbay.net/',
-        api_url = 'https://bitbay.net/API/Public/{crypto}{pair}/ticker.json',
+        api_url = 'https://api.zonda.exchange/rest/trading/ticker/{crypto}-{pair}',
 
         functions = {
             'getRateFromExchangeData': 'return data.ask',
+            'getUrl': 'return `https://api.zonda.exchange/rest/trading/ticker/${crypto}-${pair}`'
         },
     ))
 
@@ -542,6 +587,7 @@ exchanges.add(
         # https://coinmate.io/trade
         functions = {
             'getRateFromExchangeData': 'return data.data.ask',
+            'getUrl': 'return `https://coinmate.io/api/ticker?currencyPair=${crypto}_${pair}`',
         },
     ))
 
@@ -560,21 +606,9 @@ exchanges.add(
         functions = {
             # some tricks to work around odd asset naming used in returned response as main key
             'getRateFromExchangeData': "return data.result[Object.keys(data['result'])[0]].a[0]",
+            'getUrl': 'return `https://api.kraken.com/0/public/Ticker?pair=${crypto}${pair}`',
         },
     ))
-
-
-######################################################################
-
-
-def abort(msg: str = 'Aborted') -> None:
-    print('*** {}'.format(msg))
-    sys.exit(1)
-
-
-# Returns current timestamp in millis
-def now() -> int:
-    return int(round(time.time() * 1000))
 
 
 ######################################################################
@@ -627,7 +661,9 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
             '\t"{}": {{'.format(ex.code),
             '\t\t"name": "{}",'.format(ex.name),
             '\t\t"url": "{}",'.format(ex.url),
-            '\t\t"api_url": "{}",'.format(ex.api_url),
+            '\t\t"getUrl": function(crypto, pair) {',
+            '\t\t\t{}'.format(ex.functions['getUrl']),
+            '\t\t},',
             '\t\t"getRateFromExchangeData": function(data, crypto, pair) {',
             '\t\t\t{}'.format(ex.functions['getRateFromExchangeData']),
             '\t\t},',
@@ -652,7 +688,8 @@ def build_exchanges(exchanges: List[Exchange]) -> List[str]:
 ######################################################################
 
 def check_icons(currencies: List[str]) -> int:
-    img_dir = 'src/contents/images/'
+    my_dir = os.path.dirname(os.path.realpath(__file__))
+    img_dir = os.path.join(my_dir, '../src/contents/images/')
 
     ignored = ['CZK', 'EUR', 'GBP', 'JPY', 'PLN', ]
 
@@ -663,7 +700,7 @@ def check_icons(currencies: List[str]) -> int:
             skipped += 1
             continue
 
-        icon_file = os.path.join(img_dir, '{}.svg'.format(pair))
+        icon_file = os.path.join(img_dir, '{}.svg'.format(pair.lower()))
         res = os.path.exists(icon_file)
         if not res:
             if not header_shown:

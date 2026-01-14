@@ -2,13 +2,13 @@
  * Crypto Tracker widget for KDE
  *
  * @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
- * @copyright 2021 Marcin Orlowski
+ * @copyright 2021-2026 Marcin Orlowski
  * @license   http://www.opensource.org/licenses/mit-license.php MIT
  * @link      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
  */
 
-import QtQuick 2.0
-import org.kde.plasma.configuration 2.0
+import QtQuick
+import org.kde.plasma.configuration
 
 ConfigModel {
 	ConfigCategory {
@@ -22,7 +22,7 @@ ConfigModel {
 		source: "config/Layout.qml"
 	}
 	ConfigCategory {
-		name: i18n("About")
+		name: i18n("Credits")
 		icon: "view-visible"
 		source: "config/About.qml"
 	}

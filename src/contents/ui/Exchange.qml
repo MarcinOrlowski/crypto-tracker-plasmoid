@@ -2,25 +2,23 @@
  * Crypto Tracker widget for KDE
  *
  * @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
- * @copyright 2021 Marcin Orlowski
+ * @copyright 2021-2026 Marcin Orlowski
  * @license   http://www.opensource.org/licenses/mit-license.php MIT
  * @link      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
  */
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.1
-import org.kde.plasma.components 3.0 as PlasmaComponents
-import org.kde.plasma.core 2.0 as PlasmaCore
+import QtQuick
+import QtQuick.Layouts
+import org.kde.plasma.components as PlasmaComponents
+import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.plasmoid
 import "../js/crypto.js" as Crypto
 
-GridLayout {
+Item {
     id: tickerRoot
 
-    columns: 4
-    rows: 1
-
-    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-    Layout.fillWidth: true
+    implicitWidth: contentLayout.implicitWidth
+    implicitHeight: contentLayout.implicitHeight
 
     property var json: undefined
 
@@ -103,14 +101,14 @@ GridLayout {
 
     // --------------------------------------------------------------------------------------------
 
-	property var lastTrendingUpdateStamp: 0
-	property var lastTrendingRate: 0
-	property int trendingDirection: 0		// -1, 0, 1
+    property var lastTrendingUpdateStamp: 0
+    property var lastTrendingRate: 0
+    property int trendingDirection: 0		// -1, 0, 1
     property bool trendingCalculated: false
 
     function invalidateExchangeData() {
         lastTrendingUpdateStamp = 0
-        lastTrendingRate: 0
+        lastTrendingRate = 0
         trendingDirection = 0
         trendingCalculated = false
 
@@ -123,28 +121,28 @@ GridLayout {
         rateChangeDirectionCalculated = false
     }
 
-	function updateTrending(rate) {
-		var now = new Date()
-		var updateTrending = false
-		if (lastTrendingUpdateStamp != 0) {
-			if ((now.getTime() - lastTrendingUpdateStamp) >= (trendingTimeSpan * 60 * 1000)) {
-				if (rate > lastTrendingRate) {
-					trendingDirection = 1
-				} else if (currentRate < lastTrendingRate) {
-					trendingDirection = -1
-				} else {
-					trendingDirection = 0
-				}
-				updateTrending = true
+    function updateTrending(rate) {
+        var now = new Date()
+        var updateTrending = false
+        if (lastTrendingUpdateStamp != 0) {
+            if ((now.getTime() - lastTrendingUpdateStamp) >= (trendingTimeSpan * 60 * 1000)) {
+                if (rate > lastTrendingRate) {
+                    trendingDirection = 1
+                } else if (currentRate < lastTrendingRate) {
+                    trendingDirection = -1
+                } else {
+                    trendingDirection = 0
+                }
+                updateTrending = true
                 trendingCalculated = true
-			}
-		}
+            }
+        }
 
-		if (lastTrendingUpdateStamp == 0 || updateTrending) {
-			lastTrendingUpdateStamp = now.getTime()
-			lastTrendingRate = rate
-		}
-	}
+        if (lastTrendingUpdateStamp == 0 || updateTrending) {
+            lastTrendingUpdateStamp = now.getTime()
+            lastTrendingRate = rate
+        }
+    }
 
     function getTrendingMarkerText() {
         // https://unicode-table.com/en/sets/arrow-symbols/
@@ -160,19 +158,6 @@ GridLayout {
         }
 
         return rateText
-    }
-
-    // --------------------------------------------------------------------------------------------
-
-    MouseArea {
-        id: mouseArea
-        anchors.fill: parent
-        onClicked: {
-            if (!dataDownloadInProgress) {
-                tickerRoot.opacity = 0.5
-                fetchRate(exchange, crypto, pair)
-            }
-        }
     }
 
     // --------------------------------------------------------------------------------------------
@@ -213,90 +198,98 @@ GridLayout {
 
     // --------------------------------------------------------------------------------------------
 
-    // must be first item in the layout hierarchy to stay behind all other elements
+    // Background for flash effect - must be behind content
     Rectangle {
         id: bgWall
         anchors.fill: parent
         opacity: 0
+        z: -1
     }
 
-	Timer {
+    Timer {
         id: bgWallFadeTimer
         interval: 100
-		running: false
-		repeat: true
-		triggeredOnStart: false
-		onTriggered: {
+        running: false
+        repeat: true
+        triggeredOnStart: false
+        onTriggered: {
             bgWall.opacity = (bgWall.opacity > 0) ? (bgWall.opacity -= 0.1) : 0
             running = (bgWall.opacity !== 0)
         }
-	}
+    }
+
+    // MouseArea for click handling
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        z: 1
+        onClicked: {
+            if (!dataDownloadInProgress) {
+                tickerRoot.opacity = 0.5
+                fetchRate(exchange, crypto, pair)
+            }
+        }
+    }
 
     // --------------------------------------------------------------------------------------------
 
-    Image {
-        id: cryptoIcon
-        visible: !hideCryptoLogo
+    RowLayout {
+        id: contentLayout
+        anchors.centerIn: parent
 
-        width: 20
-        height: 20
-        Layout.minimumWidth: 20
-        Layout.minimumHeight: 20
-        Layout.maximumWidth: 20
-        Layout.maximumHeight: 20
-        // Layout.alignment: Qt.AlignHCenter
-        // fillMode: Image.PreserveAspectFit
-        source: plasmoid.file('', 'images/' + Crypto.getCryptoIcon(crypto))
-    }
+        Image {
+            id: cryptoIcon
+            visible: !hideCryptoLogo
 
-    PlasmaComponents.Label {
-        visible: showTrendingMarker
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+            Layout.preferredWidth: 20
+            Layout.preferredHeight: 20
+            Layout.minimumWidth: 20
+            Layout.minimumHeight: 20
+            Layout.maximumWidth: 20
+            Layout.maximumHeight: 20
+            source: crypto ? Qt.resolvedUrl('../images/' + Crypto.getCryptoIcon(crypto)) : ''
+        }
 
-        Layout.alignment: Qt.AlignHCenter
-        // Layout.fillWidth: true
-        height: 20
-        textFormat: Text.RichText
-        fontSizeMode: Text.Fit
-        // minimumPixelSize: bitcoinIcon.width * 0.7
-        minimumPixelSize: 8
-        // font.pixelSize: 12
-        text: getTrendingMarkerText()
-    }
+        PlasmaComponents.Label {
+            visible: showTrendingMarker
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
 
-    PlasmaComponents.Label {
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+            Layout.alignment: Qt.AlignHCenter
+            height: 20
+            textFormat: Text.RichText
+            fontSizeMode: Text.Fit
+            minimumPixelSize: 8
+            text: getTrendingMarkerText()
+        }
 
-        Layout.alignment: Qt.AlignHCenter
-        // Layout.fillWidth: true
-        height: 20
+        PlasmaComponents.Label {
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
 
-        textFormat: Text.RichText
-        fontSizeMode: Text.Fit
-        // minimumPixelSize: bitcoinIcon.width * 0.7
-        minimumPixelSize: 8
-        // font.pixelSize: 12
-        text: getCurrentRateText()
-    }
+            Layout.alignment: Qt.AlignHCenter
+            height: 20
 
-    PlasmaComponents.Label {
-        visible: showPriceChangeMarker
+            textFormat: Text.RichText
+            fontSizeMode: Text.Fit
+            minimumPixelSize: 8
+            text: getCurrentRateText()
+        }
 
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+        PlasmaComponents.Label {
+            visible: showPriceChangeMarker
 
-        Layout.alignment: Qt.AlignHCenter
-        // Layout.fillWidth: true
-        height: 16
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
 
-        textFormat: Text.RichText
-        fontSizeMode: Text.Fit
-        // minimumPixelSize: bitcoinIcon.width * 0.7
-        minimumPixelSize: 8
-        // font.pixelSize: 12
-        text: getRateChangeMarkerText()
+            Layout.alignment: Qt.AlignHCenter
+            height: 16
+
+            textFormat: Text.RichText
+            fontSizeMode: Text.Fit
+            minimumPixelSize: 8
+            text: getRateChangeMarkerText()
+        }
     }
 
     // --------------------------------------------------------------------------------------------
@@ -327,13 +320,13 @@ GridLayout {
         }
     }
 
-	Timer {
-		interval: refreshRate * 60 * 1000
-		running: true
-		repeat: true
-		triggeredOnStart: true
-		onTriggered: fetchRate(exchange, crypto, pair)
-	}
+    Timer {
+        interval: refreshRate * 60 * 1000
+        running: true
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: fetchRate(exchange, crypto, pair)
+    }
 
     // --------------------------------------------------------------------------------------------
 
@@ -390,7 +383,8 @@ GridLayout {
 
     function downloadExchangeRate(exchangeId, crypto, pair, callback) {
         var exchange = Crypto.exchanges[exchangeId]
-        var url = exchange.api_url.replace('{crypto}', crypto).replace('{pair}', pair)
+        // var url = exchange.api_url.replace('{crypto}', crypto).replace('{pair}', pair)
+        var url = exchange.getUrl(crypto, pair)
 
         // console.debug(`Download url: '${url}'`)
 

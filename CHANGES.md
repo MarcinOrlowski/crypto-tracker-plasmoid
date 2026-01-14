@@ -1,3 +1,11 @@
+* v3.0.0 (2026-01-14)
+  * Added support for Plasma 6
+  * Changed Binance API url to use `/v3/ticker/price` endpoint.
+  * Bitstamp ticker queries now lowercase the pairs to make API happy.
+  * Added 1INCH, BNT, BTT, EOS, GLM, SOL, THETA, WBTC, XTZ, ZRX.
+  * Added new 29 pairs among supported exchanges.
+  * Fixed setting not storing number of layout grid column.
+
 * v2.1.0 (2021-05-29)
   * Added support for Binance.
   * Significantly increased number of supported pairs to 365 total.

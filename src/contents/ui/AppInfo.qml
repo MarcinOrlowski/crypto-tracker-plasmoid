@@ -2,15 +2,15 @@
  * Crypto Tracker widget for KDE
  *
  * @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
- * @copyright 2021 Marcin Orlowski
+ * @copyright 2021-2026 Marcin Orlowski
  * @license   http://www.opensource.org/licenses/mit-license.php MIT
  * @link      https://github.com/MarcinOrlowski/crypto-tracker-plasmoid
  */
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.1
-import QtQuick.Controls 2.3
-import org.kde.plasma.components 3.0 as PlasmaComponents
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import org.kde.plasma.components as PlasmaComponents
 import "../js/meta.js" as Meta
 
 ColumnLayout {
@@ -25,7 +25,7 @@ ColumnLayout {
 		id: aboutLogo
 		Layout.alignment: Qt.AlignHCenter
 		fillMode: Image.PreserveAspectFit
-		source: plasmoid.file('', 'images/logo.png')
+		source: Qt.resolvedUrl('../images/logo.png')
 	}
 
 	// metadata access is not available until very recent Plasma

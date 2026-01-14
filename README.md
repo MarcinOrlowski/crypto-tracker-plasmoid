@@ -1,8 +1,8 @@
 ![Crypto Tracker Logo](docs/img/logo.png)
 
-Crypto Tracker for KDE
-======================
-Plasma/KDE multi crypto currency price tracker widget, with support for multiple exchanges and currency pairs.
+Crypto Tracker for Plasma 6
+===========================
+Plasma 6/KDE multi crypto currency price tracker widget, with support for multiple exchanges and currency pairs.
 
 ![Widget vertical](docs/img/widget01.png) ![Widget horizontal](docs/img/widget02.png) ![Widget bg flash](docs/img/widget03.gif)
 
@@ -31,6 +31,6 @@ Plasma/KDE multi crypto currency price tracker widget, with support for multiple
 
 ## License ##
 
- * Written and copyrighted &copy;2021 by Marcin Orlowski <mail (#) marcinorlowski (.) com>
+ * Written and copyrighted &copy;2021-2026 by Marcin Orlowski <mail (#) marcinorlowski (.) com>
  * Weekday Grid widget is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
 

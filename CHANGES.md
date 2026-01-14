@@ -1,4 +1,4 @@
-* dev (TBD)
+* v3.0.0 (2026-01-14)
   * Added support for Plasma 6
   * Changed Binance API url to use `/v3/ticker/price` endpoint.
   * Bitstamp ticker queries now lowercase the pairs to make API happy.

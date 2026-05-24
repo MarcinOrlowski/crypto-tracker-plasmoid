@@ -247,6 +247,11 @@ Item {
             Layout.minimumHeight: 20
             Layout.maximumWidth: 20
             Layout.maximumHeight: 20
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            mipmap: true
+            sourceSize.width: Math.ceil(width * Screen.devicePixelRatio)
+            sourceSize.height: Math.ceil(height * Screen.devicePixelRatio)
             source: crypto ? Qt.resolvedUrl('../images/' + Crypto.getCryptoIcon(crypto)) : ''
         }
 
